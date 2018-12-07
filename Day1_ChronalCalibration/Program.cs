@@ -13,7 +13,10 @@ namespace Day1_ChronalCalibration
             switch (choice)
             {
                 case "0":
-                    ReadFromInputFile();
+                    Console.Write(
+                        "Do you want to process the data normally or look for repeating frequencies? (0,1): ");
+                    var repeatChoice = Convert.ToBoolean(Convert.ToInt16(Console.ReadLine().Trim()));
+                    ReadFromInputFile(repeatChoice);
                     break;
                 case "1":
                     ManualInput();
@@ -23,18 +26,37 @@ namespace Day1_ChronalCalibration
             Console.ReadLine();
         }
 
-        private static void ReadFromInputFile()
+        private static void ProcessData(string[] data, int frequency)
         {
-            var fileContents = File.ReadAllLines("inputs.txt");
-            var frequency = 0;
+            foreach (var line in data)
+            {
+                Console.WriteLine(line);
+                var operation = line[0];
+                var value = Convert.ToInt32(line.Substring(1, line.Length - 1));
 
+                switch (operation)
+                {
+                    case '+':
+                        frequency = frequency + value;
+                        break;
+                    case '-':
+                        frequency = frequency - value;
+                        break;
+                }
+            }
+
+            Console.WriteLine($"Final frequency: {frequency}");
+        }
+
+        private static void ProcessDataForRepeats(string[] data, int frequency)
+        {
+            // Frequency dictionary to keep track of frequencies we've seen.
             var frequencyDic = new Dictionary<int, bool>();
             frequencyDic[0] = true;
 
             var foundRepeat = false;
-
             while (foundRepeat == false)
-                foreach (var line in fileContents)
+                foreach (var line in data)
                 {
                     Console.WriteLine(line);
                     var shouldExit = false;
@@ -65,9 +87,23 @@ namespace Day1_ChronalCalibration
                         break;
                     }
                 }
+        }
 
 
-            Console.WriteLine($"Final frequency: {frequency}");
+        private static void ReadFromInputFile(bool findRepeatingFrequency)
+        {
+            var fileContents = File.ReadAllLines("inputs.txt");
+            var frequency = 0;
+
+            switch (findRepeatingFrequency)
+            {
+                case true:
+                    ProcessDataForRepeats(fileContents, frequency);
+                    break;
+                case false:
+                    ProcessData(fileContents, frequency);
+                    break;
+            }
         }
 
         private static void ManualInput()
