@@ -48,5 +48,22 @@ namespace Day2_InventoryManagement
             Console.WriteLine($"Checksum: {checkSum}");
             Console.ReadLine();
         }
+
+
+        // The hamming distance is the number of characters in string that would have to change in order for it to equal another string.
+        static int GetHammingDistance(string a, string b)
+        {
+            if (a.Length != b.Length)
+                throw new ArgumentException("Hamming distance can only be calculated on strings of equal length");
+
+            var result = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[0] != b[0])
+                    result++;
+            }
+
+            return result;
+        }
     }
 }
