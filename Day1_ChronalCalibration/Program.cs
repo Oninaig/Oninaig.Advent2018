@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day1_ChronalCalibration
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("Read from file or enter values manually? (0,1)");
             var choice = Console.ReadLine().Trim();
@@ -22,14 +19,14 @@ namespace Day1_ChronalCalibration
                     ManualInput();
                     break;
             }
-           
+
             Console.ReadLine();
         }
 
-        static void ReadFromInputFile()
+        private static void ReadFromInputFile()
         {
             var fileContents = File.ReadAllLines("inputs.txt");
-            int frequency = 0;
+            var frequency = 0;
 
             var frequencyDic = new Dictionary<int, bool>();
             frequencyDic[0] = true;
@@ -37,36 +34,25 @@ namespace Day1_ChronalCalibration
             var foundRepeat = false;
 
             while (foundRepeat == false)
-            {
                 foreach (var line in fileContents)
                 {
                     Console.WriteLine(line);
-                    bool shouldExit = false;
-
-           
+                    var shouldExit = false;
                     var operation = line[0];
-                    int value = Convert.ToInt32(line.Substring(1, line.Length-1));
-                    var firstRepeat = -1;
-
-                
-
+                    var value = Convert.ToInt32(line.Substring(1, line.Length - 1));
                     switch (operation)
                     {
                         case '+':
                             frequency = frequency + value;
                             if (frequencyDic.ContainsKey(frequency))
-                            {
                                 shouldExit = true;
-                            }
                             else
                                 frequencyDic[frequency] = true;
                             break;
                         case '-':
                             frequency = frequency - value;
                             if (frequencyDic.ContainsKey(frequency))
-                            {
                                 shouldExit = true;
-                            }
                             else
                                 frequencyDic[frequency] = true;
                             break;
@@ -79,16 +65,15 @@ namespace Day1_ChronalCalibration
                         break;
                     }
                 }
-            }
-            
+
 
             Console.WriteLine($"Final frequency: {frequency}");
         }
 
-        static void ManualInput()
+        private static void ManualInput()
         {
             Console.WriteLine("Please enter the first input frequency.");
-            int frequency = 0;
+            var frequency = 0;
             var input = Console.ReadLine().Trim();
             var inputs = new List<string>();
 
@@ -96,7 +81,7 @@ namespace Day1_ChronalCalibration
             while (!input.ToLower().Equals("q") && !input.Equals(string.Empty))
             {
                 var operation = input[0];
-                int value = Convert.ToInt32(input.Substring(1, input.Length-1));
+                var value = Convert.ToInt32(input.Substring(1, input.Length - 1));
 
 
                 switch (operation)
