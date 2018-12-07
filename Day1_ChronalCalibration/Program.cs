@@ -34,54 +34,53 @@ namespace Day1_ChronalCalibration
             var frequencyDic = new Dictionary<int, bool>();
             frequencyDic[0] = true;
 
-            var inputsDic = new Dictionary<string, bool>();
+            var foundRepeat = false;
 
-            foreach (var line in fileContents)
+            while (foundRepeat == false)
             {
-                Console.WriteLine(line);
-                bool shouldExit = false;
+                foreach (var line in fileContents)
+                {
+                    Console.WriteLine(line);
+                    bool shouldExit = false;
 
-                //add the raw input to our inputs dictionary
-                if(inputsDic.ContainsKey(line))
-                    
-                inputsDic[line] = true;
-                
-                var operation = line[0];
-                int value = Convert.ToInt32(line.Substring(1, line.Length-1));
-                var firstRepeat = -1;
+           
+                    var operation = line[0];
+                    int value = Convert.ToInt32(line.Substring(1, line.Length-1));
+                    var firstRepeat = -1;
 
                 
 
-                switch (operation)
-                {
-                    case '+':
-                        frequency = frequency + value;
-                        if (frequencyDic.ContainsKey(frequency))
-                        {
-                            firstRepeat = frequency;
-                            shouldExit = true;
-                        }
-                        else
-                            frequencyDic[frequency] = true;
-                        break;
-                    case '-':
-                        frequency = frequency - value;
-                        if (frequencyDic.ContainsKey(frequency))
-                        {
-                            firstRepeat = frequency;
-                            shouldExit = true;
-                        }
-                        else
-                            frequencyDic[frequency] = true;
-                        break;
-                }
+                    switch (operation)
+                    {
+                        case '+':
+                            frequency = frequency + value;
+                            if (frequencyDic.ContainsKey(frequency))
+                            {
+                                shouldExit = true;
+                            }
+                            else
+                                frequencyDic[frequency] = true;
+                            break;
+                        case '-':
+                            frequency = frequency - value;
+                            if (frequencyDic.ContainsKey(frequency))
+                            {
+                                shouldExit = true;
+                            }
+                            else
+                                frequencyDic[frequency] = true;
+                            break;
+                    }
 
-                if (shouldExit)
-                {
-                    Console.WriteLine($"Found first duplicate frequency: {frequency}");
-                    break;
+                    if (shouldExit)
+                    {
+                        Console.WriteLine($"Found first duplicate frequency: {frequency}");
+                        foundRepeat = true;
+                        break;
+                    }
                 }
             }
+            
 
             Console.WriteLine($"Final frequency: {frequency}");
         }
