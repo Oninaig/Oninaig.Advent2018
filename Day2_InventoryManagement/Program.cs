@@ -65,5 +65,29 @@ namespace Day2_InventoryManagement
 
             return result;
         }
+
+        static void ProcessHammingDistances(string[] data)
+        {
+            // Our hamming data will be a dictionary where the key is the string and the value is a dictionary containing keys which are the indexes of all other strings along with their hamming distance for the value
+            var hammingData = new Dictionary<string, Dictionary<int, int>>();
+
+            // Horribly inefficient but can't think of another way right now.
+            for (int i = 0; i < data.Length; i++)
+            {
+                var currString = data[i];
+                var hammingDistances = new Dictionary<int, int>();
+                for (int j = 0; j < data.Length; j++)
+                {
+                    if (j == i)
+                        continue;
+                    var distance = GetHammingDistance(currString, data[j]);
+                    hammingDistances[j] = distance;
+                }
+
+                hammingData[currString] = hammingDistances;
+            }
+
+
+        }
     }
 }
