@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day1_ChronalCalibration", "Day1_ChronalCalibration\Day1_ChronalCalibration.csproj", "{FFCB927A-D79D-490A-A4B3-CD90BAC21D58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day2_InventoryManagement", "Day2_InventoryManagement\Day2_InventoryManagement.csproj", "{09CF8D63-9F67-467A-82C0-36D09B08864C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{FFCB927A-D79D-490A-A4B3-CD90BAC21D58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFCB927A-D79D-490A-A4B3-CD90BAC21D58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFCB927A-D79D-490A-A4B3-CD90BAC21D58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09CF8D63-9F67-467A-82C0-36D09B08864C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09CF8D63-9F67-467A-82C0-36D09B08864C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09CF8D63-9F67-467A-82C0-36D09B08864C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09CF8D63-9F67-467A-82C0-36D09B08864C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
