@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,7 +47,20 @@ namespace Day2_InventoryManagement
 
             var checkSum = twoCounts * threeCounts;
             Console.WriteLine($"Checksum: {checkSum}");
+            PartTwo(inputs);
             Console.ReadLine();
+        }
+
+        static void PartTwo(string[] data)
+        {
+            var result = ProcessHammingDistances(data);
+
+            //We only care about the two strings that differ by exactly 1 character.
+            var resultsCollection = result.Where(x => x.Value.ContainsValue(1)).Select(x => x.Key);
+            var similar = (string.Join("",resultsCollection)).GroupBy(c=>c).Where(c=>c.Count() > 1).Select(c=>c.Key);
+            
+            //Now we can find the string that only contains the characters that are similar by removing the one different char from the first string.
+            var finalResult = string.Join("",resultsCollection.First().Where(x => similar.Contains(x)));
         }
 
 
@@ -59,14 +73,14 @@ namespace Day2_InventoryManagement
             var result = 0;
             for (int i = 0; i < a.Length; i++)
             {
-                if (a[0] != b[0])
+                if (a[i] != b[i])
                     result++;
             }
 
             return result;
         }
 
-        static void ProcessHammingDistances(string[] data)
+        static Dictionary<string, Dictionary<int, int>> ProcessHammingDistances(string[] data)
         {
             // Our hamming data will be a dictionary where the key is the string and the value is a dictionary containing keys which are the indexes of all other strings along with their hamming distance for the value
             var hammingData = new Dictionary<string, Dictionary<int, int>>();
@@ -75,6 +89,7 @@ namespace Day2_InventoryManagement
             for (int i = 0; i < data.Length; i++)
             {
                 var currString = data[i];
+                //hammingDistance is the dictionary specific to a string that contains the hamming distance of itself compared to all other strings in the original data array. Basically, each string keeps a dictionary of how similar it is to other strings.
                 var hammingDistances = new Dictionary<int, int>();
                 for (int j = 0; j < data.Length; j++)
                 {
@@ -87,7 +102,7 @@ namespace Day2_InventoryManagement
                 hammingData[currString] = hammingDistances;
             }
 
-
+            return hammingData;
         }
     }
 }
