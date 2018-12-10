@@ -32,7 +32,7 @@ namespace Day3_NoMatterHowYouSliceIt
             }
 
             var overlap = mainFabric.Overlap();
-
+            mainFabric.FindNoOverlap();
             Console.ReadLine();
         }
     }
