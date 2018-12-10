@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day1_ChronalCalibration", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day2_InventoryManagement", "Day2_InventoryManagement\Day2_InventoryManagement.csproj", "{09CF8D63-9F67-467A-82C0-36D09B08864C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day3_NoMatterHowYouSliceIt", "Day3_NoMatterHowYouSliceIt\Day3_NoMatterHowYouSliceIt.csproj", "{3B99420E-CA93-40CA-B9AE-EC784113AB42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{09CF8D63-9F67-467A-82C0-36D09B08864C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09CF8D63-9F67-467A-82C0-36D09B08864C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09CF8D63-9F67-467A-82C0-36D09B08864C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B99420E-CA93-40CA-B9AE-EC784113AB42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B99420E-CA93-40CA-B9AE-EC784113AB42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B99420E-CA93-40CA-B9AE-EC784113AB42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B99420E-CA93-40CA-B9AE-EC784113AB42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
