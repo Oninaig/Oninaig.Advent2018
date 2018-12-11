@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Day3_NoMatterHowYouSliceIt
 {
     public class Claims
     {
-        public List<string> ClaimIds { get; set; }
-
         public Claims(List<string> claimIds)
         {
             ClaimIds = claimIds;
@@ -17,8 +11,10 @@ namespace Day3_NoMatterHowYouSliceIt
 
         public Claims()
         {
-            this.ClaimIds = new List<string>();
+            ClaimIds = new List<string>();
         }
+
+        public List<string> ClaimIds { get; set; }
 
         public void AddClaim(string ID)
         {

@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day4_ReposeRecord
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var data = File.ReadAllLines("input.txt");
             var processor = new GuardRecordProcessor(data);
@@ -17,7 +14,8 @@ namespace Day4_ReposeRecord
             var sleepiestMinute = sleepiest.Stats.SleepCountDict.OrderBy(x => x.Value).Last();
 
 
-            Console.WriteLine($"---PART ONE---{Environment.NewLine}Sleepiest Guard: {sleepiest.GuardId} | Sleepiest Minute: {sleepiestMinute.Key} | ID * SleepiestMinute = {Convert.ToInt32(sleepiest.GuardId.TrimStart('#')) * sleepiestMinute.Key}{Environment.NewLine}");
+            Console.WriteLine(
+                $"---PART ONE---{Environment.NewLine}Sleepiest Guard: {sleepiest.GuardId} | Sleepiest Minute: {sleepiestMinute.Key} | ID * SleepiestMinute = {Convert.ToInt32(sleepiest.GuardId.TrimStart('#')) * sleepiestMinute.Key}{Environment.NewLine}");
 
             var consistentlySleepyGuard = processor.ConsistentSleepyGuard();
             Console.WriteLine(
