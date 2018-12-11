@@ -16,9 +16,10 @@ namespace Day4_ReposeRecord
             this.SleepCountDict = new Dictionary<int, int>();
         }
 
+        public int TopMinuteAsleep { get; set; }
+        public int TopMinuteAsleepCount { get; set; }
         public List<GuardSleepEntry> SleepEntries { get; set; }
 
-        public double MostPopularSleepMinute { get; set; }
         public double MillsAwake { get;set; }
         public double MillsAsleep { get; set; }
         public Dictionary<int, int> SleepCountDict{get; set; }
@@ -42,11 +43,16 @@ namespace Day4_ReposeRecord
             get { return SecondsAsleep / 1000; }
         }
 
+        public void PostProcessSleepData()
+        {
+            var topMinute = SleepCountDict.OrderBy(x => x.Value).DefaultIfEmpty(new KeyValuePair<int, int>(-1, -1))
+                .LastOrDefault();
+            TopMinuteAsleep = topMinute.Key;
+            TopMinuteAsleepCount = topMinute.Value;
+        }
 
         public void AddSleepEntry(DateTime start, DateTime end)
         {
-            //SleepEntries.Add(new GuardSleepEntry(start, end));
-
             //A dictionary is a reference type, so it is not possible to pass by value, although references to a dictionary are values.
             SleepEntries.Add(new GuardSleepEntry(start, end, SleepCountDict));
         }
@@ -154,6 +160,7 @@ namespace Day4_ReposeRecord
 
             Stats.MillsAsleep = sleepCounter;
             Stats.MillsAwake = awakeCounter;
+            Stats.PostProcessSleepData();
         }
     }
 

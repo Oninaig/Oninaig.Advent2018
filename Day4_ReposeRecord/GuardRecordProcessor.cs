@@ -26,6 +26,14 @@ namespace Day4_ReposeRecord
             return sleepyGuard;
         }
 
+        public GuardRecord ConsistentSleepyGuard()
+        {
+            //Find guard that sleeps at the same time the most often
+            GuardRecords.Sort((x, y) => x.Stats.TopMinuteAsleepCount.CompareTo(y.Stats.TopMinuteAsleepCount));
+            var consistentSleepyGuard = GuardRecords.Last();
+            return consistentSleepyGuard;
+        }
+
         private List<GuardRecord> initGuardRecords(string[] data)
         {
             foreach (var rawGRecord in data)

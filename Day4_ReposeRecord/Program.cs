@@ -17,7 +17,14 @@ namespace Day4_ReposeRecord
             var sleepiestMinute = sleepiest.Stats.SleepCountDict.OrderBy(x => x.Value).Last();
 
 
-            Console.WriteLine($"Sleepiest Guard: {sleepiest.GuardId} | Sleepiest Minute: {sleepiestMinute.Key} | ID * SleepiestMinute = {Convert.ToInt32(sleepiest.GuardId.TrimStart('#')) * sleepiestMinute.Key}");
+            Console.WriteLine($"---PART ONE---{Environment.NewLine}Sleepiest Guard: {sleepiest.GuardId} | Sleepiest Minute: {sleepiestMinute.Key} | ID * SleepiestMinute = {Convert.ToInt32(sleepiest.GuardId.TrimStart('#')) * sleepiestMinute.Key}{Environment.NewLine}");
+
+            var consistentlySleepyGuard = processor.ConsistentSleepyGuard();
+            Console.WriteLine(
+                $"---PART TWO---{Environment.NewLine}Consisnently Sleepy Guard: {consistentlySleepyGuard.GuardId} " +
+                $"| Sleepiest Minute with Count: {consistentlySleepyGuard.Stats.TopMinuteAsleep} :: {consistentlySleepyGuard.Stats.TopMinuteAsleepCount} " +
+                $"| ID * Top Sleepy Minute = {Convert.ToInt32(consistentlySleepyGuard.GuardId.TrimStart('#')) * consistentlySleepyGuard.Stats.TopMinuteAsleep}");
+
             Console.ReadLine();
         }
     }
