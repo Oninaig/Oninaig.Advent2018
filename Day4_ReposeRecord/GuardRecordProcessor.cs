@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day4_ReposeRecord
 {
     public class GuardRecordProcessor
     {
-        public List<GuardRecord> GuardRecords { get; set; }
-
-        public List<GuardAction> AllActions { get;set; }
         public GuardRecordProcessor(string[] rawData)
         {
             AllActions = new List<GuardAction>();
             GuardRecords = initGuardRecords(rawData);
         }
+
+        public List<GuardRecord> GuardRecords { get; set; }
+
+        public List<GuardAction> AllActions { get; set; }
 
         public GuardRecord SleepiestGuard()
         {
@@ -52,9 +50,6 @@ namespace Day4_ReposeRecord
                     var guardId = otherData.Split(' ').First(x => x.StartsWith("#"));
                     var newAction = new GuardAction(tStmp, GuardActionType.BeginShift).GetSetGuard(guardId);
                     AllActions.Add(newAction);
-                    //var newRecord = new GuardRecord(guardId);
-                    //newRecord.AddAction(tStmp, GuardActionType.BeginShift);
-
                 }
 
                 if (otherData.Contains("falls asleep"))
@@ -67,22 +62,19 @@ namespace Day4_ReposeRecord
                     var newAction = new GuardAction(tStmp, GuardActionType.WakeUp);
                     AllActions.Add(newAction);
                 }
-
             }
 
 
             //Sort our action list
-            ((List<GuardAction>) AllActions).Sort((x, y) => DateTime.Compare(x.TimeStamp, y.TimeStamp));
+            AllActions.Sort((x, y) => DateTime.Compare(x.TimeStamp, y.TimeStamp));
 
             //Run through the list and set guardIds for all actions based on the most recent guardId found that doesn't equal the current guardId being processed.
             var currGuardId = string.Empty;
             foreach (var act in AllActions)
-            {
                 if (!act.MissingGuardId && act.GuardId != currGuardId)
                     currGuardId = act.GuardId;
                 else
                     act.GuardId = currGuardId;
-            }
 
             //Group our sorted and processed list by GuardId
             var grouped = AllActions.GroupBy(x => x.GuardId);
@@ -92,18 +84,13 @@ namespace Day4_ReposeRecord
             foreach (var group in grouped)
             {
                 var newRecord = new GuardRecord(group.Key);
-                foreach (var value in group)
-                {
-                    newRecord.AddAction(value);
-                }
+                foreach (var value in group) newRecord.AddAction(value);
 
                 newRecord.ProcessStats();
                 GuardRecords.Add(newRecord);
             }
 
 
-
-            //placeholderx
             return GuardRecords;
         }
     }
