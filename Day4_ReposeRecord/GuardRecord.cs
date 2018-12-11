@@ -14,13 +14,15 @@ namespace Day4_ReposeRecord
             SleepCountDict = new Dictionary<int, int>();
         }
 
+        public List<GuardSleepEntry> SleepEntries { get; set; }
+
+        public Dictionary<int, int> SleepCountDict { get; set; }
+
         public int TopMinuteAsleep { get; set; }
         public int TopMinuteAsleepCount { get; set; }
-        public List<GuardSleepEntry> SleepEntries { get; set; }
 
         public double MillsAwake { get; set; }
         public double MillsAsleep { get; set; }
-        public Dictionary<int, int> SleepCountDict { get; set; }
 
         public double SecondsAwake => MillsAwake / 1000;
 
