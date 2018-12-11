@@ -13,7 +13,7 @@ namespace Day4_ReposeRecord
         public GuardStats()
         {
             this.SleepEntries = new List<GuardSleepEntry>();
-            this.SleepCountDict = new Dictionary<DateTime, int>();
+            this.SleepCountDict = new Dictionary<int, int>();
         }
 
         public List<GuardSleepEntry> SleepEntries { get; set; }
@@ -21,7 +21,7 @@ namespace Day4_ReposeRecord
         public double MostPopularSleepMinute { get; set; }
         public double MillsAwake { get;set; }
         public double MillsAsleep { get; set; }
-        public Dictionary<DateTime, int> SleepCountDict{get; set; }
+        public Dictionary<int, int> SleepCountDict{get; set; }
         public double SecondsAwake
         {
             get { return MillsAwake / 1000; }
@@ -42,9 +42,13 @@ namespace Day4_ReposeRecord
             get { return SecondsAsleep / 1000; }
         }
 
+
         public void AddSleepEntry(DateTime start, DateTime end)
         {
-            SleepEntries.Add(new GuardSleepEntry(start, end));
+            //SleepEntries.Add(new GuardSleepEntry(start, end));
+
+            //A dictionary is a reference type, so it is not possible to pass by value, although references to a dictionary are values.
+            SleepEntries.Add(new GuardSleepEntry(start, end, SleepCountDict));
         }
     }
 
@@ -57,26 +61,26 @@ namespace Day4_ReposeRecord
         public GuardSleepEntry()
         {
         }
-
-        public GuardSleepEntry(DateTime sleepStart, DateTime sleepEnd)
+        
+        public GuardSleepEntry(DateTime sleepStart, DateTime sleepEnd, Dictionary<int, int> sleepCountDict)
         {
             SleepStart = sleepStart;
             SleepEnd = sleepEnd;
-            initSleepTimes();
+            initSleepTimes(sleepCountDict);
         }
-        public GuardSleepEntry(DateTime sleepStart, DateTime sleepEnd, ref Dictionary<DateTime, int> SleepCountDict)
-        {
-            SleepStart = sleepStart;
-            SleepEnd = sleepEnd;
-            initSleepTimes();
-        }
-        private void initSleepTimes()
+        private void initSleepTimes(Dictionary<int, int> sleepCountDict)
         {
             if (TimesAsleep == null)
                 TimesAsleep = new List<DateTime>();
 
-            for (DateTime timeAsleep = SleepStart; timeAsleep <= SleepEnd; timeAsleep = timeAsleep.AddMinutes(1))
+            for (DateTime timeAsleep = SleepStart; timeAsleep < SleepEnd; timeAsleep = timeAsleep.AddMinutes(1))
+            {
                 TimesAsleep.Add(timeAsleep);
+                if (sleepCountDict.ContainsKey(timeAsleep.Minute))
+                    sleepCountDict[timeAsleep.Minute] = sleepCountDict[timeAsleep.Minute] + 1;
+                else
+                    sleepCountDict[timeAsleep.Minute] = 1;
+            }
         }
     }
 

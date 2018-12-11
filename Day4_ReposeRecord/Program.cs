@@ -13,6 +13,11 @@ namespace Day4_ReposeRecord
         {
             var data = File.ReadAllLines("input.txt");
             var processor = new GuardRecordProcessor(data);
+            var sleepiest = processor.SleepiestGuard();
+            var sleepiestMinute = sleepiest.Stats.SleepCountDict.OrderBy(x => x.Value).Last();
+
+
+            Console.WriteLine($"Sleepiest Guard: {sleepiest.GuardId} | Sleepiest Minute: {sleepiestMinute.Key} | ID * SleepiestMinute = {Convert.ToInt32(sleepiest.GuardId.TrimStart('#')) * sleepiestMinute.Key}");
             Console.ReadLine();
         }
     }
