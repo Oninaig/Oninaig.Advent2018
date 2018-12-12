@@ -84,6 +84,34 @@ namespace Day5_AlchemicalReduction
             return true;
         }
 
+        public bool StartReaction()
+        {
+
+            if (IsEmpty())
+                Console.WriteLine("No chain to start reaction", Color.Red);
+            else
+            {
+                var current = FirstPolymer;
+                while (current != null)
+                {
+                    if (((Polymer)current).React())
+                    {
+                        Console.Write($"Deleting {current.Data} and {current.Next.Data}...", Color.DarkOrange);
+                        
+                        //We are reacting, run through our checks and deletions
+                        //First check: If current.next.next is null AND current.prev is NOT null, it means current.next was
+                        //the last element in the chain so we need to set current.prev.next to null.
+                        if (current.Previous != null && current.Next.Next == null)
+                        {
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+
         public void Dump()
         {
             if (IsEmpty())

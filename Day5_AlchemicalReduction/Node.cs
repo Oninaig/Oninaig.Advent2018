@@ -12,7 +12,8 @@ namespace Day5_AlchemicalReduction
         public T Data { get; set; }
         public Node<T> Next { get;set; }
         public Node<T> Previous { get;set; }
-
+        public bool HasPrevious => Previous != null;
+        public bool HasNext => Next != null;
         protected Node()
         {
             this.Id = Guid.NewGuid();
