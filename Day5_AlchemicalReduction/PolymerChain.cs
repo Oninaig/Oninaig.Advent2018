@@ -82,23 +82,12 @@ namespace Day5_AlchemicalReduction
                 return false;
             }
 
-            var current = FirstPolymer;
-            while (current != null)
-            {
-                var next = current.Next;
-                if (current.Id == polymer.Id)
-                {
-                    if (current == FirstPolymer)
-                        FirstPolymer = current.Next;
-                    if (current == LastPolymer)
-                        LastPolymer = current.Previous;
-                    current.Destroy();
-                    PolymerCount--;
-                }
-                current = next;
-
-            }
-
+            if (polymer == FirstPolymer)
+                FirstPolymer = polymer.Next;
+            if (polymer == LastPolymer)
+                LastPolymer = polymer.Previous;
+            polymer.Destroy();
+            PolymerCount--;
             return true;
         }
 
@@ -137,7 +126,7 @@ namespace Day5_AlchemicalReduction
                         stack.Push(current.Next);
                     }
 
-                    if (counter % 50 == 0)
+                    if (counter % 2000000 == 0)
                         Console.WriteLine($"{counter} operations complete...");
                 }
             }
