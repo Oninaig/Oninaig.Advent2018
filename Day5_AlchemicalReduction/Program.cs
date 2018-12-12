@@ -72,23 +72,31 @@ namespace Day5_AlchemicalReduction
 
             #region actual puzzle
 
-            var input = File.ReadAllText("input.txt");
-            var puzzleChain = new PolymerChain();
-            foreach (var poly in input)
-                puzzleChain.InsertPolymerAtBack(poly);
+            //var input = File.ReadAllText("input.txt");
+            //var puzzleChain = new PolymerChain();
+            //foreach (var poly in input)
+            //    puzzleChain.InsertPolymerAtBack(poly);
 
-            Console.WriteLine($"PolymerCount: {puzzleChain.PolymerCount}");
-            var verbose = false;
-            if (input.Length < 100)
-                verbose = true;
+            //Console.WriteLine($"PolymerCount: {puzzleChain.PolymerCount}");
+            //var verbose = false;
+            //if (input.Length < 100)
+            //    verbose = true;
 
-            puzzleChain.StartReactionSansRecursion(verbose);
-            Console.WriteLine($"PolymerCount: {puzzleChain.PolymerCount}");
-            if (verbose)
-                puzzleChain.Dump();
+            //puzzleChain.StartReactionSansRecursion(verbose);
+            //Console.WriteLine($"PolymerCount: {puzzleChain.PolymerCount}");
+            //if (verbose)
+            //    puzzleChain.Dump();
 
             #endregion
 
+            #region part two
+            var input = File.ReadAllText("input.txt");
+            var manager = new PolymerChainManager(input);
+            manager.FindBestCharToRemove();
+
+            
+
+            #endregion
             Console.ReadLine();
         }
     }

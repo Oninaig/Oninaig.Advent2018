@@ -52,10 +52,6 @@ namespace Day5_AlchemicalReduction
 
             if (Data == ((Polymer) Next).Inverted())
             {
-                //Next.Destroy();
-                //Destroy();
-                if (verbose)
-                    Console.WriteLine($"{Data} REACTS WITH {Next.Data}!", Color.Orange);
                 return true;
             }
 

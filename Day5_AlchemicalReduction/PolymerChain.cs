@@ -10,13 +10,13 @@ namespace Day5_AlchemicalReduction
     {
         public Node<char> FirstPolymer;
         public Node<char> LastPolymer;
+        public int PolymerCount { get; set; }
 
         public PolymerChain()
         {
             FirstPolymer = LastPolymer = null;
         }
 
-        public int PolymerCount { get; set; }
 
         public bool IsEmpty()
         {
