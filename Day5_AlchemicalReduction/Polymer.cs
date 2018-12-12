@@ -41,5 +41,6 @@ namespace Day5_AlchemicalReduction
             this.Data = '#';
         }
 
+
     }
 }
