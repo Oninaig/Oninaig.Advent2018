@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Console = Colorful.Console;
+﻿using System.IO;
+using Colorful;
+
 namespace Day5_AlchemicalReduction
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             #region TESTS
-            
+
             //Console.WriteLine($"{new string('#', 5)} Insert at front tests {new string('#', 5)}", Color.LightSkyBlue);
             //var chain = new PolymerChain();
             //chain.InsertPolymerAtFront('A');
@@ -83,13 +78,13 @@ namespace Day5_AlchemicalReduction
                 puzzleChain.InsertPolymerAtBack(poly);
 
             Console.WriteLine($"PolymerCount: {puzzleChain.PolymerCount}");
-            bool verbose = false;
+            var verbose = false;
             if (input.Length < 100)
                 verbose = true;
-                
+
             puzzleChain.StartReactionSansRecursion(verbose);
             Console.WriteLine($"PolymerCount: {puzzleChain.PolymerCount}");
-            if(verbose)
+            if (verbose)
                 puzzleChain.Dump();
 
             #endregion

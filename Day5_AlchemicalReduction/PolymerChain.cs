@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,12 +10,13 @@ namespace Day5_AlchemicalReduction
     {
         public Node<char> FirstPolymer;
         public Node<char> LastPolymer;
-        public int PolymerCount { get; set; }
 
         public PolymerChain()
         {
             FirstPolymer = LastPolymer = null;
         }
+
+        public int PolymerCount { get; set; }
 
         public bool IsEmpty()
         {
@@ -38,6 +38,7 @@ namespace Day5_AlchemicalReduction
                 LastPolymer = newPoly;
             }
         }
+
         public void InsertPolymerAtBack(Polymer polymerData)
         {
             PolymerCount++;
@@ -52,6 +53,7 @@ namespace Day5_AlchemicalReduction
                 LastPolymer = polymerData;
             }
         }
+
         public void InsertPolymerAtFront(char polymerData)
         {
             PolymerCount++;
@@ -65,7 +67,9 @@ namespace Day5_AlchemicalReduction
         {
             PolymerCount++;
             if (IsEmpty())
+            {
                 FirstPolymer = LastPolymer = polymerData;
+            }
             else
             {
                 FirstPolymer.Previous = polymerData;
@@ -93,17 +97,17 @@ namespace Day5_AlchemicalReduction
 
         public void StartReactionSansRecursion(bool verbose = false)
         {
-            var counter = 0;
             if (IsEmpty())
+            {
                 Console.WriteLine("No chain to start reaction", Color.Red);
+            }
             else
             {
                 var stack = new Stack<Node<char>>();
                 stack.Push(FirstPolymer);
-                bool finished = false;
+                var finished = false;
                 while (stack.Count > 0 && !finished)
                 {
-                    counter++;
                     var current = stack.Pop();
                     if (current == LastPolymer)
                         finished = true;
@@ -112,11 +116,12 @@ namespace Day5_AlchemicalReduction
                         if (verbose)
                         {
                             Console.WriteLine($"Deleting {current.Data} and {current.Next.Data}...", Color.DarkOrange);
-                            Dump(new Guid[] {current.Id, current.Next.Id});
+                            Dump(new[] {current.Id, current.Next.Id});
                         }
 
                         Delete((Polymer) current.Next);
                         Delete((Polymer) current);
+
                         //maintain stack if necessary
                         if (FirstPolymer != null)
                             stack.Push(FirstPolymer);
@@ -125,51 +130,16 @@ namespace Day5_AlchemicalReduction
                     {
                         stack.Push(current.Next);
                     }
-
-                    if (counter % 2000000 == 0)
-                        Console.WriteLine($"{counter} operations complete...");
                 }
             }
         }
-
-        public bool StartReaction(bool verbose = false)
-        {
-
-            if (IsEmpty())
-                Console.WriteLine("No chain to start reaction", Color.Red);
-            else
-            {
-                var current = FirstPolymer;
-                while (current != null)
-                {
-                    if (((Polymer)current).React(verbose))
-                    {
-                        if (verbose)
-                        {
-                            Console.WriteLine($"Deleting {current.Data} and {current.Next.Data}...", Color.DarkOrange);
-                            Dump(new Guid[] {current.Id, current.Next.Id});
-                        }
-                            
-                        Delete((Polymer) current.Next);
-                        Delete((Polymer) current);
-                        break;
-                    }
-                    else
-                    {
-                        current = current.Next;
-                    }
-                }
-                if(current == null)
-                    return true;
-            }
-            return StartReaction(verbose);
-        }
-
 
         public void Dump(IEnumerable<Guid> standouts = null)
         {
             if (IsEmpty())
+            {
                 Console.WriteLine("Empty chain", Color.Red);
+            }
             else
             {
                 var current = FirstPolymer;
@@ -181,7 +151,8 @@ namespace Day5_AlchemicalReduction
 
                     //standouts != null && standouts.Contains(current.Id) ?
 
-                    Console.Write(current.Data, standouts != null && standouts.Contains(current.Id) ? Color.Red : Color.Gray);
+                    Console.Write(current.Data,
+                        standouts != null && standouts.Contains(current.Id) ? Color.Red : Color.Gray);
 
                     //We will use magenta to show links
                     if (current.Next?.Id != current.Id && current.Next != null)
