@@ -44,7 +44,7 @@ namespace Day5_AlchemicalReduction
             return (char) (Data ^ ' ');
         }
 
-        public bool React()
+        public bool React(bool verbose = false)
         {
             //Cant react with anything if you aren't followed by anything
             if (!HasNext)
@@ -54,7 +54,8 @@ namespace Day5_AlchemicalReduction
             {
                 //Next.Destroy();
                 //Destroy();
-                Console.WriteLine($"{Data} REACTS WITH {Next.Data}!", Color.Orange);
+                if(verbose)
+                    Console.WriteLine($"{Data} REACTS WITH {Next.Data}!", Color.Orange);
                 return true;
             }
             
