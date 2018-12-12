@@ -10,6 +10,19 @@ namespace Day5_AlchemicalReduction
     {
         static void Main(string[] args)
         {
+            var chain = new PolymerChain();
+            chain.InsertPolymerAtFront('A');
+            var middlePolymer = new Polymer('B');
+            chain.InsertPolymerAtFront(middlePolymer);
+            chain.InsertPolymerAtFront('C');
+            chain.Dump();
+
+
+            Console.WriteLine("Deleting middle node");
+            chain.Delete(middlePolymer);
+            chain.Dump();
+
+            Console.ReadLine();
         }
     }
 }
