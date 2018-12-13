@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
+using Colorful;
 
 namespace Day5_AlchemicalReduction
 {
     public class Polymer : Node<char>
     {
-        public bool HasPrevious => Previous != null;
-        public bool HasNext => Next != null;
-
-        public Polymer(char element) : base()
+        public Polymer(char element)
         {
-            this.Data = element;
+            Data = element;
         }
 
-        public Polymer(char element, Node<char> next) : base()
+        public Polymer(char element, Node<char> next)
         {
-            this.Data = element;
-            this.Next = next;
+            Data = element;
+            Next = next;
             next.Previous = this;
         }
 
@@ -27,19 +21,41 @@ namespace Day5_AlchemicalReduction
         {
             if (HasPrevious && HasNext)
             {
-                Previous.Next = this.Next;
-                Next.Previous = this.Previous;
+                Previous.Next = Next;
+                Next.Previous = Previous;
             }
             else if (HasNext && !HasPrevious)
+            {
                 Next.Previous = null;
+            }
             else if (HasPrevious && !HasNext)
+            {
                 Previous.Next = null;
+            }
 
 
-            this.Next = null;
-            this.Previous = null;
-            this.Data = '#';
+            Next = null;
+            Previous = null;
+            Data = '#';
         }
 
+        public char Inverted()
+        {
+            return (char) (Data ^ ' ');
+        }
+
+        public bool React(bool verbose = false)
+        {
+            //Cant react with anything if you aren't followed by anything
+            if (!HasNext)
+                return false;
+
+            if (Data == ((Polymer) Next).Inverted())
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
