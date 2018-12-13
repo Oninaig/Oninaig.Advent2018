@@ -44,8 +44,12 @@ namespace Day6_ChronalCoordinates.Grid
             if (seedCoords != null)
             {
                 var arr = seedCoords.ToArray();
+                //Risky to use just ints for our data because our "empty" coordinate uses a period char, which is equivalent to 46 when expressed as an int. 
+                //Lets change this to use letters intead.
                 for (int i = 0; i < arr.Length; i++)
-                    SetCoordinateData(arr[i], i);
+                {
+                    SetCoordinateData(arr[i], $"A{i}");
+                }
             }
             
         }
