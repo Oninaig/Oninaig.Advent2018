@@ -19,7 +19,7 @@ namespace Day6_ChronalCoordinates
                 manager.AddCoordinate(line.Split(',')[0], line.Split(',')[1]);
 
             manager.InitMasterGrid();
-            Console.WriteLine($"Master Grid Area: {manager.GridMeta.MaxArea()}");
+            Console.WriteLine($"Master Grid Area: {manager.Grid.MaxArea()}");
             Console.ReadLine();
         }
     }

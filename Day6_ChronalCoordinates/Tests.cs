@@ -104,8 +104,8 @@ namespace Day6_ChronalCoordinates
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(topRight, manager.GridMeta.TopRight);
-                Assert.AreEqual(bottomLeft, manager.GridMeta.BottomLeft);
+                Assert.AreEqual(topRight, manager.Grid.MetaData.TopRight);
+                Assert.AreEqual(bottomLeft, manager.Grid.MetaData.BottomLeft);
             });
         }
     }

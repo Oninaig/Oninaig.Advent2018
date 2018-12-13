@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Day6_ChronalCoordinates
+﻿namespace Day6_ChronalCoordinates.Grid
 {
     public struct MasterGridMeta
     {
@@ -20,9 +14,6 @@ namespace Day6_ChronalCoordinates
             BottomLeft = new Coordinate(minX, minY);
         }
 
-        public int MaxArea()
-        {
-            return (MaxX - MinX) * (MaxY - MinY);
-        }
+       
     }
 }
