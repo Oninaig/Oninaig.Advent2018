@@ -17,8 +17,10 @@ namespace Day6_ChronalCoordinates.Grid
             BottomLeft = new Coordinate(minX, minY);
             Length = MaxX - MinX;
             Width = MaxY - MinY;
-            RelativeOffsetX = MinX < 0 ? Math.Abs(MinX) : -MinX;
-            RelativeOffsetY = MinY < 0 ? Math.Abs(MinY) : -MinY;
+            RelativeOffsetX = 0;
+            RelativeOffsetY = 0;
+            //RelativeOffsetX = MinX < 0 ? Math.Abs(MinX) : -MinX;
+            //RelativeOffsetY = MinY < 0 ? Math.Abs(MinY) : -MinY;
         }
 
        

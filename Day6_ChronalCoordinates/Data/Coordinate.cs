@@ -17,6 +17,11 @@ namespace Day6_ChronalCoordinates.Data
         {
             return $"({x}, {y})";
         }
+
+        public override bool Equals(object obj)
+        {
+            return (this.x == ((Coordinate) obj).x && this.y == ((Coordinate) obj).y);
+        }
     }
 
     public static class CoordinateExtensions

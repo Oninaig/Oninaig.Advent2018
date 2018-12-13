@@ -56,9 +56,14 @@ namespace Day6_ChronalCoordinates
 
             if (lazy)
                 return;
-            Grid.InitGridData();
+            Grid.InitGridData(Coordinates);
+            Grid.FillGrid(Coordinates);
         }
 
+        public void PrintGrid()
+        {
+            Grid.PrintGrid();
+        }
 
     }
 }

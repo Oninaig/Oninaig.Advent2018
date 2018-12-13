@@ -15,9 +15,15 @@ namespace Day6_ChronalCoordinates
 
             //Sample grid
             var sampleManager = new ChronalCoordinateManager();
-            sampleManager.AddCoordinate(5, 5);
-            sampleManager.AddCoordinate(-1, -2);
+            sampleManager.AddCoordinate(1,1);
+            sampleManager.AddCoordinate(1,6);
+            sampleManager.AddCoordinate(8,3);
+            sampleManager.AddCoordinate(3,4);
+            sampleManager.AddCoordinate(5,5);
+            sampleManager.AddCoordinate(8,9);
             sampleManager.InitMasterGrid();
+            sampleManager.PrintGrid();
+
             Console.ReadLine();
 
             var input = File.ReadAllLines("puzzleinput.txt");
