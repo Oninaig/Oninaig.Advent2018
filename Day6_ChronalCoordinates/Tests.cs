@@ -1,39 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using Day6_ChronalCoordinates.Data;
 using NUnit.Framework;
+
 namespace Day6_ChronalCoordinates
 {
     [TestFixture]
     public class Tests
     {
         [Test]
-        public void ManhattanDistanceTwoPoints()
+        public void HighetLowestPoint()
         {
-            
-            var p1 = new Coordinate(5, 4);
-            var p2 = new Coordinate(4, 6);
+            var input = File.ReadAllLines(TestContext.CurrentContext.TestDirectory + "\\testinput.txt");
+            Console.WriteLine($"Lines found: {input.Length}");
 
-            var distance = p1.ManhanttanDistance(p2);
-            Assert.AreEqual(3, distance);
+            var manager = new ChronalCoordinateManager();
+            foreach (var line in input)
+                manager.AddCoordinate(line.Split(',')[0], line.Split(',')[1]);
 
+            manager.InitMasterGrid();
+
+            var topRight = new Coordinate(352, 2000);
+            var bottomLeft = new Coordinate(-100, -423);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(topRight, manager.Grid.MetaData.TopRight);
+                Assert.AreEqual(bottomLeft, manager.Grid.MetaData.BottomLeft);
+            });
         }
 
         [Test]
         public void ManhattanDistanceTotal()
         {
-            var points = new List<Coordinate>()
+            var points = new List<Coordinate>
             {
                 new Coordinate(-1, 5),
                 new Coordinate(1, 6),
                 new Coordinate(3, 5),
                 new Coordinate(2, 3)
-
             };
 
             var totalDistance = 0;
@@ -42,10 +48,10 @@ namespace Day6_ChronalCoordinates
 
             var thirdDistance = 0;
 
-            for (int i = 0; i < points.Count; i++)
+            for (var i = 0; i < points.Count; i++)
             {
                 var currPoint = points[i];
-                for (int j = i+1; j < points.Count; j++)
+                for (var j = i + 1; j < points.Count; j++)
                 {
                     var nextPoint = points[j];
                     var distance = currPoint.ManhanttanDistance(nextPoint);
@@ -81,33 +87,21 @@ namespace Day6_ChronalCoordinates
         }
 
         [Test]
+        public void ManhattanDistanceTwoPoints()
+        {
+            var p1 = new Coordinate(5, 4);
+            var p2 = new Coordinate(4, 6);
+
+            var distance = p1.ManhanttanDistance(p2);
+            Assert.AreEqual(3, distance);
+        }
+
+        [Test]
         public void TestCanReadFile()
         {
             var input = File.ReadAllLines(TestContext.CurrentContext.TestDirectory + "\\testinput.txt");
             Console.WriteLine(input.Length);
             Assert.Greater(input.Length, 0);
-        }
-
-        [Test]
-        public void HighetLowestPoint()
-        {
-            var input = File.ReadAllLines(TestContext.CurrentContext.TestDirectory + "\\testinput.txt");
-            Console.WriteLine($"Lines found: {input.Length}");
-            
-            var manager= new ChronalCoordinateManager();
-            foreach (var line in input)
-                manager.AddCoordinate(line.Split(',')[0], line.Split(',')[1]);
-
-            manager.InitMasterGrid();
-
-            var topRight = new Coordinate(352, 2000);
-            var bottomLeft = new Coordinate(-100, -423);
-
-            Assert.Multiple(() =>
-            {
-                Assert.AreEqual(topRight, manager.Grid.MetaData.TopRight);
-                Assert.AreEqual(bottomLeft, manager.Grid.MetaData.BottomLeft);
-            });
         }
     }
 }

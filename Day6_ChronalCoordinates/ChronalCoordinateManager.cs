@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Day6_ChronalCoordinates.Data;
 using Day6_ChronalCoordinates.Grid;
 
@@ -10,16 +8,16 @@ namespace Day6_ChronalCoordinates
 {
     public class ChronalCoordinateManager
     {
-        public IList<Coordinate> Coordinates { get; private set; }
-        public IList<CoordinateData> CoordinatesWithData { get; private set; }
-
-        public MasterGrid Grid { get; private set; }
-
         public ChronalCoordinateManager()
         {
-            this.Coordinates = new List<Coordinate>();
-            this.CoordinatesWithData = new List<CoordinateData>();
+            Coordinates = new List<Coordinate>();
+            CoordinatesWithData = new List<CoordinateData>();
         }
+
+        public IList<Coordinate> Coordinates { get; }
+        public IList<CoordinateData> CoordinatesWithData { get; }
+
+        public MasterGrid Grid { get; private set; }
 
         public void AddCoordinate(int x, int y)
         {
@@ -30,11 +28,12 @@ namespace Day6_ChronalCoordinates
         {
             Coordinates.Add(coord);
         }
+
         public void AddCoordinate(string x, string y)
         {
-            if(!Int16.TryParse(x, out Int16 newX))
+            if (!short.TryParse(x, out var newX))
                 throw new ArgumentException($"Cannot parse x value: {x}");
-            if (!Int16.TryParse(y, out Int16 newY))
+            if (!short.TryParse(y, out var newY))
                 throw new ArgumentException($"Cannot parse y value: {y}");
             Coordinates.Add(new Coordinate(newX, newY));
         }
@@ -74,6 +73,5 @@ namespace Day6_ChronalCoordinates
         {
             Grid.FindSafeRegion();
         }
-
     }
 }

@@ -20,7 +20,7 @@ namespace Day6_ChronalCoordinates.Data
 
         public override bool Equals(object obj)
         {
-            return (this.x == ((Coordinate) obj).x && this.y == ((Coordinate) obj).y);
+            return x == ((Coordinate) obj).x && y == ((Coordinate) obj).y;
         }
     }
 

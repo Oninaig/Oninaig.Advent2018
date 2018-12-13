@@ -2,46 +2,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Day6_ChronalCoordinates.Data;
 
 namespace Day6_ChronalCoordinates.Grid
 {
     public class MasterGrid
     {
-        public MasterGridMeta MetaData { get; private set;}
+        private readonly IEnumerator labelEnumerator;
+
+        public MasterGrid()
+        {
+        }
+
+
+        public MasterGrid(int maxX, int maxY, int minX, int minY)
+        {
+            MetaData = new MasterGridMeta(maxX, maxY, minX, minY);
+            labelEnumerator = Constants.AlphabetList.GetEnumerator();
+            labelEnumerator.MoveNext();
+            CoordAreas = new Dictionary<CoordinateData, int>();
+        }
+
+        public MasterGridMeta MetaData { get; }
         public CoordinateData[][] GridData { get; private set; }
         public int GridArrLength => MetaData.MaxX + 1;
         public int GridArrWidth => MetaData.MaxY + 1;
 
-        public Dictionary<CoordinateData, int> CoordAreas { get; private set; }
-
-        private IEnumerator labelEnumerator;
+        public Dictionary<CoordinateData, int> CoordAreas { get; }
 
         public void PrintGrid()
         {
-
-            for (int j = 0; j < GridData[0].Length; j++)
+            for (var j = 0; j < GridData[0].Length; j++)
             {
-                for (int i = 0; i < GridData.GetLength(0); i++)
-                {
-                    Console.Write($"{GridData[i][j].Data} ");
-                }
+                for (var i = 0; i < GridData.GetLength(0); i++) Console.Write($"{GridData[i][j].Data} ");
 
                 Console.WriteLine();
             }
-
-        }
-        public MasterGrid(){}
-
-        
-        public MasterGrid(int maxX, int maxY, int minX, int minY)
-        {
-            this.MetaData = new MasterGridMeta(maxX, maxY, minX, minY);
-            labelEnumerator = Constants.AlphabetList.GetEnumerator();
-            labelEnumerator.MoveNext();
-            this.CoordAreas = new Dictionary<CoordinateData, int>();
         }
 
 
@@ -60,13 +56,12 @@ namespace Day6_ChronalCoordinates.Grid
         public void InitGridData(IEnumerable<Coordinate> seedCoords)
         {
             GridData = new CoordinateData[GridArrLength][];
-            for (int i = 0; i < GridArrLength; i++)
+            for (var i = 0; i < GridArrLength; i++)
             {
                 GridData[i] = new CoordinateData[GridArrWidth];
-                for (int j = 0; j < GridArrWidth; j++)
-                {
-                    GridData[i][j] = new CoordinateData($"{Constants.EmptyCoord}", new Coordinate(i - MetaData.RelativeOffsetX, j - MetaData.RelativeOffsetY), -1);
-                }
+                for (var j = 0; j < GridArrWidth; j++)
+                    GridData[i][j] = new CoordinateData($"{Constants.EmptyCoord}",
+                        new Coordinate(i - MetaData.RelativeOffsetX, j - MetaData.RelativeOffsetY), -1);
             }
 
             if (seedCoords != null)
@@ -75,9 +70,10 @@ namespace Day6_ChronalCoordinates.Grid
                 //Risky to use just ints for our data because our "empty" coordinate uses a period char, which is equivalent to 46 when expressed as an int. 
                 //Lets change this to use letters intead.
                 var resetCount = 0;
-                for (int i = 0; i < arr.Length; i++)
+                for (var i = 0; i < arr.Length; i++)
                 {
-                    var added = SetCoordinateData(arr[i], resetCount > 0 ? $"{labelEnumerator.Current}{resetCount}" : labelEnumerator.Current, -1);
+                    var added = SetCoordinateData(arr[i],
+                        resetCount > 0 ? $"{labelEnumerator.Current}{resetCount}" : labelEnumerator.Current, -1);
 
                     if (!labelEnumerator.MoveNext())
                     {
@@ -85,6 +81,7 @@ namespace Day6_ChronalCoordinates.Grid
                         labelEnumerator.Reset();
                         labelEnumerator.MoveNext();
                     }
+
                     CoordAreas.Add(added, -1);
                 }
             }
@@ -97,7 +94,7 @@ namespace Day6_ChronalCoordinates.Grid
             var currY = cData.Coords.y;
 
             //Check left
-            for (int i = currX; i >= 0; i--)
+            for (var i = currX; i >= 0; i--)
             {
                 if (GridData[i][currY].Data.ToString().ToUpper() != cData.Data.ToString().ToUpper())
                     break;
@@ -106,7 +103,7 @@ namespace Day6_ChronalCoordinates.Grid
             }
 
             //check right
-            for (int i = currX; i < GridData.GetLength(0); i++)
+            for (var i = currX; i < GridData.GetLength(0); i++)
             {
                 if (GridData[i][currY].Data.ToString().ToUpper() != cData.Data.ToString().ToUpper())
                     break;
@@ -115,7 +112,7 @@ namespace Day6_ChronalCoordinates.Grid
             }
 
             //check up
-            for (int i = currY; i >=0 ; i--)
+            for (var i = currY; i >= 0; i--)
             {
                 if (GridData[currX][i].Data.ToString().ToUpper() != cData.Data.ToString().ToUpper())
                     break;
@@ -124,7 +121,7 @@ namespace Day6_ChronalCoordinates.Grid
             }
 
             //check down
-            for (int i = currY; i < GridData[0].Length ; i++)
+            for (var i = currY; i < GridData[0].Length; i++)
             {
                 if (GridData[currX][i].Data.ToString().ToUpper() != cData.Data.ToString().ToUpper())
                     break;
@@ -138,7 +135,7 @@ namespace Day6_ChronalCoordinates.Grid
         public void FindAreas()
         {
             var largestArea = 0;
-            string largestAreaLabel = "XXXX";
+            var largestAreaLabel = "XXXX";
             foreach (var kvp in CoordAreas)
             {
                 //We are going to definte "infinite" as whether or not there is a way for a coordinate to reach the "edge" of the array without hitting
@@ -149,7 +146,9 @@ namespace Day6_ChronalCoordinates.Grid
                 var coordData = kvp.Key;
                 var isInfinite = IsInfinite(coordData);
                 if (isInfinite)
+                {
                     Console.WriteLine($"{coordData.Data} is infinite");
+                }
                 else
                 {
                     var maxArea = GetMaxAreaOfCoord(coordData);
@@ -159,9 +158,7 @@ namespace Day6_ChronalCoordinates.Grid
                         largestArea = maxArea;
                         largestAreaLabel = coordData.Data.ToString();
                     }
-                        
                 }
-
             }
 
             Console.WriteLine($"Largest FINITE area is coordinate {largestAreaLabel} with area {largestArea}.");
@@ -170,14 +167,12 @@ namespace Day6_ChronalCoordinates.Grid
         private int GetMaxAreaOfCoord(CoordinateData coordData)
         {
             var area = 0;
-            for (int i = 0; i < GridArrLength; i++)
+            for (var i = 0; i < GridArrLength; i++)
+            for (var j = 0; j < GridArrWidth; j++)
             {
-                for (int j = 0; j < GridArrWidth; j++)
-                {
-                    var currCoordData = GridData[i][j];
-                    if (currCoordData.Data.ToString().ToUpper() == coordData.Data.ToString().ToUpper())
-                        area++;
-                }
+                var currCoordData = GridData[i][j];
+                if (currCoordData.Data.ToString().ToUpper() == coordData.Data.ToString().ToUpper())
+                    area++;
             }
 
             return area;
@@ -187,6 +182,7 @@ namespace Day6_ChronalCoordinates.Grid
         {
             return GridData[coordX + MetaData.RelativeOffsetX][coordY + MetaData.RelativeOffsetY];
         }
+
         public CoordinateData RetrieveCoordinateData(Coordinate coord)
         {
             return GridData[coord.x + MetaData.RelativeOffsetX][coord.y + MetaData.RelativeOffsetY];
@@ -195,66 +191,60 @@ namespace Day6_ChronalCoordinates.Grid
         public void FindSafeRegion()
         {
             var regionArea = 0;
-            for (int i = 0; i < GridArrLength; i++)
+            for (var i = 0; i < GridArrLength; i++)
+            for (var j = 0; j < GridArrWidth; j++)
             {
-                for (int j = 0; j < GridArrWidth; j++)
-                {
-                    var currCoordData = GridData[i][j];
-                    if (currCoordData.DistanceToAllOthers < 10000)
-                        regionArea++;
-                }
+                var currCoordData = GridData[i][j];
+                if (currCoordData.DistanceToAllOthers < 10000)
+                    regionArea++;
             }
 
             Console.WriteLine($"Safe region area: {regionArea}");
         }
+
         public void FillGrid(IEnumerable<Coordinate> seedCoords)
         {
             var counter = 0;
-            for (int i = 0; i < GridArrLength; i++)
+            for (var i = 0; i < GridArrLength; i++)
+            for (var j = 0; j < GridArrWidth; j++)
             {
-                for (int j = 0; j < GridArrWidth; j++)
+                var currCoordData = GridData[i][j];
+
+                //we have our current coord, now we loop through our master/seed coords and calculate the manhattan distance between our
+                //current coord and the seed coord to find the closest one.
+                var shortestDistance = -1;
+                var totalDistance = 0;
+                var closestCoord = new Coordinate(int.MaxValue, int.MaxValue);
+                var tied = false;
+                var distances = new List<int>();
+                foreach (var coord in seedCoords)
                 {
-                    
-                    var currCoordData = GridData[i][j];
-                    
-                    //we have our current coord, now we loop through our master/seed coords and calculate the manhattan distance between our
-                    //current coord and the seed coord to find the closest one.
-                    var shortestDistance = -1;
-                    var totalDistance = 0;
-                    var closestCoord = new Coordinate(int.MaxValue, int.MaxValue);
-                    bool tied = false;
-                    List<int> distances = new List<int>();
-                    foreach (var coord in seedCoords)
+                    var currDistance = currCoordData.Coords.ManhanttanDistance(coord);
+                    totalDistance += currDistance;
+                    distances.Add(currDistance);
+
+                    if (shortestDistance == -1 || currDistance < shortestDistance)
                     {
-                        var currDistance = currCoordData.Coords.ManhanttanDistance(coord);
-                        totalDistance += currDistance;
-                        distances.Add(currDistance);
-
-                        if (shortestDistance == -1 || currDistance < shortestDistance)
-                        {
-                            
-                            shortestDistance = currDistance;
-                            closestCoord = coord;
-                        }
+                        shortestDistance = currDistance;
+                        closestCoord = coord;
                     }
+                }
 
-                    if (distances.Count(x=>x==shortestDistance) > 1)
-                        tied = true;
+                if (distances.Count(x => x == shortestDistance) > 1)
+                    tied = true;
 
-                    if (shortestDistance > 0 && closestCoord.x != int.MaxValue)
-                    {
-                        var closestLabel = RetrieveCoordinateData(closestCoord).Data;
-                        if(tied)
-                            SetCoordinateData(new Coordinate(i,j),$"{Constants.EmptyCoord}", totalDistance);
-                        else
-                            SetCoordinateData(new Coordinate(i,j),closestLabel.ToString().ToLower(),totalDistance);
-                    }
-                    else if (shortestDistance == 0)
-                    {
-                        SetCoordinateData(closestCoord, RetrieveCoordinateData(closestCoord).Data, totalDistance);
-                        Console.WriteLine("We are at ourselves");
-                    }
-
+                if (shortestDistance > 0 && closestCoord.x != int.MaxValue)
+                {
+                    var closestLabel = RetrieveCoordinateData(closestCoord).Data;
+                    if (tied)
+                        SetCoordinateData(new Coordinate(i, j), $"{Constants.EmptyCoord}", totalDistance);
+                    else
+                        SetCoordinateData(new Coordinate(i, j), closestLabel.ToString().ToLower(), totalDistance);
+                }
+                else if (shortestDistance == 0)
+                {
+                    SetCoordinateData(closestCoord, RetrieveCoordinateData(closestCoord).Data, totalDistance);
+                    Console.WriteLine("We are at ourselves");
                 }
             }
         }
