@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Day6_ChronalCoordinates
 {
-    public struct MasterGrid
+    public struct MasterGridMeta
     {
         public int MaxX, MaxY, MinX, MinY;
         public Coordinate TopRight, BottomLeft;
-        public MasterGrid(int maxX, int maxY, int minX, int minY)
+        public MasterGridMeta(int maxX, int maxY, int minX, int minY)
         {
             MaxX = maxX;
             MaxY = maxY;

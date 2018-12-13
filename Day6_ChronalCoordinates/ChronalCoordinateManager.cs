@@ -10,7 +10,7 @@ namespace Day6_ChronalCoordinates
     {
         public IList<Coordinate> Coordinates { get; private set; }
         
-        public MasterGrid Grid { get; private set; }
+        public MasterGridMeta GridMeta { get; private set; }
 
         public ChronalCoordinateManager()
         {
@@ -46,7 +46,7 @@ namespace Day6_ChronalCoordinates
             var minX = Coordinates.Aggregate((agg, next) => next.x <= agg.x ? next : agg);
             var minY = Coordinates.Aggregate((agg, next) => next.y <= agg.y ? next : agg);
 
-            Grid = new MasterGrid(maxX.x, maxY.y, minX.x, minY.y);
+            GridMeta = new MasterGridMeta(maxX.x, maxY.y, minX.x, minY.y);
             Console.WriteLine(
                 $"Max X: {maxX.x} {maxX} | Max Y: {maxY.y} {maxY} | Min X: {minX.x} {minX}| Min Y: {minY.y} {minY}");
         }
