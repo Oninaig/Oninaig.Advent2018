@@ -20,7 +20,7 @@ namespace Day6_ChronalCoordinates
 
         public override string ToString()
         {
-            return $"({x},{y})";
+            return $"({x}, {y})";
         }
     }
 

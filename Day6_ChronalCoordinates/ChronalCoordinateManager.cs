@@ -41,7 +41,6 @@ namespace Day6_ChronalCoordinates
         //available.
         public void InitMasterGrid()
         {
-
             var maxX = Coordinates.Aggregate((agg, next) => next.x >= agg.x ? next : agg);
             var maxY = Coordinates.Aggregate((agg, next) => next.y >= agg.y ? next : agg);
             var minX = Coordinates.Aggregate((agg, next) => next.x <= agg.x ? next : agg);
@@ -49,7 +48,7 @@ namespace Day6_ChronalCoordinates
 
             Grid = new MasterGrid(maxX.x, maxY.y, minX.x, minY.y);
             Console.WriteLine(
-                $"Max X: {maxX} | Max Y: {maxY} | Min X: {minX} | Min Y: {minY}");
+                $"Max X: {maxX.x} {maxX} | Max Y: {maxY.y} {maxY} | Min X: {minX.x} {minX}| Min Y: {minY.y} {minY}");
         }
 
 

@@ -19,5 +19,10 @@ namespace Day6_ChronalCoordinates
             TopRight = new Coordinate(maxX, maxY);
             BottomLeft = new Coordinate(minX, minY);
         }
+
+        public int MaxArea()
+        {
+            return (MaxX - MinX) * (MaxY - MinY);
+        }
     }
 }
