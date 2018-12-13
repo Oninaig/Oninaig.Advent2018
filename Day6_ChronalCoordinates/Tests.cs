@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Day6_ChronalCoordinates.Data;
 using NUnit.Framework;
 namespace Day6_ChronalCoordinates
 {

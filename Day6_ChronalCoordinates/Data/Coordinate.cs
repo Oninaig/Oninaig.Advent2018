@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Day6_ChronalCoordinates
+namespace Day6_ChronalCoordinates.Data
 {
     //Structs are faster than concrete classes
     public struct Coordinate

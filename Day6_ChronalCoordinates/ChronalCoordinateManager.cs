@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Day6_ChronalCoordinates.Data;
 using Day6_ChronalCoordinates.Grid;
 
 namespace Day6_ChronalCoordinates
@@ -40,7 +41,7 @@ namespace Day6_ChronalCoordinates
         //We will use the highest and lowest x and y points to do this and draw a square around the largest possible area
         //in the entire grid. This master grid will contain all other coordinates since its corners are using the highest and lowest points
         //available.
-        public void InitMasterGrid()
+        public void InitMasterGrid(bool lazy = false)
         {
             var maxX = Coordinates.Aggregate((agg, next) => next.x >= agg.x ? next : agg);
             var maxY = Coordinates.Aggregate((agg, next) => next.y >= agg.y ? next : agg);
@@ -50,6 +51,10 @@ namespace Day6_ChronalCoordinates
             Grid = new MasterGrid(maxX.x, maxY.y, minX.x, minY.y);
             Console.WriteLine(
                 $"Max X: {maxX.x} {maxX} | Max Y: {maxY.y} {maxY} | Min X: {minX.x} {minX}| Min Y: {minY.y} {minY}");
+
+            if (lazy)
+                return;
+            Grid.InitGridData();
         }
 
 

@@ -49,7 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChronalCoordinateManager.cs" />
-    <Compile Include="Coordinate.cs" />
+    <Compile Include="Data\Constants.cs" />
+    <Compile Include="Data\Coordinate.cs" />
+    <Compile Include="Data\CoordinateData.cs" />
     <Compile Include="Grid\MasterGrid.cs" />
     <Compile Include="Grid\MasterGridMeta.cs" />
     <Compile Include="Program.cs" />
