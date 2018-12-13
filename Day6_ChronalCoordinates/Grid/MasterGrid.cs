@@ -74,10 +74,17 @@ namespace Day6_ChronalCoordinates.Grid
                 var arr = seedCoords.ToArray();
                 //Risky to use just ints for our data because our "empty" coordinate uses a period char, which is equivalent to 46 when expressed as an int. 
                 //Lets change this to use letters intead.
+                var resetCount = 0;
                 for (int i = 0; i < arr.Length; i++)
                 {
-                    var added = SetCoordinateData(arr[i], labelEnumerator.Current);
-                    labelEnumerator.MoveNext();
+                    var added = SetCoordinateData(arr[i], resetCount > 0 ? $"{labelEnumerator.Current}{resetCount}" : labelEnumerator.Current);
+
+                    if (!labelEnumerator.MoveNext())
+                    {
+                        resetCount++;
+                        labelEnumerator.Reset();
+                        labelEnumerator.MoveNext();
+                    }
                     CoordAreas.Add(added, -1);
                 }
             }
@@ -130,6 +137,8 @@ namespace Day6_ChronalCoordinates.Grid
 
         public void FindAreas()
         {
+            var largestArea = 0;
+            string largestAreaLabel = "XXXX";
             foreach (var kvp in CoordAreas)
             {
                 //We are going to definte "infinite" as whether or not there is a way for a coordinate to reach the "edge" of the array without hitting
@@ -141,8 +150,37 @@ namespace Day6_ChronalCoordinates.Grid
                 var isInfinite = IsInfinite(coordData);
                 if (isInfinite)
                     Console.WriteLine($"{coordData.Data} is infinite");
+                else
+                {
+                    var maxArea = GetMaxAreaOfCoord(coordData);
+                    Console.WriteLine($"{coordData.Data} is FINITE with area of: {maxArea}");
+                    if (maxArea > largestArea)
+                    {
+                        largestArea = maxArea;
+                        largestAreaLabel = coordData.Data.ToString();
+                    }
+                        
+                }
 
             }
+
+            Console.WriteLine($"Largest FINITE area is coordinate {largestAreaLabel} with area {largestArea}.");
+        }
+
+        private int GetMaxAreaOfCoord(CoordinateData coordData)
+        {
+            var area = 0;
+            for (int i = 0; i < GridArrLength; i++)
+            {
+                for (int j = 0; j < GridArrWidth; j++)
+                {
+                    var currCoordData = GridData[i][j];
+                    if (currCoordData.Data.ToString().ToUpper() == coordData.Data.ToString().ToUpper())
+                        area++;
+                }
+            }
+
+            return area;
         }
 
         public CoordinateData RetrieveCoordinateData(int coordX, int coordY)

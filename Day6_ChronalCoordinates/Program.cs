@@ -14,18 +14,18 @@ namespace Day6_ChronalCoordinates
 
 
             //Sample grid
-            var sampleManager = new ChronalCoordinateManager();
-            sampleManager.AddCoordinate(1,1);
-            sampleManager.AddCoordinate(1,6);
-            sampleManager.AddCoordinate(8,3);
-            sampleManager.AddCoordinate(3,4);
-            sampleManager.AddCoordinate(5,5);
-            sampleManager.AddCoordinate(8,9);
-            sampleManager.InitMasterGrid();
-            sampleManager.PrintGrid();
-            sampleManager.FindAreas();
+            //var sampleManager = new ChronalCoordinateManager();
+            //sampleManager.AddCoordinate(1,1);
+            //sampleManager.AddCoordinate(1,6);
+            //sampleManager.AddCoordinate(8,3);
+            //sampleManager.AddCoordinate(3,4);
+            //sampleManager.AddCoordinate(5,5);
+            //sampleManager.AddCoordinate(8,9);
+            //sampleManager.InitMasterGrid();
+            //sampleManager.PrintGrid();
+            //sampleManager.FindAreas();
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
             var input = File.ReadAllLines("puzzleinput.txt");
                         
@@ -34,7 +34,7 @@ namespace Day6_ChronalCoordinates
                 manager.AddCoordinate(line.Split(',')[0], line.Split(',')[1]);
 
             manager.InitMasterGrid();
-            Console.WriteLine($"Master Grid Area: {manager.Grid.MaxArea()}");
+            manager.FindAreas();
             Console.ReadLine();
         }
     }
