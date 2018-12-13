@@ -9,21 +9,8 @@ namespace Day6_ChronalCoordinates
     public class ChronalCoordinateManager
     {
         public IList<Coordinate> Coordinates { get; private set; }
-        public Coordinate TopRight { get; private set; }
-        public Coordinate BottomLeft { get; private set; }
-
-        public struct MasterGrid
-        {
-            public int MaxX, MaxY, MinX, MinY;
-
-            public MasterGrid(int maxX, int maxY, int minX, int minY)
-            {
-                MaxX = maxX;
-                MaxY = maxY;
-                MinX = minX;
-                MinY = minY;
-            }
-        }
+        
+        public MasterGrid Grid { get; private set; }
 
         public ChronalCoordinateManager()
         {
@@ -52,7 +39,6 @@ namespace Day6_ChronalCoordinates
         //We will use the highest and lowest x and y points to do this and draw a square around the largest possible area
         //in the entire grid. This master grid will contain all other coordinates since its corners are using the highest and lowest points
         //available.
-
         public void InitMasterGrid()
         {
 
@@ -61,10 +47,7 @@ namespace Day6_ChronalCoordinates
             var minX = Coordinates.Aggregate((agg, next) => next.x <= agg.x ? next : agg);
             var minY = Coordinates.Aggregate((agg, next) => next.y <= agg.y ? next : agg);
 
-
-            TopRight = new Coordinate(maxX.x, maxY.y);
-            BottomLeft = new Coordinate(minX.x, minY.y);
-
+            Grid = new MasterGrid(maxX.x, maxY.y, minX.x, minY.y);
             Console.WriteLine(
                 $"Max X: {maxX} | Max Y: {maxY} | Min X: {minX} | Min Y: {minY}");
         }
