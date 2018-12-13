@@ -11,12 +11,14 @@ namespace Day6_ChronalCoordinates
     public class ChronalCoordinateManager
     {
         public IList<Coordinate> Coordinates { get; private set; }
-        
+        public IList<CoordinateData> CoordinatesWithData { get; private set; }
+
         public MasterGrid Grid { get; private set; }
 
         public ChronalCoordinateManager()
         {
             this.Coordinates = new List<Coordinate>();
+            this.CoordinatesWithData = new List<CoordinateData>();
         }
 
         public void AddCoordinate(int x, int y)
