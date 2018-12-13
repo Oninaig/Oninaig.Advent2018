@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -78,5 +79,34 @@ namespace Day6_ChronalCoordinates
             });
         }
 
+        [Test]
+        public void TestCanReadFile()
+        {
+            var input = File.ReadAllLines(TestContext.CurrentContext.TestDirectory + "\\testinput.txt");
+            Console.WriteLine(input.Length);
+            Assert.Greater(input.Length, 0);
+        }
+
+        [Test]
+        public void HighetLowestPoint()
+        {
+            var input = File.ReadAllLines(TestContext.CurrentContext.TestDirectory + "\\testinput.txt");
+            Console.WriteLine($"Lines found: {input.Length}");
+            
+            var manager= new ChronalCoordinateManager();
+            foreach (var line in input)
+                manager.AddCoordinate(line.Split(',')[0], line.Split(',')[1]);
+
+            manager.InitMasterGrid();
+
+            var topRight = new Coordinate(352, 2000);
+            var bottomLeft = new Coordinate(-100, -423);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(topRight, manager.TopRight);
+                Assert.AreEqual(bottomLeft, manager.BottomLeft);
+            });
+        }
     }
 }

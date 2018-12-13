@@ -17,6 +17,11 @@ namespace Day6_ChronalCoordinates
             x = p1;
             y = p2;
         }
+
+        public override string ToString()
+        {
+            return $"({x},{y})";
+        }
     }
 
     public static class CoordinateExtensions
