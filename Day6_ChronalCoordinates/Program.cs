@@ -23,6 +23,7 @@ namespace Day6_ChronalCoordinates
             sampleManager.AddCoordinate(8,9);
             sampleManager.InitMasterGrid();
             sampleManager.PrintGrid();
+            sampleManager.FindAreas();
 
             Console.ReadLine();
 

@@ -65,5 +65,10 @@ namespace Day6_ChronalCoordinates
             Grid.PrintGrid();
         }
 
+        public void FindAreas()
+        {
+            Grid.FindAreas();
+        }
+
     }
 }
