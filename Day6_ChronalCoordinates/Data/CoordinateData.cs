@@ -10,11 +10,13 @@ namespace Day6_ChronalCoordinates.Data
     {
         public object Data { get; set; }
         public Coordinate Coords { get;set; }
+        public int DistanceToAllOthers { get; set; }
 
-        public CoordinateData(object data, Coordinate coords)
+        public CoordinateData(object data, Coordinate coords, int distanceToAllOthers)
         {
             this.Data = data;
             this.Coords = coords;
+            this.DistanceToAllOthers = distanceToAllOthers;
         }
     }
 }

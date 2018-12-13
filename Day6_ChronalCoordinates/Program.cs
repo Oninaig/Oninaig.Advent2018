@@ -35,6 +35,7 @@ namespace Day6_ChronalCoordinates
 
             manager.InitMasterGrid();
             manager.FindAreas();
+            manager.FindSafeRegion();
             Console.ReadLine();
         }
     }

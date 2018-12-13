@@ -70,5 +70,10 @@ namespace Day6_ChronalCoordinates
             Grid.FindAreas();
         }
 
+        public void FindSafeRegion()
+        {
+            Grid.FindSafeRegion();
+        }
+
     }
 }
