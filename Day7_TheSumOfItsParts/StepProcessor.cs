@@ -7,7 +7,8 @@ namespace Day7_TheSumOfItsParts
 {
     public static class StepProcessor
     {
-
+        public static string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public static readonly int WorkConstant = 60;
         /// <summary>
         /// We know from the samples that each step, when split on whitespaces, contains the current step name at index 7 and its prerequisite at index 1.
         /// </summary>
@@ -28,6 +29,11 @@ namespace Day7_TheSumOfItsParts
             }
 
             return stepMap;
+        }
+
+        public static int GetWorkTimeForLetter(string letter)
+        {
+            return Alphabet.IndexOf(letter) + 1 + WorkConstant;
         }
 
     }

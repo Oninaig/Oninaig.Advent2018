@@ -16,11 +16,19 @@ namespace Day7_TheSumOfItsParts
         public bool HasPrerequisites => this.PreRequisites != null && this.PreRequisites.Any();
         public bool CanProcess => !HasPrerequisites;
         
+        public Step(){}
         public Step(string name)
         {
             this.PreRequisites = new List<Step>();
             this.UniqueStepId = Guid.NewGuid();
             this.StepName = name;
+        }
+
+        public Step(Step otherStep)
+        {
+            this.PreRequisites = otherStep.PreRequisites;
+            this.UniqueStepId = otherStep.UniqueStepId;
+            this.StepName = otherStep.StepName;
         }
 
         public Step AddPrerequisite(Step requiredStep)
