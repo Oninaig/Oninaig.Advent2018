@@ -10,8 +10,11 @@ namespace Day7_TheSumOfItsParts
     {
         static void Main(string[] args)
         {
-            var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
-            test.PrintOrder();
+            //var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
+            //test.PrintOrder();
+
+            var puzzle = StepProcessor.GenerateStepMapFromFile("puzzleinput.txt");
+            puzzle.PrintOrder();
             Console.ReadLine();
         }
     }

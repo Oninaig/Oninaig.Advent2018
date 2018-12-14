@@ -15,7 +15,6 @@ namespace Day7_TheSumOfItsParts
         public string StepName { get; private set; }
         public bool HasPrerequisites => this.PreRequisites != null && this.PreRequisites.Any();
         public bool CanProcess => !HasPrerequisites;
-        public bool Processed { get; set; }
         
         public Step(string name)
         {

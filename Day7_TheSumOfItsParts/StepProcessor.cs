@@ -30,12 +30,5 @@ namespace Day7_TheSumOfItsParts
             return stepMap;
         }
 
-
-        //public static List<string> GetOrder(Dictionary<string, Step> stepMap)
-        //{
-        //    //First lets find our step that has no prerequisites.
-        //    var firstStep = stepMap.First(x => !x.Value.HasPrerequisites);
-
-        //}
     }
 }
