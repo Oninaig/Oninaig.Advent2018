@@ -35,14 +35,11 @@ namespace Day7_TheSumOfItsParts
             Map[stepName] = currStep.AddPrerequisite(preReqStep);
         }
 
-        public void PrintOrder()
-        {
-            ProcessSteps();
-        }
+       
 
         
 
-        public void ProcessSteps()
+        public void PrintOrder()
         {
             var steps = Map.Values.Where(x=>!x.HasPrerequisites).OrderBy(x=>x.StepName);
             if (!steps.Any())
@@ -60,7 +57,7 @@ namespace Day7_TheSumOfItsParts
 
             Console.Write($"{nextStep.StepName}");
             Map.Remove(nextStep.StepName);
-            ProcessSteps();
+            PrintOrder();
         }
 
     }
