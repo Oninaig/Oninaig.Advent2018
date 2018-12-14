@@ -12,9 +12,14 @@ namespace Day7_TheSumOfItsParts.Production
 
         public WorkingStep(){}
 
-        public void Init()
+        public WorkingStep(Step baseStep) : base(baseStep)
+        {
+
+        }
+        public WorkingStep Init()
         {
             this.WorkRequired = StepProcessor.GetWorkTimeForLetter(this.StepName);
+            return this;
         }
 
         /// <summary>

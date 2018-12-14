@@ -12,16 +12,14 @@ namespace Day7_TheSumOfItsParts.Production
         public WorkingStep CurrWorkStep { get; private set; }
 
         public bool IsBusy => CurrWorkStep.WorkRequired > 0;
-        public Worker(Step workingStep, int id)
+        public Worker(int id)
         {
-            this.CurrWorkStep = (WorkingStep)workingStep;
-            this.CurrWorkStep.Init();
             this.Id = id;
         }
 
-        public void SetWork(Step step)
+        public void SetWork(WorkingStep workStep)
         {
-            this.CurrWorkStep = (WorkingStep) step;
+            this.CurrWorkStep = workStep;
             this.CurrWorkStep.Init();
         }
     }
