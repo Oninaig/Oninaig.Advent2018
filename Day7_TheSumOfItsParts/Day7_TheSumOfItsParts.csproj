@@ -44,12 +44,12 @@
   <ItemGroup>
     <Compile Include="Production\StepProcessingFactory.cs" />
     <Compile Include="Production\Worker.cs" />
-    <Compile Include="Production\WorkingStep.cs" />
+    <Compile Include="Process\WorkingStep.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Step.cs" />
-    <Compile Include="StepMap.cs" />
-    <Compile Include="StepProcessor.cs" />
+    <Compile Include="Process\Step.cs" />
+    <Compile Include="Process\StepMap.cs" />
+    <Compile Include="Process\StepProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

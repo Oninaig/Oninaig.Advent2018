@@ -1,29 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Day7_TheSumOfItsParts.Production
+﻿namespace Day7_TheSumOfItsParts.Process
 {
     public class WorkingStep : Step
     {
-        public int WorkRequired { get; private set; }
-
-        public WorkingStep(){}
+        public WorkingStep()
+        {
+        }
 
         public WorkingStep(Step baseStep) : base(baseStep)
         {
-
         }
+
+        public int WorkRequired { get; private set; }
+
         public WorkingStep Init()
         {
-            this.WorkRequired = StepProcessor.GetWorkTimeForLetter(this.StepName);
+            WorkRequired = StepProcessor.GetWorkTimeForLetter(StepName);
             return this;
         }
 
         /// <summary>
-        /// Decrement the work counter. If there is no more work do to, return false.
+        ///     Decrement the work counter. If there is no more work do to, return false.
         /// </summary>
         /// <returns></returns>
         public bool DoWork()
