@@ -41,8 +41,8 @@ namespace Day7_TheSumOfItsParts.Production
 
         private void hireWorkers()
         {
-            for (var i = 0; i < MaxWorkers; i++)
-                Workers.Add(new Worker(i));
+            //for (var i = 0; i < MaxWorkers; i++)
+            //    Workers.Add(new Worker(i));
         }
 
         public void Init()
