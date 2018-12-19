@@ -7,11 +7,18 @@ namespace Day7_TheSumOfItsParts.Production
 {
     public class TimeClockStation
     {
-        public List<Worker> ClockedInWorkers { get; private set; }
         private readonly Timer _timeClock;
-        private Guid _timerId;
+        private readonly Guid _timerId;
 
-        public delegate void ClockInAction(object sender, ElapsedEventArgs args);
+        public TimeClockStation(double interval = 1000.0)
+        {
+            _timeClock = new Timer(interval);
+            _timeClock.Elapsed += MasterElapsed;
+            _timerId = Guid.NewGuid();
+            ClockedInWorkers = new List<Worker>();
+        }
+
+        public List<Worker> ClockedInWorkers { get; }
 
 
         public event ElapsedEventHandler TimeClockTimeStep
@@ -20,30 +27,28 @@ namespace Day7_TheSumOfItsParts.Production
             remove => _timeClock.Elapsed -= value;
         }
 
-        public TimeClockStation(double interval = 1000.0)
-        {
-            this._timeClock = new Timer(interval);
-            _timeClock.Elapsed += MasterElapsed;
-            this._timerId = Guid.NewGuid();
-            this.ClockedInWorkers = new List<Worker>();
-        }
-
+        /// <summary>
+        /// This event will always be the first to subscribe to the timer elapsed event so we always have an up-to-date status of the timer as the first handler thats called when the timer elapses.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void MasterElapsed(object sender, ElapsedEventArgs args)
         {
             Console.WriteLine($"Timer {this} current clocked in workers: {ClockedInWorkers.Count}");
         }
 
-        public void WorkerClockIn(Worker worker, ElapsedEventHandler act)
+        public void ClockIn(Worker worker, ElapsedEventHandler act)
         {
-            if(ClockedInWorkers.Contains(worker))
-                throw new ArgumentException($"Worker {worker} can't clock in more than once before clocking out in between!");
+            if (ClockedInWorkers.Contains(worker))
+                throw new ArgumentException(
+                    $"Worker {worker} can't clock in more than once before clocking out in between!");
             ClockedInWorkers.Add(worker);
             TimeClockTimeStep += act;
         }
 
-        public void WorkerClockOut(Worker worker, ElapsedEventHandler act)
+        public void ClockOut(Worker worker, ElapsedEventHandler act)
         {
-            if(!ClockedInWorkers.Contains(worker))
+            if (!ClockedInWorkers.Contains(worker))
                 throw new ArgumentException($"Worker {worker} can't clock out without clocking in first!");
             ClockedInWorkers.Remove(worker);
             TimeClockTimeStep -= act;
@@ -52,23 +57,23 @@ namespace Day7_TheSumOfItsParts.Production
         public void Start()
         {
             Console.WriteLine($"Timeclock {this} is starting!");
-            this._timeClock.Start();
+            _timeClock.Start();
         }
 
         public void Stop()
         {
-            this._timeClock.Stop();
+            _timeClock.Stop();
         }
 
         public void Restart()
         {
-            this._timeClock.Enabled = false;
-            this._timeClock.Enabled = true;
+            _timeClock.Enabled = false;
+            _timeClock.Enabled = true;
         }
 
         public override string ToString()
         {
-            var splitId = this._timerId.ToString().Replace("{", "").Replace("}", "").Split('-');
+            var splitId = _timerId.ToString().Replace("{", "").Replace("}", "").Split('-');
             var sBuilder = new StringBuilder();
             foreach (var part in splitId)
                 sBuilder.Append(part[0]);
