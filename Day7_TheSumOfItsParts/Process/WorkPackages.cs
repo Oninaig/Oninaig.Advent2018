@@ -24,6 +24,15 @@ namespace Day7_TheSumOfItsParts.Process
         {
             this.Packages.Add(packageProcessOrder, new WorkPackage(packageProcessOrder, eligibleSteps));
         }
+
+        public void DumpPackages()
+        {
+            Console.WriteLine("The order in which the packages can be completed is:");
+            foreach (var kvp in Packages)
+            {
+                Console.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.StepName))}");
+            }
+        }
     }
 
     public class WorkPackage
