@@ -11,17 +11,20 @@ namespace Day7_TheSumOfItsParts
     {
         private static void Main(string[] args)
         {
-            StepProcessor.EnableWorkConstant = true;
-            //var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
-            //test.PrintOrder();
+            //StepProcessor.EnableWorkConstant = true;
+            //var puzzle = StepProcessor.GenerateStepMapFromFile("puzzleinput.txt");
+            //var puzzleFactory = new StepProcessingFactory(puzzle, 5);
+            //puzzleFactory.Init();
+            //puzzleFactory.FindSolution();
 
-            var puzzle = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
-            //todo change this so it doesnt modify the master step list
-            //puzzle.PrintOrder();
-
-            var testFactory = new StepProcessingFactory(puzzle, 2);
+            StepProcessor.EnableWorkConstant = false;
+            var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
+            
+            var testFactory = new StepProcessingFactory(test, 5);
             testFactory.Init();
+            testFactory.FindSolution();
             testFactory.WorkProcessingOrder.DumpPackages();
+
             Console.ReadLine();
         }
 

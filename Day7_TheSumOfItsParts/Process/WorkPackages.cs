@@ -33,6 +33,57 @@ namespace Day7_TheSumOfItsParts.Process
                 Console.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.Identify()))}");
             }
         }
+
+        public void SetAssigned(WorkingStep step)
+        {
+            if (step == null)
+                return;
+            foreach (var kvp in Packages)
+            {
+                foreach(var stp in kvp.Value.EligibleSteps)
+                    if (stp.UniqueStepId == step.UniqueStepId)
+                    {
+                        stp.IsAssigned = true;
+                        stp.RemainingWorkRequired = stp.WorkRequired;
+                    }
+            }
+        }
+
+        public void SetCompleted(WorkingStep step)
+        {
+            if (step == null)
+                return;
+            foreach (var kvp in Packages)
+            {
+                foreach(var stp in kvp.Value.EligibleSteps)
+                    if (stp.UniqueStepId == step.UniqueStepId)
+                    {
+                        stp.IsCompleted = true;
+                        stp.IsAssigned = false;
+                        stp.RemainingWorkRequired = 0;
+                    }
+            }
+        }
+
+        public void DoSetAmountOfWork(WorkingStep step, int workAmount)
+        {
+            if (step == null)
+                return;
+            foreach (var kvp in Packages)
+            {
+                foreach(var stp in kvp.Value.EligibleSteps)
+                    if (stp.UniqueStepId == step.UniqueStepId)
+                    {
+                        stp.RemainingWorkRequired -= workAmount;
+                        if (stp.RemainingWorkRequired == 0)
+                        {
+                            Console.WriteLine($"Step {stp.StepName} completed.");
+                            stp.IsCompleted = true;
+                            stp.IsAssigned = false;
+                        }
+                    }
+            }
+        }
     }
 
     public class WorkPackage

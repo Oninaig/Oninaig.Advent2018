@@ -8,6 +8,8 @@ namespace Day7_TheSumOfItsParts.Process
     {
         private WorkingStepParams _workingParams;
         private bool _initialized;
+        public bool IsAssigned { get;set; }
+        public bool IsCompleted {get; set; }
         public WorkingStep()
         {
         }
@@ -19,7 +21,7 @@ namespace Day7_TheSumOfItsParts.Process
         {
         }
 
-        public int RemainingWorkRequired { get; private set; }
+        public int RemainingWorkRequired { get; set; }
         public int WorkRequired { get; private set; }
         
 

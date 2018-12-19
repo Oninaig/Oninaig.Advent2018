@@ -24,6 +24,7 @@ namespace Day7_TheSumOfItsParts.Production
             //Processing = new List<WorkingStep>();
             //Processed = new List<WorkingStep>();
             workPackageCount = 0;
+
         }
 
         public List<Worker> Workers { get; }
@@ -50,10 +51,122 @@ namespace Day7_TheSumOfItsParts.Production
         public void Init()
         {
             initJobQueue();
+            Console.WriteLine();
             hireWorkers();
         }
 
-        
+        public void FindSolution()
+        {
+            var runningEfficientTime = 0;
+            var runningTime = 0;
+            var availableWorkers = MaxWorkers;
+            foreach (var kvp in WorkProcessingOrder.Packages)
+            {
+                var tasksToRun = kvp.Value.EligibleSteps.Where(x=>!x.IsAssigned && !x.IsCompleted).OrderBy(x=>x.WorkRequired).Take(MaxWorkers).OrderByDescending(x=>x.WorkRequired);
+                
+
+               
+
+
+                //out of every task we are currently processing, find the fastest one and subtract its work time from all other working tasks
+                var fastest = tasksToRun.LastOrDefault();
+                foreach (var tsk in tasksToRun)
+                {
+                    WorkProcessingOrder.SetAssigned(tsk);
+                    WorkProcessingOrder.DoSetAmountOfWork(tsk, fastest?.WorkRequired ?? int.MinValue);
+                    runningTime += fastest?.WorkRequired ?? int.MinValue;
+                }
+
+
+
+                ////first task is the slowest and dictates how long this level will take
+                //var slowest = tasksToRun.FirstOrDefault();
+                //var slowestTime = slowest?.WorkRequired ?? 0;
+
+                //var fastest = tasksToRun.LastOrDefault();
+                //var fastestTime = fastest?.WorkRequired ?? 0;
+
+                //if (tasksToRun.Count() == 1)
+                //{
+                //    runningTime += slowest?.WorkRequired ?? 0;
+                //    WorkProcessingOrder.SetAssigned(slowest);
+                //    WorkProcessingOrder.SetCompleted(slowest);
+                //    continue;
+                //}
+
+                ////Set our slowest task as assigned
+                //WorkProcessingOrder.SetAssigned(slowest);
+
+                //foreach (var tsk in tasksToRun)
+                //{
+                //    WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime);
+                //}
+
+
+
+            }
+            //foreach (var kvp in WorkProcessingOrder.Packages)
+            //{
+            //    //First we find the longest running task in our current package
+            //    var sortedLargest = kvp.Value.EligibleSteps.OrderByDescending(x => x.WorkRequired);
+            //    var longest = sortedLargest.FirstOrDefault(x=> !x.IsAssigned);
+            //    if (longest != null)
+            //    {
+            //        //longest.IsAssigned = true;
+            //        WorkProcessingOrder.SetAssigned(longest);
+            //        if (runningEfficientTime == 0)
+            //            runningEfficientTime = longest.WorkRequired;
+            //        else if (runningEfficientTime > longest.WorkRequired)
+            //        {
+            //            runningEfficientTime -= longest.WorkRequired;
+            //            runningTime += longest.WorkRequired;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        runningTime += runningEfficientTime;
+            //        runningEfficientTime = 0;
+            //        continue;
+            //    }
+                
+                
+            //    //Then, for each of our workers, we divy up the remaining work thats next-hardest
+            //    //i < MaxWorkers - 1 becuase we already "assigned" the first (longest) running task in the line above, so we are already down 1 worker.
+            //    //also we can only run this part if we have enough work remaining to go around in the first place
+            //    if (kvp.Value.EligibleSteps.Count(x=>!x.IsAssigned) > 0 && (MaxWorkers - 1 > 0))
+            //    {
+            //        for (int i = 0; i < MaxWorkers - 1; i++)
+            //        {
+            //            var nextHardest = sortedLargest.Skip(i + 1).FirstOrDefault(x=> !x.IsAssigned);
+            //            if (nextHardest == null)
+            //                break;
+            //            WorkProcessingOrder.SetAssigned(nextHardest);
+            //            //nextHardest.IsAssigned = true;
+
+            //            //Now we can fit the total time of the next hardest task into our current hardest task, being efficient with our time
+            //            if (runningEfficientTime > nextHardest.WorkRequired)
+            //            {
+            //                runningEfficientTime -= nextHardest.WorkRequired;
+            //                runningTime += nextHardest.WorkRequired;
+            //            }
+            //            else
+            //            {
+            //                runningTime += runningEfficientTime;
+            //                runningEfficientTime = nextHardest.WorkRequired - runningEfficientTime;
+
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        runningTime += longest.WorkRequired;
+            //        runningEfficientTime = 0;
+            //    }
+
+            //}
+
+            Console.WriteLine($"Solution is: {runningTime} seconds.");
+        }
 
         private void initJobQueue()
         {
