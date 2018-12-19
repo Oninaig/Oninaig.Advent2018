@@ -21,8 +21,8 @@ namespace Day7_TheSumOfItsParts.Production
             //WorkDict = new Dictionary<int, List<WorkingStep>>();
             WorkProcessingOrder = new WorkPackages();
             //WorkQueue = new Queue<List<WorkingStep>>();
-            Processing = new List<WorkingStep>();
-            Processed = new List<WorkingStep>();
+            //Processing = new List<WorkingStep>();
+            //Processed = new List<WorkingStep>();
             workPackageCount = 0;
         }
 

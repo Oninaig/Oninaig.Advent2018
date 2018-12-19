@@ -30,7 +30,7 @@ namespace Day7_TheSumOfItsParts.Process
             Console.WriteLine("The order in which the packages can be completed is:");
             foreach (var kvp in Packages)
             {
-                Console.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.StepName))}");
+                Console.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.Identify()))}");
             }
         }
     }

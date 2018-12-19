@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Timers;
+using Day7_TheSumOfItsParts.Process.Helpers;
 
 namespace Day7_TheSumOfItsParts.Process
 {
@@ -51,6 +52,11 @@ namespace Day7_TheSumOfItsParts.Process
         {
             return
                 $"{RemainingWorkRequired} ({Math.Round((((double) WorkRequired - (double) RemainingWorkRequired) / (double) WorkRequired) * 100)}% complete)";
+        }
+
+        public string Identify()
+        {
+            return $"{this.StepName}-{this.WorkRequired}";
         }
 
     }

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Timers;
 using Day7_TheSumOfItsParts.Process;
+using Day7_TheSumOfItsParts.Process.Helpers;
 using Day7_TheSumOfItsParts.Production;
 
 namespace Day7_TheSumOfItsParts
@@ -32,6 +33,8 @@ namespace Day7_TheSumOfItsParts
             //worker1.ClockIn();
             //worker2.ClockIn();
             //Thread.Sleep(10000);
+
+            StepProcessor.EnableWorkConstant = false;
             var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
             //test.PrintOrder();
 
