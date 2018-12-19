@@ -53,6 +53,8 @@ namespace Day7_TheSumOfItsParts.Production
             hireWorkers();
         }
 
+        
+
         private void initJobQueue()
         {
             //Same strategy as StepMap.PrintOrder
