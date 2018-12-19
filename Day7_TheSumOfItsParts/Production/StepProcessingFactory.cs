@@ -62,7 +62,7 @@ namespace Day7_TheSumOfItsParts.Production
             var availableWorkers = MaxWorkers;
             foreach (var kvp in WorkProcessingOrder.Packages)
             {
-                var tasksToRun = kvp.Value.EligibleSteps.Where(x=>!x.IsAssigned && !x.IsCompleted).OrderBy(x=>x.WorkRequired).Take(MaxWorkers).OrderByDescending(x=>x.WorkRequired);
+                var tasksToRun = kvp.Value.EligibleSteps.Where(x=>!x.IsAssigned || !x.IsCompleted).OrderBy(x=>x.RemainingWorkRequired).Take(MaxWorkers).OrderByDescending(x=>x.RemainingWorkRequired).ToList();
                 
 
                
@@ -70,13 +70,31 @@ namespace Day7_TheSumOfItsParts.Production
 
                 //out of every task we are currently processing, find the fastest one and subtract its work time from all other working tasks
                 var fastest = tasksToRun.LastOrDefault();
+                var priorityTasks = tasksToRun.Where(x => x.IsAssigned && !x.IsCompleted);
+                if (priorityTasks.Any())
+                {
+                    var pTaskEnum = tasksToRun.GetEnumerator();
+                    while (pTaskEnum.MoveNext() && availableWorkers > 0)
+                    {
+                        availableWorkers--;
+                        
+                        if (iter)
+                        {
+                            availableWorkers--;
+
+                        }
+                    }
+                }
+                
                 foreach (var tsk in tasksToRun)
                 {
                     WorkProcessingOrder.SetAssigned(tsk);
+                    availableWorkers--;
                     WorkProcessingOrder.DoSetAmountOfWork(tsk, fastest?.WorkRequired ?? int.MinValue);
-                    runningTime += fastest?.WorkRequired ?? int.MinValue;
+                    if (tsk.IsCompleted)
+                        availableWorkers++;
                 }
-
+                runningTime += fastest?.WorkRequired ?? int.MinValue;
 
 
                 ////first task is the slowest and dictates how long this level will take
