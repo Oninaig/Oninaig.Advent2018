@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Process\WorkPackages.cs" />
     <Compile Include="Production\TimeClockStation.cs" />
     <Compile Include="Production\StepProcessingFactory.cs" />
     <Compile Include="Production\Worker.cs" />

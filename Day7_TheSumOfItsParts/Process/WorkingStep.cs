@@ -6,6 +6,7 @@ namespace Day7_TheSumOfItsParts.Process
     public class WorkingStep : Step
     {
         private WorkingStepParams _workingParams;
+        private bool _initialized;
         public WorkingStep()
         {
         }
@@ -23,11 +24,15 @@ namespace Day7_TheSumOfItsParts.Process
 
         public WorkingStep Init()
         {
-            RemainingWorkRequired = WorkRequired = 0;
-            if (_workingParams != null && _workingParams.Debug)
-                RemainingWorkRequired = WorkRequired = _workingParams.WorkRequiredOverride;
-            else
-                RemainingWorkRequired = WorkRequired = StepProcessor.GetWorkTimeForLetter(StepName);
+            if (!_initialized)
+            {
+                RemainingWorkRequired = WorkRequired = 0;
+                if (_workingParams != null && _workingParams.Debug)
+                    RemainingWorkRequired = WorkRequired = _workingParams.WorkRequiredOverride;
+                else
+                    RemainingWorkRequired = WorkRequired = StepProcessor.GetWorkTimeForLetter(StepName);
+                _initialized = true;
+            }
             return this;
         }
 

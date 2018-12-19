@@ -18,8 +18,9 @@ namespace Day7_TheSumOfItsParts.Production
             ProcessingSteps = stepsToProcess;
             MaxWorkers = maxWorkers;
             Workers = new List<Worker>(maxWorkers);
-            WorkDict = new Dictionary<int, List<WorkingStep>>();
-            WorkQueue = new Queue<List<WorkingStep>>();
+            //WorkDict = new Dictionary<int, List<WorkingStep>>();
+            WorkProcessingOrder = new WorkPackages();
+            //WorkQueue = new Queue<List<WorkingStep>>();
             Processing = new List<WorkingStep>();
             Processed = new List<WorkingStep>();
             workPackageCount = 0;
@@ -29,7 +30,8 @@ namespace Day7_TheSumOfItsParts.Production
         public int MaxWorkers { get; set; }
         public StepMap ProcessingSteps { get; }
 
-        public Dictionary<int, List<WorkingStep>> WorkDict { get; }
+        //public Dictionary<int, List<WorkingStep>> WorkDict { get; }
+        public WorkPackages WorkProcessingOrder { get; }
         public Queue<List<WorkingStep>> WorkQueue { get; }
         public List<WorkingStep> Processing { get; }
 
@@ -58,8 +60,9 @@ namespace Day7_TheSumOfItsParts.Production
             if (!steps.Any())
                 return;
 
-            WorkDict.Add(++workPackageCount, new List<WorkingStep>(steps.Select(x => new WorkingStep(x).Init())));
-            WorkQueue.Enqueue(new List<WorkingStep>(steps.Select(x => new WorkingStep(x).Init())));
+            var eligibleSteps = steps.Select(x => new WorkingStep(x).Init());
+            WorkProcessingOrder.AddWorkPackage(++workPackageCount,new List<WorkingStep>(eligibleSteps));
+            //WorkQueue.Enqueue(new List<WorkingStep>(eligibleSteps));
 
             var nextStep = steps.First();
             if (nextStep.CanProcess)
