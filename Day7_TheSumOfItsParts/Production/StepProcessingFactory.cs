@@ -18,17 +18,13 @@ namespace Day7_TheSumOfItsParts.Production
         {
             ProcessingSteps = stepsToProcess;
             MaxWorkers = maxWorkers;
-            WorkProcessingOrder = new WorkPackages();
+            WorkProcessingOrder = new WorkProcessingOrder();
             workPackageCount = 0;
         }
-        
+
         public int MaxWorkers { get; set; }
         public StepMap ProcessingSteps { get; }
-        public WorkPackages WorkProcessingOrder { get; }
-        
-        public void Work()
-        {
-        }
+        public WorkProcessingOrder WorkProcessingOrder { get; }
 
         public void Init()
         {
@@ -39,16 +35,15 @@ namespace Day7_TheSumOfItsParts.Production
 
         public void FindSolution()
         {
-            var runningEfficientTime = 0;
             var runningTime = 0;
-            var InProgress = new Queue<WorkingStep>();
+            var InProgress = new Queue<Step>();
             while (WorkProcessingOrder.HasWorkToDo)
             {
                 var availableWorkers = MaxWorkers;
 
                 //What are we going to work on during this time step
                 //First lets grab any tasks we are still working on from our last time step
-                var todaysWork = new List<WorkingStep>();
+                var todaysWork = new List<Step>();
                 while (InProgress.Any() && availableWorkers > 0)
                 {
                     todaysWork.Add(InProgress.Dequeue());
@@ -56,13 +51,19 @@ namespace Day7_TheSumOfItsParts.Production
                 }
 
                 //Then we grab any tasks that are eligible to be processed during this time step that aren't already in our current work queue (todaysWork).
-                var eligibleSteps = WorkProcessingOrder.Packages.SelectMany(x => x.Value.EligibleSteps)
-                    .Where(x => !x.HasPrerequisites && !x.IsCompleted).Distinct().Where(x => !todaysWork.Contains(x))
+                var eligibleSteps = WorkProcessingOrder.Packages
+                    .SelectMany(x => x.Value.EligibleSteps)
+                    .Where(x => !x.HasPrerequisites && !x.IsCompleted)
+                    .Distinct()
+                    .Where(x => !todaysWork.Contains(x))
                     .OrderBy(x => x.WorkRequired);
 
                 var fastestTask = eligibleSteps.FirstOrDefault();
+
                 var fastestInProgressTime = todaysWork.OrderByDescending(x => x.RemainingWorkRequired).LastOrDefault()
                     ?.RemainingWorkRequired;
+
+                //This line just says "use whatever the fastest remaining time is between in-progress and new tasks.
                 var fastestTime =
                     (fastestTask?.RemainingWorkRequired < fastestInProgressTime
                         ? fastestTask?.RemainingWorkRequired
@@ -81,9 +82,9 @@ namespace Day7_TheSumOfItsParts.Production
 
                 foreach (var tsk in todaysWork)
                 {
-                    WorkProcessingOrder.SetAssigned(tsk);
+                    WorkProcessingOrder.FlagStepAsAssigned(tsk);
                     if (WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime))
-                        WorkProcessingOrder.SetCompleted(tsk);
+                        WorkProcessingOrder.FlagStepAsCompleted(tsk);
                     else
                         InProgress.Enqueue(tsk);
                 }
@@ -104,12 +105,12 @@ namespace Day7_TheSumOfItsParts.Production
             if (!steps.Any())
                 return;
 
-            var eligibleSteps = steps.Select(x => new WorkingStep(x).Init());
-            WorkProcessingOrder.AddWorkPackage(++workPackageCount, new List<WorkingStep>(eligibleSteps));
+            var eligibleSteps = steps.Select(x => new Step(x).Init());
+            WorkProcessingOrder.AddWorkPackage(++workPackageCount, new List<Step>(eligibleSteps));
 
             var nextStep = steps.First();
-            if (nextStep.CanProcess)
-                foreach (var dependent in ProcessingSteps.Map.Values.Where(x => x.DependsOn(nextStep))
+            if (nextStep.CanProcessMapping)
+                foreach (var dependent in ProcessingSteps.Map.Values.Where(x => x.DoesHaveDependencyOn(nextStep))
                     .OrderBy(x => x.StepName))
                     dependent.MarkPrerequisiteAsMapped(nextStep);
 

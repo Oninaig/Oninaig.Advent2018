@@ -43,9 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Process\Helpers\Dumper.cs" />
-    <Compile Include="Process\WorkPackages.cs" />
+    <Compile Include="Process\WorkProcessingOrder.cs" />
     <Compile Include="Production\StepProcessingFactory.cs" />
-    <Compile Include="Process\WorkingStep.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Process\Step.cs" />
@@ -63,5 +62,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

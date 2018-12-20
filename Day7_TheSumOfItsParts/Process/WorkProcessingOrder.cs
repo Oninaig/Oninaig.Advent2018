@@ -6,14 +6,14 @@ using Day7_TheSumOfItsParts.Process.Helpers;
 namespace Day7_TheSumOfItsParts.Process
 {
     /// <summary>
-    ///     Workpackage conists of an id (int) and a collection of WorkingStep objects that are "eligible" to be worked on
-    ///     throughout a given "order" of WorkingSteps.
+    ///     Workpackage conists of an id (int) and a collection of Step objects that are "eligible" to be worked on
+    ///     throughout a given "order" of Steps.
     ///     Example: If the order of work is ABC where B and C depend on A to be finished first, your first work package would
     ///     just be 1-A and your second would be 2-BC.
     /// </summary>
-    public class WorkPackages
+    public class WorkProcessingOrder
     {
-        public WorkPackages()
+        public WorkProcessingOrder()
         {
             Packages = new Dictionary<int, WorkPackage>();
         }
@@ -22,7 +22,7 @@ namespace Day7_TheSumOfItsParts.Process
 
         public bool HasWorkToDo => Packages.Values.Any(x => x.EligibleSteps.Any(y => !y.IsCompleted));
 
-        public void AddWorkPackage(int packageProcessOrder, IEnumerable<WorkingStep> eligibleSteps)
+        public void AddWorkPackage(int packageProcessOrder, IEnumerable<Step> eligibleSteps)
         {
             Packages.Add(packageProcessOrder, new WorkPackage(packageProcessOrder, eligibleSteps));
         }
@@ -33,21 +33,21 @@ namespace Day7_TheSumOfItsParts.Process
                 Dumper.WriteLine("The order in which the packages can be completed is:");
             foreach (var kvp in Packages)
                 Dumper.WriteLine(
-                    $"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x => x.IdentifyRemaining()))}");
+                    $"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x => x.IdentifyWithWorkRemaining()))}");
         }
 
         public void DumpInProgress()
         {
-            var inProgress = new List<WorkingStep>();
+            var inProgress = new List<Step>();
             foreach (var kvp in Packages)
             foreach (var step in kvp.Value.EligibleSteps)
                 if (step.IsAssigned && !step.IsCompleted && !inProgress.Contains(step))
                     inProgress.Add(step);
             Dumper.WriteLine(
-                $"In progress:{Environment.NewLine}{string.Join("", inProgress.Select(x => $"{x.IdentifyRemaining()}{Environment.NewLine}"))}");
+                $"In progress:{Environment.NewLine}{string.Join("", inProgress.Select(x => $"{x.IdentifyWithWorkRemaining()}{Environment.NewLine}"))}");
         }
 
-        public void SetAssigned(WorkingStep step)
+        public void FlagStepAsAssigned(Step step)
         {
             if (step == null)
                 return;
@@ -62,7 +62,7 @@ namespace Day7_TheSumOfItsParts.Process
                 }
         }
 
-        public void SetCompleted(WorkingStep step)
+        public void FlagStepAsCompleted(Step step)
         {
             if (step == null)
                 return;
@@ -86,7 +86,7 @@ namespace Day7_TheSumOfItsParts.Process
         }
 
 
-        public bool DoSetAmountOfWork(WorkingStep step, int workAmount)
+        public bool DoSetAmountOfWork(Step step, int workAmount)
         {
             if (step == null)
                 return true;
@@ -112,13 +112,13 @@ namespace Day7_TheSumOfItsParts.Process
 
     public class WorkPackage
     {
-        public WorkPackage(int packageProcessOrderId, IEnumerable<WorkingStep> eligibleSteps)
+        public WorkPackage(int packageProcessOrderId, IEnumerable<Step> eligibleSteps)
         {
             PackageProcessOrderId = packageProcessOrderId;
             EligibleSteps = eligibleSteps;
         }
 
         public int PackageProcessOrderId { get; set; }
-        public IEnumerable<WorkingStep> EligibleSteps { get; set; }
+        public IEnumerable<Step> EligibleSteps { get; set; }
     }
 }
