@@ -44,9 +44,7 @@
   <ItemGroup>
     <Compile Include="Process\Helpers\Dumper.cs" />
     <Compile Include="Process\WorkPackages.cs" />
-    <Compile Include="Production\TimeClockStation.cs" />
     <Compile Include="Production\StepProcessingFactory.cs" />
-    <Compile Include="Production\Worker.cs" />
     <Compile Include="Process\WorkingStep.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

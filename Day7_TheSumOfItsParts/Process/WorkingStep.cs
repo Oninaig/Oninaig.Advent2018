@@ -1,46 +1,51 @@
 ﻿using System;
 using System.Linq;
-using System.Timers;
 using Day7_TheSumOfItsParts.Process.Helpers;
 
 namespace Day7_TheSumOfItsParts.Process
 {
     public class WorkingStep : Step, IEquatable<WorkingStep>
     {
-        private WorkingStepParams _workingParams;
+        private readonly WorkingStepParams _workingParams;
         private bool _initialized;
-    
+
         public WorkingStep()
         {
         }
+
         public WorkingStep(WorkingStepParams workParams)
         {
-            this._workingParams = workParams;
+            _workingParams = workParams;
         }
+
         public WorkingStep(Step baseStep) : base(baseStep)
         {
         }
-
-        public override int GetHashCode()
-        {
-            return this.UniqueStepId.GetHashCode();
-        }
-        public bool Equals(WorkingStep other)
-        {
-            if (other is null)
-                return false;
-            if (this.UniqueStepId == other.UniqueStepId)
-                return true;
-            return false;
-        }
-
-        public override bool Equals(object obj) => Equals(obj as WorkingStep);
 
         public int RemainingWorkRequired { get; set; }
         public int WorkRequired { get; private set; }
 
         public bool HasPrerequisites =>
-            this.PreRequisites.Any(x => !x.Key.IsCompleted);
+            PreRequisites.Any(x => !x.Key.IsCompleted);
+
+        public bool Equals(WorkingStep other)
+        {
+            if (other is null)
+                return false;
+            if (UniqueStepId == other.UniqueStepId)
+                return true;
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return UniqueStepId.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as WorkingStep);
+        }
 
         public WorkingStep Init()
         {
@@ -53,6 +58,7 @@ namespace Day7_TheSumOfItsParts.Process
                     RemainingWorkRequired = WorkRequired = StepProcessor.GetWorkTimeForLetter(StepName);
                 _initialized = true;
             }
+
             return this;
         }
 
@@ -70,16 +76,17 @@ namespace Day7_TheSumOfItsParts.Process
         public string RemaingWorkPct()
         {
             return
-                $"{RemainingWorkRequired} ({Math.Round((((double) WorkRequired - (double) RemainingWorkRequired) / (double) WorkRequired) * 100)}% complete)";
+                $"{RemainingWorkRequired} ({Math.Round((WorkRequired - (double) RemainingWorkRequired) / WorkRequired * 100)}% complete)";
         }
 
         public string Identify()
         {
-            return $"{this.StepName}-{this.RemainingWorkRequired} / {this.WorkRequired}";
+            return $"{StepName}-{RemainingWorkRequired} / {WorkRequired}";
         }
+
         public string IdentifyRemaining()
         {
-            return $"{this.StepName} - {this.RemainingWorkRequired}";
+            return $"{StepName} - {RemainingWorkRequired}";
         }
 
         public override object AddPrerequisite(Step requiredStep)
@@ -87,18 +94,17 @@ namespace Day7_TheSumOfItsParts.Process
             PreRequisites.Add(requiredStep, false);
             return this;
         }
-
     }
 
     public class WorkingStepParams
     {
-        public bool Debug { get; set; }
-        public int WorkRequiredOverride { get; set; }
-
         public WorkingStepParams(bool debug, int workRequiredOverride)
         {
             Debug = debug;
             WorkRequiredOverride = workRequiredOverride;
         }
+
+        public bool Debug { get; set; }
+        public int WorkRequiredOverride { get; set; }
     }
 }

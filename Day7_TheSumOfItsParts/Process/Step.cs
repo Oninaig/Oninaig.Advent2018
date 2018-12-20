@@ -12,7 +12,7 @@ namespace Day7_TheSumOfItsParts.Process
 
         public Step(string name)
         {
-            PreRequisites = new Dictionary<Step,bool>();
+            PreRequisites = new Dictionary<Step, bool>();
             UniqueStepId = Guid.NewGuid();
             StepName = name;
         }
@@ -24,15 +24,14 @@ namespace Day7_TheSumOfItsParts.Process
             StepName = otherStep.StepName;
         }
 
-        //public IList<Step> PreRequisites { get; }
-        public bool IsAssigned { get;set; }
-        public bool IsCompleted {get; set; }
-        public bool IsProcessing { get;set; }
+        public bool IsAssigned { get; set; }
+        public bool IsCompleted { get; set; }
         public Guid UniqueStepId { get; }
         public Dictionary<Step, bool> PreRequisites { get; }
         public string StepName { get; }
-        public bool HasUnmappedPrerequisites => PreRequisites != null && PreRequisites.Any(x=> x.Value == false);
-        //public virtual bool HasPrerequisites => PreRequisites != null && PreRequisites.Any();
+
+        public bool HasUnmappedPrerequisites => PreRequisites != null && PreRequisites.Any(x => x.Value == false);
+
         public bool CanProcess => !HasUnmappedPrerequisites;
 
         public virtual object AddPrerequisite(Step requiredStep)

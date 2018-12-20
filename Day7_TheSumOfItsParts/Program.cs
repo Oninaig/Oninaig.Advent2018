@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading;
 using System.Timers;
-using Day7_TheSumOfItsParts.Process;
 using Day7_TheSumOfItsParts.Process.Helpers;
 using Day7_TheSumOfItsParts.Production;
 
