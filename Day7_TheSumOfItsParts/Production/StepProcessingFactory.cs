@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Day7_TheSumOfItsParts.Process;
 
@@ -51,7 +52,7 @@ namespace Day7_TheSumOfItsParts.Production
         public void Init()
         {
             initJobQueue();
-            Console.WriteLine();
+            Debug.WriteLine("");
             hireWorkers();
         }
 
@@ -59,10 +60,11 @@ namespace Day7_TheSumOfItsParts.Production
         {
             var runningEfficientTime = 0;
             var runningTime = 0;
-            var availableWorkers = MaxWorkers;
+            
             foreach (var kvp in WorkProcessingOrder.Packages)
             {
-                var tasksToRun = kvp.Value.EligibleSteps.Where(x=>!x.IsAssigned || !x.IsCompleted).OrderBy(x=>x.RemainingWorkRequired).Take(MaxWorkers).OrderByDescending(x=>x.RemainingWorkRequired).ToList();
+                var availableWorkers = MaxWorkers;
+                var tasksToRun = kvp.Value.EligibleSteps.Where(x=> !x.IsCompleted).OrderBy(x=>x.RemainingWorkRequired).Take(MaxWorkers).OrderByDescending(x=>x.RemainingWorkRequired).ToList();
                 
 
                
@@ -70,6 +72,7 @@ namespace Day7_TheSumOfItsParts.Production
 
                 //out of every task we are currently processing, find the fastest one and subtract its work time from all other working tasks
                 var fastest = tasksToRun.LastOrDefault();
+                //Get tasks that are assigned but not completed
                 var priorityTasks = tasksToRun.Where(x => x.IsAssigned && !x.IsCompleted);
                 if (priorityTasks.Any())
                 {
@@ -77,15 +80,15 @@ namespace Day7_TheSumOfItsParts.Production
                     while (pTaskEnum.MoveNext() && availableWorkers > 0)
                     {
                         availableWorkers--;
-                        
-                        if (iter)
-                        {
-                            availableWorkers--;
-
-                        }
+                        WorkProcessingOrder.DoSetAmountOfWork(pTaskEnum.Current, fastest?.WorkRequired ?? int.MinValue);
                     }
                 }
-                
+
+                if (availableWorkers == 0)
+                    continue;
+                if (availableWorkers < 0)
+                    throw new Exception("Somehow we have negative available workers");
+
                 foreach (var tsk in tasksToRun)
                 {
                     WorkProcessingOrder.SetAssigned(tsk);
@@ -95,7 +98,7 @@ namespace Day7_TheSumOfItsParts.Production
                         availableWorkers++;
                 }
                 runningTime += fastest?.WorkRequired ?? int.MinValue;
-
+                WorkProcessingOrder.DumpPackages();
 
                 ////first task is the slowest and dictates how long this level will take
                 //var slowest = tasksToRun.FirstOrDefault();
@@ -183,7 +186,7 @@ namespace Day7_TheSumOfItsParts.Production
 
             //}
 
-            Console.WriteLine($"Solution is: {runningTime} seconds.");
+            Debug.WriteLine($"Solution is: {runningTime} seconds.");
         }
 
         private void initJobQueue()

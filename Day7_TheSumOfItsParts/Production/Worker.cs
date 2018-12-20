@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Timers;
 using Day7_TheSumOfItsParts.Process;
@@ -36,13 +37,13 @@ namespace Day7_TheSumOfItsParts.Production
 
         public void ClockIn()
         {
-            Console.WriteLine($"Worker {this} is clocking in!");
+            Debug.WriteLine($"Worker {this} is clocking in!");
             TimeClock.ClockIn(this, DoWorkTimeStep);
         }
 
         public void ClockOut()
         {
-            Console.WriteLine($"Worker {this} is clocking out!");
+            Debug.WriteLine($"Worker {this} is clocking out!");
             TimeClock.ClockOut(this, DoWorkTimeStep);
         }
 
@@ -52,7 +53,7 @@ namespace Day7_TheSumOfItsParts.Production
             WorkCount++;
             if (CurrWorkStep.DoWork())
             {
-                Console.WriteLine(
+                Debug.WriteLine(
                     $"Worker {this} is working! Current total work count: {TotalWorkCount}. Current task required work: {CurrWorkStep.WorkRequired}. Remaining work: {CurrWorkStep.RemaingWorkPct()}");
             }
             else

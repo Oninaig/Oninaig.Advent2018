@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Timers;
 
@@ -34,7 +35,7 @@ namespace Day7_TheSumOfItsParts.Production
         /// <param name="args"></param>
         public void MasterElapsed(object sender, ElapsedEventArgs args)
         {
-            Console.WriteLine($"Timer {this} current clocked in workers: {ClockedInWorkers.Count}");
+            Debug.WriteLine($"Timer {this} current clocked in workers: {ClockedInWorkers.Count}");
         }
 
         public void ClockIn(Worker worker, ElapsedEventHandler act)
@@ -56,7 +57,7 @@ namespace Day7_TheSumOfItsParts.Production
 
         public void Start()
         {
-            Console.WriteLine($"Timeclock {this} is starting!");
+            Debug.WriteLine($"Timeclock {this} is starting!");
             _timeClock.Start();
         }
 

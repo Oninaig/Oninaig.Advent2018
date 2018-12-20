@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Timers;
 using Day7_TheSumOfItsParts.Process;
@@ -20,7 +21,7 @@ namespace Day7_TheSumOfItsParts
             StepProcessor.EnableWorkConstant = false;
             var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
             
-            var testFactory = new StepProcessingFactory(test, 5);
+            var testFactory = new StepProcessingFactory(test, 2);
             testFactory.Init();
             testFactory.FindSolution();
             testFactory.WorkProcessingOrder.DumpPackages();
@@ -30,7 +31,7 @@ namespace Day7_TheSumOfItsParts
 
         private static void TestStationOnTimeClockTimeStep(object sender, ElapsedEventArgs e)
         {
-            Console.WriteLine("Hello from timeclock event handler!");
+            Debug.WriteLine("Hello from timeclock event handler!");
         }
     }
 }

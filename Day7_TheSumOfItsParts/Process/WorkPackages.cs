@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,12 +26,13 @@ namespace Day7_TheSumOfItsParts.Process
             this.Packages.Add(packageProcessOrder, new WorkPackage(packageProcessOrder, eligibleSteps));
         }
 
-        public void DumpPackages()
+        public void DumpPackages(bool orderString = true)
         {
-            Console.WriteLine("The order in which the packages can be completed is:");
+            if(orderString)
+                Debug.WriteLine("The order in which the packages can be completed is:");
             foreach (var kvp in Packages)
             {
-                Console.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.Identify()))}");
+                Debug.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.IdentifyRemaining()))}");
             }
         }
 
@@ -38,6 +40,7 @@ namespace Day7_TheSumOfItsParts.Process
         {
             if (step == null)
                 return;
+            Debug.WriteLine($"Assigning {step.StepName}");
             foreach (var kvp in Packages)
             {
                 foreach(var stp in kvp.Value.EligibleSteps)
@@ -77,7 +80,7 @@ namespace Day7_TheSumOfItsParts.Process
                         stp.RemainingWorkRequired -= workAmount;
                         if (stp.RemainingWorkRequired == 0)
                         {
-                            Console.WriteLine($"Step {stp.StepName} completed.");
+                            Debug.WriteLine($"Step {stp.StepName} completed.");
                             stp.IsCompleted = true;
                             stp.IsAssigned = false;
                         }

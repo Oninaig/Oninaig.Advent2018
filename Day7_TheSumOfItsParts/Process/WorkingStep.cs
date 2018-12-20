@@ -10,6 +10,7 @@ namespace Day7_TheSumOfItsParts.Process
         private bool _initialized;
         public bool IsAssigned { get;set; }
         public bool IsCompleted {get; set; }
+        public bool IsProcessing { get;set; }
         public WorkingStep()
         {
         }
@@ -58,7 +59,11 @@ namespace Day7_TheSumOfItsParts.Process
 
         public string Identify()
         {
-            return $"{this.StepName}-{this.WorkRequired}";
+            return $"{this.StepName}-{this.RemainingWorkRequired} / {this.WorkRequired}";
+        }
+        public string IdentifyRemaining()
+        {
+            return $"{this.StepName} - {this.RemainingWorkRequired}";
         }
 
     }
