@@ -12,7 +12,7 @@ namespace Day7_TheSumOfItsParts.Process
 
         public Step(string name)
         {
-            PreRequisites = new List<Step>();
+            PreRequisites = new Dictionary<Step,bool>();
             UniqueStepId = Guid.NewGuid();
             StepName = name;
         }
@@ -24,26 +24,31 @@ namespace Day7_TheSumOfItsParts.Process
             StepName = otherStep.StepName;
         }
 
-        public IList<Step> PreRequisites { get; }
+        //public IList<Step> PreRequisites { get; }
+        public bool IsAssigned { get;set; }
+        public bool IsCompleted {get; set; }
+        public bool IsProcessing { get;set; }
         public Guid UniqueStepId { get; }
+        public Dictionary<Step, bool> PreRequisites { get; }
         public string StepName { get; }
-        public bool HasPrerequisites => PreRequisites != null && PreRequisites.Any();
-        public bool CanProcess => !HasPrerequisites;
+        public bool HasUnmappedPrerequisites => PreRequisites != null && PreRequisites.Any(x=> x.Value == false);
+        //public virtual bool HasPrerequisites => PreRequisites != null && PreRequisites.Any();
+        public bool CanProcess => !HasUnmappedPrerequisites;
 
-        public Step AddPrerequisite(Step requiredStep)
+        public virtual object AddPrerequisite(Step requiredStep)
         {
-            PreRequisites.Add(requiredStep);
+            PreRequisites.Add(requiredStep, false);
             return this;
         }
 
-        public bool DependsOn(Step otherStep)
+        public virtual bool DependsOn(Step otherStep)
         {
-            return PreRequisites.Contains(otherStep);
+            return PreRequisites.Keys.Contains(otherStep);
         }
 
-        public void RemovePrerequisite(Step processedStep)
+        public virtual void MarkPrerequisiteAsMapped(Step processedStep)
         {
-            PreRequisites.Remove(processedStep);
+            PreRequisites[processedStep] = true;
         }
     }
 }

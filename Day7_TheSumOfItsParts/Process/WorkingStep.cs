@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Linq;
 using System.Timers;
 using Day7_TheSumOfItsParts.Process.Helpers;
 
 namespace Day7_TheSumOfItsParts.Process
 {
-    public class WorkingStep : Step
+    public class WorkingStep : Step, IEquatable<WorkingStep>
     {
         private WorkingStepParams _workingParams;
         private bool _initialized;
-        public bool IsAssigned { get;set; }
-        public bool IsCompleted {get; set; }
-        public bool IsProcessing { get;set; }
+    
         public WorkingStep()
         {
         }
@@ -22,9 +21,26 @@ namespace Day7_TheSumOfItsParts.Process
         {
         }
 
+        public override int GetHashCode()
+        {
+            return this.UniqueStepId.GetHashCode();
+        }
+        public bool Equals(WorkingStep other)
+        {
+            if (other is null)
+                return false;
+            if (this.UniqueStepId == other.UniqueStepId)
+                return true;
+            return false;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as WorkingStep);
+
         public int RemainingWorkRequired { get; set; }
         public int WorkRequired { get; private set; }
-        
+
+        public bool HasPrerequisites =>
+            this.PreRequisites.Any(x => !x.Key.IsCompleted);
 
         public WorkingStep Init()
         {
@@ -64,6 +80,12 @@ namespace Day7_TheSumOfItsParts.Process
         public string IdentifyRemaining()
         {
             return $"{this.StepName} - {this.RemainingWorkRequired}";
+        }
+
+        public override object AddPrerequisite(Step requiredStep)
+        {
+            PreRequisites.Add(requiredStep, false);
+            return this;
         }
 
     }

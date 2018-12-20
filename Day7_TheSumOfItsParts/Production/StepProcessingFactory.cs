@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Day7_TheSumOfItsParts.Process;
+using Day7_TheSumOfItsParts.Process.Helpers;
 
 namespace Day7_TheSumOfItsParts.Production
 {
@@ -52,147 +53,310 @@ namespace Day7_TheSumOfItsParts.Production
         public void Init()
         {
             initJobQueue();
-            Debug.WriteLine("");
+            Dumper.WriteLine("");
             hireWorkers();
         }
+
+        //public void FindSolution()
+        //{
+        //    var availableSteps =
+        //        WorkProcessingOrder.Packages.SelectMany(x => x.Value.EligibleSteps).Where(x=>!x.HasPrerequisites).Distinct();
+
+        //}
 
         public void FindSolution()
         {
             var runningEfficientTime = 0;
             var runningTime = 0;
-            
-            foreach (var kvp in WorkProcessingOrder.Packages)
+            Queue<WorkingStep> InProgress = new Queue<WorkingStep>();
+            while (WorkProcessingOrder.HasWorkToDo)
             {
                 var availableWorkers = MaxWorkers;
-                var tasksToRun = kvp.Value.EligibleSteps.Where(x=> !x.IsCompleted).OrderBy(x=>x.RemainingWorkRequired).Take(MaxWorkers).OrderByDescending(x=>x.RemainingWorkRequired).ToList();
-                
 
-               
-
-
-                //out of every task we are currently processing, find the fastest one and subtract its work time from all other working tasks
-                var fastest = tasksToRun.LastOrDefault();
-                //Get tasks that are assigned but not completed
-                var priorityTasks = tasksToRun.Where(x => x.IsAssigned && !x.IsCompleted);
-                if (priorityTasks.Any())
+                //What are we going to work on during this time step
+                //First lets grab any tasks we are still working on from our last time step
+                var todaysWork = new List<WorkingStep>();
+                while (InProgress.Any() && availableWorkers > 0)
                 {
-                    var pTaskEnum = tasksToRun.GetEnumerator();
-                    while (pTaskEnum.MoveNext() && availableWorkers > 0)
-                    {
-                        availableWorkers--;
-                        WorkProcessingOrder.DoSetAmountOfWork(pTaskEnum.Current, fastest?.WorkRequired ?? int.MinValue);
-                    }
+                    todaysWork.Add(InProgress.Dequeue());
+                    availableWorkers--;
                 }
 
-                if (availableWorkers == 0)
-                    continue;
-                if (availableWorkers < 0)
-                    throw new Exception("Somehow we have negative available workers");
+                //Then we grab any tasks that are eligible to be processed during this time step.
+                var eligibleSteps = WorkProcessingOrder.Packages.SelectMany(x => x.Value.EligibleSteps)
+                    .Where(x => !x.HasPrerequisites && !x.IsCompleted).Distinct().Where(x=> !todaysWork.Contains(x)).OrderBy(x => x.WorkRequired);
+                var fastestTask = eligibleSteps.FirstOrDefault();
+                var fastestInProgressTime = todaysWork.OrderByDescending(x => x.RemainingWorkRequired).LastOrDefault()?.RemainingWorkRequired;
+                var fastestTime = (fastestTask?.RemainingWorkRequired < fastestInProgressTime ? fastestTask?.RemainingWorkRequired : fastestInProgressTime) ?? fastestTask.RemainingWorkRequired;
 
-                foreach (var tsk in tasksToRun)
+                foreach (var eligibleStep in eligibleSteps)
+                {
+                    if (availableWorkers > 0)
+                    {
+                        todaysWork.Add(eligibleStep);
+                        availableWorkers--;
+                    }
+                    else
+                        break;
+                }
+
+                foreach (var tsk in todaysWork)
                 {
                     WorkProcessingOrder.SetAssigned(tsk);
-                    availableWorkers--;
-                    WorkProcessingOrder.DoSetAmountOfWork(tsk, fastest?.WorkRequired ?? int.MinValue);
-                    if (tsk.IsCompleted)
-                        availableWorkers++;
+                    if (WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime))
+                        WorkProcessingOrder.SetCompleted(tsk);
+                    else
+                        InProgress.Enqueue(tsk);
                 }
-                runningTime += fastest?.WorkRequired ?? int.MinValue;
-                WorkProcessingOrder.DumpPackages();
 
-                ////first task is the slowest and dictates how long this level will take
-                //var slowest = tasksToRun.FirstOrDefault();
-                //var slowestTime = slowest?.WorkRequired ?? 0;
 
-                //var fastest = tasksToRun.LastOrDefault();
-                //var fastestTime = fastest?.WorkRequired ?? 0;
 
-                //if (tasksToRun.Count() == 1)
+                //foreach (var tsk in eligibleSteps)
                 //{
-                //    runningTime += slowest?.WorkRequired ?? 0;
-                //    WorkProcessingOrder.SetAssigned(slowest);
-                //    WorkProcessingOrder.SetCompleted(slowest);
+
+                //    WorkProcessingOrder.SetAssigned(tsk);
+                //    availableWorkers--;
+                //    if (WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime))
+                //    {
+                //        availableWorkers++;
+                //        WorkProcessingOrder.SetCompleted(tsk);
+                //    }
+                //    else
+                //        InProgress.Enqueue(tsk);
+                //}
+                
+
+
+                runningTime += fastestTime;
+                WorkProcessingOrder.DumpPackages(false);
+
+
+                ////out of every task we are currently processing, find the fastest one and subtract its work time from all other working tasks
+                //var fastestTime = int.MaxValue;
+                //var fastPrioTask = InProgress.Any()
+                //    ? InProgress.ToList().OrderBy(x => x.RemainingWorkRequired).First() : null;
+
+                //var fastestPriorityTime = InProgress.Any()
+                //    ? InProgress.ToList().OrderBy(x => x.RemainingWorkRequired).First().RemainingWorkRequired
+                //    : int.MaxValue;
+                //var fastestTaskToRun = tasksToRun.LastOrDefault();
+
+                ////if our priority task is faster, use that as baseline
+                //if (fastestTaskToRun?.RemainingWorkRequired < fastestPriorityTime)
+                //    fastestTime = fastestTaskToRun.RemainingWorkRequired;
+                //else
+                //    fastestTime = fastestPriorityTime;
+
+                //if (fastestTime == int.MaxValue)
                 //    continue;
-                //}
-
-                ////Set our slowest task as assigned
-                //WorkProcessingOrder.SetAssigned(slowest);
-
-                //foreach (var tsk in tasksToRun)
+                ////Process the in-progress tasks
+                //var tempQueue = new Queue<WorkingStep>();
+                //while (InProgress.Any())
                 //{
-                //    WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime);
+                //    var inProgressTask = InProgress.Dequeue();
+                //    if (WorkProcessingOrder.DoSetAmountOfWork(inProgressTask, fastestTime))
+                //        availableWorkers++;
+                //    else
+                //        tempQueue.Enqueue(inProgressTask);
                 //}
 
+                //InProgress = tempQueue;
 
 
+
+
+                //if (availableWorkers == 0)
+                //{
+                //    //no available workers means we are still processing tasks from the last package, so we redo this one
+                //    continue;
+                //};
+                //if (availableWorkers < 0)
+                //    throw new Exception("Somehow we have negative available workers");
+
+                //if (!needToWait)
+                //{
+                //    foreach (var tsk in tasksToRun)
+                //    {
+
+                //        WorkProcessingOrder.SetAssigned(tsk);
+
+                //        availableWorkers--;
+                //        if (WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime))
+                //        {
+                //            availableWorkers++;
+                //        }
+                //        else
+                //            InProgress.Enqueue(tsk);
+                //    }
+                //}
+            
+
+
+                //runningTime += fastestTime;
+                //WorkProcessingOrder.DumpPackages(false);
             }
-            //foreach (var kvp in WorkProcessingOrder.Packages)
-            //{
-            //    //First we find the longest running task in our current package
-            //    var sortedLargest = kvp.Value.EligibleSteps.OrderByDescending(x => x.WorkRequired);
-            //    var longest = sortedLargest.FirstOrDefault(x=> !x.IsAssigned);
-            //    if (longest != null)
-            //    {
-            //        //longest.IsAssigned = true;
-            //        WorkProcessingOrder.SetAssigned(longest);
-            //        if (runningEfficientTime == 0)
-            //            runningEfficientTime = longest.WorkRequired;
-            //        else if (runningEfficientTime > longest.WorkRequired)
-            //        {
-            //            runningEfficientTime -= longest.WorkRequired;
-            //            runningTime += longest.WorkRequired;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        runningTime += runningEfficientTime;
-            //        runningEfficientTime = 0;
-            //        continue;
-            //    }
-                
-                
-            //    //Then, for each of our workers, we divy up the remaining work thats next-hardest
-            //    //i < MaxWorkers - 1 becuase we already "assigned" the first (longest) running task in the line above, so we are already down 1 worker.
-            //    //also we can only run this part if we have enough work remaining to go around in the first place
-            //    if (kvp.Value.EligibleSteps.Count(x=>!x.IsAssigned) > 0 && (MaxWorkers - 1 > 0))
-            //    {
-            //        for (int i = 0; i < MaxWorkers - 1; i++)
-            //        {
-            //            var nextHardest = sortedLargest.Skip(i + 1).FirstOrDefault(x=> !x.IsAssigned);
-            //            if (nextHardest == null)
-            //                break;
-            //            WorkProcessingOrder.SetAssigned(nextHardest);
-            //            //nextHardest.IsAssigned = true;
 
-            //            //Now we can fit the total time of the next hardest task into our current hardest task, being efficient with our time
-            //            if (runningEfficientTime > nextHardest.WorkRequired)
+            //for (int i = 0; i < WorkProcessingOrder.Packages.Count; i++)
+            //{
+            //    bool needToWait = false;
+            //    var kvp = WorkProcessingOrder.Packages.ElementAt(i);
+            //    Dumper.WriteLine($"Currently processing package: {kvp.Key}");
+            //    if (i > 0 && kvp.Value.EligibleSteps.Intersect(WorkProcessingOrder.Packages.ElementAt(i - 1).Value.EligibleSteps).Any())
+            //    {
+            //        var prevPackage = WorkProcessingOrder.Packages.ElementAt(i - 1).Value.EligibleSteps;
+            //        var sameElements = kvp.Value.EligibleSteps.Intersect(prevPackage);
+            //        var nonRepeatedElements = prevPackage.Where(x => !kvp.Value.EligibleSteps.Contains(x));
+            //        if (nonRepeatedElements.Any(x => !x.IsCompleted))
+            //            needToWait = true;
+            //    }
+
+            //    var tasksToRun = kvp.Value.EligibleSteps.Where(x => !x.IsAssigned && !x.IsCompleted).OrderBy(x => x.RemainingWorkRequired).Take(MaxWorkers - InProgress.Count).OrderByDescending(x => x.RemainingWorkRequired).ToList();
+
+
+
+
+
+            //    //out of every task we are currently processing, find the fastest one and subtract its work time from all other working tasks
+            //    var fastestTime = int.MaxValue;
+            //    var fastPrioTask = InProgress.Any()
+            //        ? InProgress.ToList().OrderBy(x => x.RemainingWorkRequired).First() : null;
+
+            //    var fastestPriorityTime = InProgress.Any()
+            //        ? InProgress.ToList().OrderBy(x => x.RemainingWorkRequired).First().RemainingWorkRequired
+            //        : int.MaxValue;
+            //    var fastestTaskToRun = tasksToRun.LastOrDefault();
+
+            //    //if our priority task is faster, use that as baseline
+            //    if (fastestTaskToRun?.RemainingWorkRequired < fastestPriorityTime)
+            //        fastestTime = fastestTaskToRun.RemainingWorkRequired;
+            //    else
+            //        fastestTime = fastestPriorityTime;
+
+            //    if (fastestTime == int.MaxValue)
+            //        continue;
+            //    //Process the in-progress tasks
+            //    var tempQueue = new Queue<WorkingStep>();
+            //    while (InProgress.Any())
+            //    {
+            //        var inProgressTask = InProgress.Dequeue();
+            //        if (WorkProcessingOrder.DoSetAmountOfWork(inProgressTask, fastestTime))
+            //            availableWorkers++;
+            //        else
+            //            tempQueue.Enqueue(inProgressTask);
+            //    }
+
+            //    InProgress = tempQueue;
+
+
+
+
+            //    if (availableWorkers == 0)
+            //    {
+            //        //no available workers means we are still processing tasks from the last package, so we redo this one
+            //        i--;
+            //        continue;
+            //    };
+            //    if (availableWorkers < 0)
+            //        throw new Exception("Somehow we have negative available workers");
+
+            //    if (!needToWait)
+            //    {
+            //        foreach (var tsk in tasksToRun)
+            //        {
+
+            //            WorkProcessingOrder.SetAssigned(tsk);
+
+            //            availableWorkers--;
+            //            if (WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime))
             //            {
-            //                runningEfficientTime -= nextHardest.WorkRequired;
-            //                runningTime += nextHardest.WorkRequired;
+            //                availableWorkers++;
             //            }
             //            else
-            //            {
-            //                runningTime += runningEfficientTime;
-            //                runningEfficientTime = nextHardest.WorkRequired - runningEfficientTime;
-
-            //            }
+            //                InProgress.Enqueue(tsk);
             //        }
             //    }
             //    else
             //    {
-            //        runningTime += longest.WorkRequired;
-            //        runningEfficientTime = 0;
+            //        i--;
             //    }
 
-            //}
 
-            Debug.WriteLine($"Solution is: {runningTime} seconds.");
+
+            //    runningTime += fastestTime;
+            //    WorkProcessingOrder.DumpPackages(false);
+            //}
+            //    //foreach (var kvp in WorkProcessingOrder.Packages)
+            //    //{
+            //    //    Dumper.WriteLine($"Currently processing package: {kvp.Key}");
+            //    //    var availableWorkers = MaxWorkers;
+
+
+            //    //    var tasksToRun = kvp.Value.EligibleSteps.Where(x=> !x.IsAssigned && !x.IsCompleted).OrderBy(x=>x.RemainingWorkRequired).Take(MaxWorkers - InProgress.Count).OrderByDescending(x=>x.RemainingWorkRequired).ToList();
+
+
+
+
+
+            //    //    //out of every task we are currently processing, find the fastest one and subtract its work time from all other working tasks
+            //    //    var fastestTime = int.MaxValue;
+            //    //    var fastestPriorityTask = InProgress.Any()
+            //    //        ? InProgress.ToList().OrderBy(x => x.RemainingWorkRequired).First().RemainingWorkRequired
+            //    //        : int.MaxValue;
+            //    //    var fastestTaskToRun = tasksToRun.LastOrDefault();
+
+            //    //    //if our priority task is faster, use that as baseline
+            //    //    if (fastestTaskToRun?.RemainingWorkRequired < fastestPriorityTask)
+            //    //        fastestTime = fastestTaskToRun.RemainingWorkRequired;
+            //    //    else
+            //    //        fastestTime = fastestPriorityTask;
+            //    //    if (fastestTime == int.MaxValue)
+            //    //        continue;
+            //    //    //Process the in-progress tasks
+            //    //    var tempQueue = new Queue<WorkingStep>();
+            //    //    while (InProgress.Any())
+            //    //    {
+            //    //        availableWorkers--;
+            //    //        var inProgressTask = InProgress.Dequeue();
+            //    //        if (!WorkProcessingOrder.DoSetAmountOfWork(inProgressTask, fastestTime))
+            //    //            tempQueue.Enqueue(inProgressTask);
+            //    //    }
+
+            //    //    InProgress = tempQueue;
+
+            //    //    if (availableWorkers == 0)
+            //    //        continue;
+            //    //    if (availableWorkers < 0)
+            //    //        throw new Exception("Somehow we have negative available workers");
+
+            //    //    foreach (var tsk in tasksToRun)
+            //    //    {
+            //    //        WorkProcessingOrder.SetAssigned(tsk);
+            //    //        availableWorkers--;
+            //    //        if (WorkProcessingOrder.DoSetAmountOfWork(tsk, fastestTime))
+            //    //        {
+            //    //            availableWorkers++;
+            //    //        }
+            //    //        else
+            //    //            InProgress.Enqueue(tsk);
+            //    //    }
+
+            //    //    runningTime += fastestTime;
+            //    //    WorkProcessingOrder.DumpPackages(false);
+
+
+
+
+
+            //    //}
+
+
+            Dumper.WriteLine($"Solution is: {runningTime} seconds.");
         }
 
         private void initJobQueue()
         {
             //Same strategy as StepMap.PrintOrder
-            var steps = ProcessingSteps.Map.Values.Where(x => !x.HasPrerequisites).OrderBy(x => x.StepName);
+            var steps = ProcessingSteps.Map.Values.Where(x => !x.HasUnmappedPrerequisites).OrderBy(x => x.StepName);
             if (!steps.Any())
                 return;
 
@@ -204,7 +368,7 @@ namespace Day7_TheSumOfItsParts.Production
             if (nextStep.CanProcess)
                 foreach (var dependent in ProcessingSteps.Map.Values.Where(x => x.DependsOn(nextStep))
                     .OrderBy(x => x.StepName))
-                    dependent.RemovePrerequisite(nextStep);
+                    dependent.MarkPrerequisiteAsMapped(nextStep);
 
             Console.Write($"{nextStep.StepName}");
             ProcessingSteps.Map.Remove(nextStep.StepName);

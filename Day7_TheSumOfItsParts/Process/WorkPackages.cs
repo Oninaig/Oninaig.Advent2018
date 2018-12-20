@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Day7_TheSumOfItsParts.Process.Helpers;
 
 namespace Day7_TheSumOfItsParts.Process
 {
@@ -29,25 +30,47 @@ namespace Day7_TheSumOfItsParts.Process
         public void DumpPackages(bool orderString = true)
         {
             if(orderString)
-                Debug.WriteLine("The order in which the packages can be completed is:");
+                Dumper.WriteLine("The order in which the packages can be completed is:");
             foreach (var kvp in Packages)
             {
-                Debug.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.IdentifyRemaining()))}");
+                Dumper.WriteLine($"{kvp.Key}: {string.Join(", ", kvp.Value.EligibleSteps.Select(x=>x.IdentifyRemaining()))}");
             }
+        }
+
+        public bool HasWorkToDo => Packages.Values.Any(x => x.EligibleSteps.Any(y => !y.IsCompleted));
+
+        public void DumpInProgress()
+        {
+            var inProgress = new List<WorkingStep>();
+            foreach (var kvp in Packages)
+            {
+                foreach (var step in kvp.Value.EligibleSteps)
+                {
+                    if (step.IsAssigned && !step.IsCompleted && !inProgress.Contains(step))
+                    {
+                        inProgress.Add(step);
+                    }
+
+                }
+                
+            }
+            Dumper.WriteLine($"In progress:{Environment.NewLine}{string.Join("", inProgress.Select(x=>$"{x.IdentifyRemaining()}{Environment.NewLine}"))}");
         }
 
         public void SetAssigned(WorkingStep step)
         {
             if (step == null)
                 return;
-            Debug.WriteLine($"Assigning {step.StepName}");
+            Dumper.WriteLine($"Assigning {step.StepName}");
             foreach (var kvp in Packages)
             {
                 foreach(var stp in kvp.Value.EligibleSteps)
                     if (stp.UniqueStepId == step.UniqueStepId)
                     {
+                        if(!stp.IsAssigned)
+                            stp.RemainingWorkRequired = stp.WorkRequired;
                         stp.IsAssigned = true;
-                        stp.RemainingWorkRequired = stp.WorkRequired;
+                        
                     }
             }
         }
@@ -58,20 +81,37 @@ namespace Day7_TheSumOfItsParts.Process
                 return;
             foreach (var kvp in Packages)
             {
-                foreach(var stp in kvp.Value.EligibleSteps)
+                foreach (var stp in kvp.Value.EligibleSteps)
+                {
                     if (stp.UniqueStepId == step.UniqueStepId)
                     {
                         stp.IsCompleted = true;
                         stp.IsAssigned = false;
                         stp.RemainingWorkRequired = 0;
+                        
                     }
+
+                    foreach (var prereq in stp.PreRequisites.Keys)
+                    {
+                        if (prereq.UniqueStepId == step.UniqueStepId)
+                        {
+                            prereq.IsCompleted = true;
+                            prereq.IsAssigned = false;
+                        }
+                    }
+                }
+                    
             }
         }
 
-        public void DoSetAmountOfWork(WorkingStep step, int workAmount)
+
+
+        public bool DoSetAmountOfWork(WorkingStep step, int workAmount)
         {
             if (step == null)
-                return;
+                return true;
+            var isCompleted = false;
+            Dumper.WriteLine($"Doing {workAmount} units of work for step {step.StepName}");
             foreach (var kvp in Packages)
             {
                 foreach(var stp in kvp.Value.EligibleSteps)
@@ -80,12 +120,15 @@ namespace Day7_TheSumOfItsParts.Process
                         stp.RemainingWorkRequired -= workAmount;
                         if (stp.RemainingWorkRequired == 0)
                         {
-                            Debug.WriteLine($"Step {stp.StepName} completed.");
+                            Dumper.WriteLine($"Step {stp.StepName} completed.");
                             stp.IsCompleted = true;
                             stp.IsAssigned = false;
+                            isCompleted = true;
                         }
                     }
             }
+
+            return isCompleted;
         }
     }
 

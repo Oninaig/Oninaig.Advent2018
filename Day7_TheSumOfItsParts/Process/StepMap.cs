@@ -30,19 +30,19 @@ namespace Day7_TheSumOfItsParts.Process
                 preReqStep = new Step(preReqName);
 
             Map[preReqName] = preReqStep;
-            Map[stepName] = currStep.AddPrerequisite(preReqStep);
+            Map[stepName] = currStep.AddPrerequisite(preReqStep) as Step;
         }
 
         public void PrintOrder()
         {
-            var steps = Map.Values.Where(x => !x.HasPrerequisites).OrderBy(x => x.StepName);
+            var steps = Map.Values.Where(x => !x.HasUnmappedPrerequisites).OrderBy(x => x.StepName);
             if (!steps.Any())
                 return;
 
             var nextStep = steps.First();
             if (nextStep.CanProcess)
                 foreach (var dependent in Map.Values.Where(x => x.DependsOn(nextStep)).OrderBy(x => x.StepName))
-                    dependent.RemovePrerequisite(nextStep);
+                    dependent.MarkPrerequisiteAsMapped(nextStep);
 
             Console.Write($"{nextStep.StepName}");
             Map.Remove(nextStep.StepName);

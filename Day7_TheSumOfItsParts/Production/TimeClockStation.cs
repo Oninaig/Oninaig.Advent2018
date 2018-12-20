@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Timers;
+using Day7_TheSumOfItsParts.Process.Helpers;
 
 namespace Day7_TheSumOfItsParts.Production
 {
@@ -35,7 +36,7 @@ namespace Day7_TheSumOfItsParts.Production
         /// <param name="args"></param>
         public void MasterElapsed(object sender, ElapsedEventArgs args)
         {
-            Debug.WriteLine($"Timer {this} current clocked in workers: {ClockedInWorkers.Count}");
+            Dumper.WriteLine($"Timer {this} current clocked in workers: {ClockedInWorkers.Count}");
         }
 
         public void ClockIn(Worker worker, ElapsedEventHandler act)
@@ -57,7 +58,7 @@ namespace Day7_TheSumOfItsParts.Production
 
         public void Start()
         {
-            Debug.WriteLine($"Timeclock {this} is starting!");
+            Dumper.WriteLine($"Timeclock {this} is starting!");
             _timeClock.Start();
         }
 
