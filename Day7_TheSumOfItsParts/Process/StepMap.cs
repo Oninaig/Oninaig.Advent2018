@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Day7_TheSumOfItsParts
+namespace Day7_TheSumOfItsParts.Process
 {
     public class StepMap
     {
-        public Dictionary<string, Step> Map { get; private set; }
-
         public StepMap()
         {
-            this.Map = new Dictionary<string, Step>();
+            Map = new Dictionary<string, Step>();
         }
+
+        public Dictionary<string, Step> Map { get; }
 
         public void AddStep(string stepName, string preReqName)
         {
@@ -37,19 +35,14 @@ namespace Day7_TheSumOfItsParts
 
         public void PrintOrder()
         {
-            var steps = Map.Values.Where(x=>!x.HasPrerequisites).OrderBy(x=>x.StepName);
+            var steps = Map.Values.Where(x => !x.HasUnmappedPrerequisites).OrderBy(x => x.StepName);
             if (!steps.Any())
                 return;
 
             var nextStep = steps.First();
-            if (nextStep.CanProcess)
-            {
-                //If we can process, that means we can remove this step from its dependent steps
-                foreach (var dependent in Map.Values.Where(x => x.DependsOn(nextStep)).OrderBy(x => x.StepName))
-                {
-                    dependent.RemovePrerequisite(nextStep);
-                }
-            }
+            if (nextStep.CanProcessMapping)
+                foreach (var dependent in Map.Values.Where(x => x.DoesHaveDependencyOn(nextStep)).OrderBy(x => x.StepName))
+                    dependent.MarkPrerequisiteAsMapped(nextStep);
 
             Console.Write($"{nextStep.StepName}");
             Map.Remove(nextStep.StepName);
@@ -66,6 +59,5 @@ namespace Day7_TheSumOfItsParts
 
             return false;
         }
-
     }
 }

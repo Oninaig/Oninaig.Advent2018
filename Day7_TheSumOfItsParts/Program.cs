@@ -1,26 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Timers;
+using Day7_TheSumOfItsParts.Process.Helpers;
 using Day7_TheSumOfItsParts.Production;
 
 namespace Day7_TheSumOfItsParts
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
-            //test.PrintOrder();
-
+            StepProcessor.EnableWorkConstant = true;
             var puzzle = StepProcessor.GenerateStepMapFromFile("puzzleinput.txt");
-            //todo change this so it doesnt modify the master step list
-            //puzzle.PrintOrder();
+            var puzzleFactory = new StepProcessingFactory(puzzle, 5);
+            puzzleFactory.Init();
+            puzzleFactory.FindSolution();
 
-            var testFactory = new StepProcessingFactory(test, 2);
-            testFactory.Init();
+            //StepProcessor.EnableWorkConstant = false;
+            //var test = StepProcessor.GenerateStepMapFromFile("sampleinput.txt");
+
+            //var testFactory = new StepProcessingFactory(test, 2);
+            //testFactory.Init();
+            //testFactory.FindSolution();
+            //testFactory.WorkProcessingOrder.DumpPackages();
+
             Console.ReadLine();
+        }
+
+        private static void TestStationOnTimeClockTimeStep(object sender, ElapsedEventArgs e)
+        {
+            Dumper.WriteLine("Hello from timeclock event handler!");
         }
     }
 }
