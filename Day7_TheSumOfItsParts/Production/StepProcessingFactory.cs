@@ -58,16 +58,16 @@ namespace Day7_TheSumOfItsParts.Production
                     .Where(x => !todaysWork.Contains(x))
                     .OrderBy(x => x.WorkRequired);
 
-                var fastestTask = eligibleSteps.FirstOrDefault();
+                var fastestEligibleTaskTime = eligibleSteps.FirstOrDefault().RemainingWorkRequired;
 
                 var fastestInProgressTime = todaysWork.OrderByDescending(x => x.RemainingWorkRequired).LastOrDefault()
                     ?.RemainingWorkRequired;
 
-                //This line just says "use whatever the fastest remaining time is between in-progress and new tasks.
+                //This line just says "use whatever the fastest remaining time is between in-progress and new tasks."
                 var fastestTime =
-                    (fastestTask?.RemainingWorkRequired < fastestInProgressTime
-                        ? fastestTask?.RemainingWorkRequired
-                        : fastestInProgressTime) ?? fastestTask.RemainingWorkRequired;
+                    (fastestEligibleTaskTime < fastestInProgressTime
+                        ? fastestEligibleTaskTime
+                        : fastestInProgressTime) ?? fastestEligibleTaskTime;
 
                 foreach (var eligibleStep in eligibleSteps)
                     if (availableWorkers > 0)

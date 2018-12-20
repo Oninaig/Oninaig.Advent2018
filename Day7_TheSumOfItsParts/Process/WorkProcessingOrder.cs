@@ -85,7 +85,12 @@ namespace Day7_TheSumOfItsParts.Process
             }
         }
 
-
+        /// <summary>
+        /// Do a set amount of work and return true if the task is completed. False otherwise.
+        /// </summary>
+        /// <param name="step"></param>
+        /// <param name="workAmount"></param>
+        /// <returns></returns>
         public bool DoSetAmountOfWork(Step step, int workAmount)
         {
             if (step == null)
