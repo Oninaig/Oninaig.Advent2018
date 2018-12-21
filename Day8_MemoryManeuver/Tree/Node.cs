@@ -12,8 +12,9 @@ namespace Day8_MemoryManeuver.Tree
         public Metadata<T2> Metadata;
         
         public abstract int NumChildNodes { get; }
+        public abstract int NumMetaEntries { get; }
         public abstract IEnumerable<Node<T1,T2>> Children { get; }
-        public abstract bool AddChild(Node<T1, T2> otherNode);
+        public abstract int AddChild(Node<T1, T2> otherNode);
     }
 
     public abstract class Metadata<T>
@@ -35,10 +36,16 @@ namespace Day8_MemoryManeuver.Tree
     {
         private List<Node<int, int>> _children;
         private int _numChildNodes;
+        private int _numMetaEntries;
 
         public override int NumChildNodes
         {
             get { return _numChildNodes; }
+        }
+
+        public override int NumMetaEntries
+        {
+            get { return _numMetaEntries; }
         }
 
         public override IEnumerable<Node<int, int>> Children
@@ -53,6 +60,7 @@ namespace Day8_MemoryManeuver.Tree
             this.Metadata = new MemoryMetadata();
             this._children = new List<Node<int, int>>();
             this._numChildNodes = memHeader.ChildNodeCount;
+            this._numMetaEntries = memHeader.MetadataCount;
         }
         
         public void AddMetadata(int data)
@@ -60,10 +68,13 @@ namespace Day8_MemoryManeuver.Tree
             this.Metadata.AddData(data);
         }
 
-        public override bool AddChild(Node<int, int> otherNode)
+        public override int AddChild(Node<int, int> otherNode)
         {
             _children.Add(otherNode);
-            return true;
+            var baseline = 2; // 2 elements for always-existing header
+            baseline += otherNode.NumChildNodes;
+            baseline += otherNode.NumMetaEntries;
+            return baseline;
         }
     }
 
@@ -95,7 +106,6 @@ namespace Day8_MemoryManeuver.Tree
     public class MemoryHeader : Header<int>
     {
         private int[] _headerData;
-        private int _childNodeCount;
         public static readonly int ChildNodeCountIndex = 0;
         public static readonly int MetaDataCountIndex = 1;
 

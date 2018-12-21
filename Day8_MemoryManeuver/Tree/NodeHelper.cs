@@ -48,47 +48,42 @@ namespace Day8_MemoryManeuver.Tree
             var inputQueue = new Queue<MemoryNode>();
             var inputStack = new Stack<MemoryNode>();
             var currChildIndex = 0;
-            for (int i = 0; i < splitInput.Length; i++)
+
+            var root = AddNode(splitInput);
+
+            
+
+
+
+        }
+
+
+        private static MemoryNode AddNode(string[] data)
+        {
+            var rootHeaderCNodes = Convert.ToInt32(data[0]);
+            var rootHeaderMDataCount = Convert.ToInt32(data[1]);
+            
+            var rootHeader = new MemoryHeader();
+            rootHeader.SetChildNodeCount(rootHeaderCNodes);
+            rootHeader.SetMetadataCount(rootHeaderMDataCount);
+
+            var rootNode = new MemoryNode(rootHeader);
+            var childNodeCount = rootHeaderCNodes;
+            var needToSkip = 0;
+            while (childNodeCount > 0)
             {
-                var currentHeaderChildNodeCount = Convert.ToInt32(splitInput[i]);
-                var currentHeaderMetadataCount = Convert.ToInt32(splitInput[i + 1]);
-
-                var header = new MemoryHeader();
-                header.SetChildNodeCount(currentHeaderChildNodeCount);
-                header.SetMetadataCount(currentHeaderMetadataCount);
-
-
-
-                var newNode = new MemoryNode(header);
-
-                
-                //we are already incrementing by 1 per loop, so the amount we "skip" to get to the next node *WHEN WE HAVE CHILDREN* is just an additional 1
-                var skipValue = 2;
-
-                //if our child count is > 0, it means the 3rd value in this current set is starting the first child of the current node
-                if (header.ChildNodeCount > 0)
-                {
-                    inputQueue.Enqueue(newNode);
-                    inputStack.Push(newNode);
-                    i += skipValue;
-                    //also increment our child index counter so we can keep our place during processing
-                    currChildIndex += newNode.NumChildNodes;
-                    continue;
-                }
-
-                for (int j = 0; j < header.MetadataCount; j++)
-                {
-                    var metaEntry = Convert.ToInt32(splitInput[i + j + 2]);
-                    newNode.AddMetadata(metaEntry);
-                }
-                //if we dont have children, the skipvalue is (numMetaDataEntries - childNodes) + 1
-                skipValue = header.MetadataCount - header.ChildNodeCount + 1;
-                inputQueue.Enqueue(newNode);
-                inputStack.Push(newNode);
-                i += skipValue;
-
+                needToSkip += rootNode.AddChild(AddNode(data.Skip(2).ToArray()));
+                childNodeCount--;
             }
             
+            var metaArr = data.Skip(2 + needToSkip).Take(rootHeaderMDataCount);
+            foreach (var meta in metaArr)
+            {
+                rootNode.AddMetadata(Convert.ToInt32(meta));
+            }
+
+            return rootNode;
+
         }
 
 
