@@ -72,7 +72,10 @@ namespace Day8_MemoryManeuver.Tree
         {
             _children.Add(otherNode);
             var baseline = 2; // 2 elements for always-existing header
-            baseline += otherNode.NumChildNodes;
+            foreach (var child in otherNode.Children)
+            {
+                baseline += child.NumMetaEntries + 2;
+            }
             baseline += otherNode.NumMetaEntries;
             return baseline;
         }

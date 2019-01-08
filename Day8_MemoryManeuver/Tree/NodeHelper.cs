@@ -50,15 +50,11 @@ namespace Day8_MemoryManeuver.Tree
             var currChildIndex = 0;
 
             var root = AddNode(splitInput);
-
-            
-
-
-
+            Console.ReadLine();
         }
 
 
-        private static MemoryNode AddNode(string[] data)
+        private static MemoryNode AddNode(string[] data, int needToSkip = 2)
         {
             var rootHeaderCNodes = Convert.ToInt32(data[0]);
             var rootHeaderMDataCount = Convert.ToInt32(data[1]);
@@ -69,14 +65,17 @@ namespace Day8_MemoryManeuver.Tree
 
             var rootNode = new MemoryNode(rootHeader);
             var childNodeCount = rootHeaderCNodes;
-            var needToSkip = 0;
+
+            if (childNodeCount > 0)
+                needToSkip = 2;
             while (childNodeCount > 0)
             {
-                needToSkip += rootNode.AddChild(AddNode(data.Skip(2).ToArray()));
                 childNodeCount--;
+                var result = rootNode.AddChild(AddNode(data.Skip(needToSkip).ToArray(), needToSkip));
+                needToSkip += result;
             }
             
-            var metaArr = data.Skip(2 + needToSkip).Take(rootHeaderMDataCount);
+            var metaArr = data.Skip(needToSkip).Take(rootHeaderMDataCount);
             foreach (var meta in metaArr)
             {
                 rootNode.AddMetadata(Convert.ToInt32(meta));
