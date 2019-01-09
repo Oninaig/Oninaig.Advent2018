@@ -11,10 +11,14 @@ namespace Day8_MemoryManeuver.Tree
         public Header<T1> Header;
         public Metadata<T2> Metadata;
         
+
+        public abstract int TotalLength { get; }
         public abstract int NumChildNodes { get; }
         public abstract int NumMetaEntries { get; }
         public abstract IEnumerable<Node<T1,T2>> Children { get; }
         public abstract int AddChild(Node<T1, T2> otherNode);
+
+        public abstract void Dump();
     }
 
     public abstract class Metadata<T>
@@ -37,6 +41,12 @@ namespace Day8_MemoryManeuver.Tree
         private List<Node<int, int>> _children;
         private int _numChildNodes;
         private int _numMetaEntries;
+        private int _totalLength;
+
+        public override int TotalLength
+        {
+            get { return _totalLength; }
+        }
 
         public override int NumChildNodes
         {
@@ -53,6 +63,41 @@ namespace Day8_MemoryManeuver.Tree
             get { return this._children; }
         }
 
+        public override void Dump()
+        {
+            Console.Write($"{NumChildNodes} {NumMetaEntries} ");
+            if (NumChildNodes > 0)
+            {
+                foreach (var child in _children)
+                {
+                    child.Dump();
+                }
+            }
+
+            foreach (var meta in Metadata.MetadataEntries)
+            {
+                Console.Write($"{meta} ");
+            }
+        }
+
+        public int GetTotalMetadata()
+        {
+            var metaCount = 0;
+            if (_numChildNodes > 0)
+            {
+                foreach (MemoryNode child in _children)
+                {
+                    metaCount += child.GetTotalMetadata();
+                }
+            }
+
+            foreach (var meta in Metadata.MetadataEntries)
+            {
+                metaCount += meta;
+            }
+
+            return metaCount;
+        }
 
         public MemoryNode(MemoryHeader memHeader)
         {
@@ -61,23 +106,20 @@ namespace Day8_MemoryManeuver.Tree
             this._children = new List<Node<int, int>>();
             this._numChildNodes = memHeader.ChildNodeCount;
             this._numMetaEntries = memHeader.MetadataCount;
+            this._totalLength = 2;
         }
         
         public void AddMetadata(int data)
         {
             this.Metadata.AddData(data);
+            this._totalLength++;
         }
 
         public override int AddChild(Node<int, int> otherNode)
         {
             _children.Add(otherNode);
-            var baseline = 2; // 2 elements for always-existing header
-            foreach (var child in otherNode.Children)
-            {
-                baseline += child.NumMetaEntries + 2;
-            }
-            baseline += otherNode.NumMetaEntries;
-            return baseline;
+            _totalLength += otherNode.TotalLength;
+            return _totalLength;
         }
     }
 

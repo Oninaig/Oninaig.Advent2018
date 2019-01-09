@@ -21,6 +21,7 @@ namespace Day8_MemoryManeuver
             //    Console.WriteLine(NodeHelper.GetNextChar());
             //}
             NodeHelper.ReadInput("puzzle.txt");
+
             Console.ReadLine();
         }
     }
