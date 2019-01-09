@@ -77,6 +77,7 @@ namespace Day8_MemoryManeuver.Tree
             //we calculate this by taking the number of header values (2) plus the number of metadata entries for the current series/data.
             var remainingData = data.Length;
             var numChildren = data[0];
+            var numMeta = data[1];
             var currSkip = 2;
             while (numChildren > 0)
             {
@@ -93,15 +94,16 @@ namespace Day8_MemoryManeuver.Tree
 
                 if (hasChild)
                 {
-                    var currNodeData = currDataStartingWithChild.ToArray();
+                    var currNodeData = currDataStartingWithChild.Reverse().Skip(numMeta).Reverse().ToArray();
                     rawDataStack.Push(currNodeData);
                     currSkip += 2;
+                    //numMeta = currNodeData[1];
                 }
                 else
                 {
                     var currNodeData = currDataStartingWithChild.Take(2 + currDataStartingWithChild[1]).ToArray();
+                    currSkip += currNodeData.Length + rawDataStack.Peek()[1];
                     rawDataStack.Push(currNodeData);
-                    currSkip += currNodeData.Length;
                 }
 
             }
