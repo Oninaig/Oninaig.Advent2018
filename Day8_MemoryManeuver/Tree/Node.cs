@@ -10,7 +10,7 @@ namespace Day8_MemoryManeuver.Tree
     {
         public Header<T1> Header;
         public Metadata<T2> Metadata;
-        
+        public Guid UniqueId;
 
         public abstract int TotalLength { get; }
         public abstract int NumChildNodes { get; }
@@ -42,6 +42,17 @@ namespace Day8_MemoryManeuver.Tree
         private int _numChildNodes;
         private int _numMetaEntries;
         private int _totalLength;
+
+        public bool HasChildren
+        {
+            get { return NumChildNodes > 0; }
+        }
+
+        public int CurrentChildCount
+        {
+            get { return Children.Count(); }
+        }
+
 
         public override int TotalLength
         {
@@ -107,8 +118,18 @@ namespace Day8_MemoryManeuver.Tree
             this._numChildNodes = memHeader.ChildNodeCount;
             this._numMetaEntries = memHeader.MetadataCount;
             this._totalLength = 2;
+            this.UniqueId = Guid.NewGuid();
         }
-        
+
+        public MemoryNode(int headerChildCount, int headerMetaCount) : this(new MemoryHeader(headerChildCount, headerMetaCount))
+        {
+        }
+
+        public void AddMetadata(int[] data)
+        {
+            foreach (var dat in data)
+                AddMetadata(dat);
+        }
         public void AddMetadata(int data)
         {
             this.Metadata.AddData(data);
@@ -154,6 +175,8 @@ namespace Day8_MemoryManeuver.Tree
         public static readonly int ChildNodeCountIndex = 0;
         public static readonly int MetaDataCountIndex = 1;
 
+        public int StartingChildCount = -1;
+
         public override int[] HeaderData
         {
             get { return this._headerData; }
@@ -171,7 +194,10 @@ namespace Day8_MemoryManeuver.Tree
 
         public void SetChildNodeCount(int count)
         {
+            if (StartingChildCount == -1)
+                StartingChildCount = count;
             _headerData[0] = count;
+
         }
 
         public void SetMetadataCount(int count)
@@ -182,6 +208,12 @@ namespace Day8_MemoryManeuver.Tree
         public MemoryHeader()
         {
             this._headerData = new int[2];
+        }
+        public MemoryHeader(int x, int y)
+        {
+            this._headerData = new int[2];
+            _headerData[0] = x;
+            _headerData[1] = y;
         }
     }
 }

@@ -41,8 +41,15 @@ namespace Day8_MemoryManeuver.Tree
             return ret;
         }
 
+        public static int ReadInputPartOne(string fileName)
+        {
+            var dataQueue = ReadInput(fileName);
+            var rootNode = populateTree(dataQueue);
+            var result = rootNode.GetTotalMetadata();
+            return result;
+        }
 
-        public static void ReadInput(string fileName)
+        public static Queue<int> ReadInput(string fileName)
         {
             var lines = File.ReadAllText(fileName);
             var splitInput = lines.Split(' ').Select(x=> Convert.ToInt32(x)).ToArray();
@@ -51,111 +58,89 @@ namespace Day8_MemoryManeuver.Tree
             var inputStack = new Stack<MemoryNode>();
             var currChildIndex = 0;
 
-            var root = AddNode(splitInput);
-            root.Dump();
-            var result = root.GetTotalMetadata();
-            Console.ReadLine();
+            var dataQueue = new Queue<int>();
+            foreach (var dat in splitInput)
+            {
+                dataQueue.Enqueue(dat);
+            }
+
+            return dataQueue;
+            
         }
 
 
-        private static MemoryNode AddNode(int[] data, int needToSkip = 2)
+        private static MemoryNode populateTree(Queue<int> data)
         {
-            //var rootHeaderCNodes = Convert.ToInt32(data[0]);
-            //var rootHeaderMDataCount = Convert.ToInt32(data[1]);
-            
-            //var rootHeader = new MemoryHeader();
-            //rootHeader.SetChildNodeCount(rootHeaderCNodes);
-            //rootHeader.SetMetadataCount(rootHeaderMDataCount);
-
-            var rawDataStack = new Stack<int[]>();
-            
-
-            //for our first run we just enqueue everything
-            rawDataStack.Push(data);
-
-            //now we create a variable that will store the remaining number of items left in our data array to process.
-            //we calculate this by taking the number of header values (2) plus the number of metadata entries for the current series/data.
-            var remainingData = data.Length;
-            var numChildren = data[0];
-            var numMeta = data[1];
-            var currSkip = 2;
-            while (numChildren > 0)
+            var parentNodes = new Stack<MemoryNode>();
+            var childNodes= new Stack<MemoryNode>();
+            MemoryNode rootNode = null;
+            while (data.Count > 0)
             {
-                numChildren--;
-                var currDataStartingWithChild = data.Skip(currSkip).ToArray();
-                bool hasChild = false;
-                if (currDataStartingWithChild[0] > 0)
+                //If there are any parents AND children waiting, pop one of each and pair them together.
+                if (parentNodes.Any() && childNodes.Any())
                 {
-                    numChildren++;
-                    hasChild = true;
+                    var parent = parentNodes.Pop();
+                    var child = childNodes.Pop();
+                    parent.AddChild(child);
+
+                    //if parent needs more kids, push it back on the parent stack and move on to the next piece of data
+                    if (parent.CurrentChildCount < parent.NumChildNodes)
+                    {
+                        parentNodes.Push(parent);
+                        continue;
+                    }
+                    else
+                    {
+                        //if parent doesnt need any more kids, it means it still needs its metadata
+                        var metaCount = parent.NumMetaEntries;
+                        while (metaCount > 0)
+                        {
+                            parent.AddMetadata(data.Dequeue());
+                            metaCount--;
+                        }
+                    }
+                    //if we still have parents left after popping one off of the stack, it means this current parent is a child of another one, push it to the children stack and move on to the next piece of data.
+                    if (parentNodes.Any())
+                    {
+                        childNodes.Push(parent);
+                        continue;
+                    }
+
+                    //If there is no more data in the queue, we are finished and our current parent is the root of the entire tree.
+                    if (!data.Any())
+                    {
+                        rootNode = parent;
+                        break;
+                    }
                 }
 
-                
 
-                if (hasChild)
+                var nextHeaderChildCount = data.Dequeue();
+                var nextHeaderMetaCount = data.Dequeue();
+                var nextNode = new MemoryNode(nextHeaderChildCount, nextHeaderMetaCount);
+                if (nextHeaderChildCount > 0)
                 {
-                    var currNodeData = currDataStartingWithChild.Reverse().Skip(numMeta).Reverse().ToArray();
-                    rawDataStack.Push(currNodeData);
-                    currSkip += 2;
-                    //numMeta = currNodeData[1];
-                }
-                else
-                {
-                    var currNodeData = currDataStartingWithChild.Take(2 + currDataStartingWithChild[1]).ToArray();
-                    currSkip += currNodeData.Length + rawDataStack.Peek()[1];
-                    rawDataStack.Push(currNodeData);
+                    parentNodes.Push(nextNode);
+                    continue;
                 }
 
+                var nextNodeMetaCount = nextHeaderMetaCount;
+                while (nextNodeMetaCount > 0)
+                {
+                    nextNode.AddMetadata(data.Dequeue());
+                    nextNodeMetaCount--;
+                }
+
+                //If there are any parents left, you must be a child of one of them.
+                if (parentNodes.Any())
+                    childNodes.Push(nextNode);
             }
 
-            //Process the stack
-            var childStack = new Stack<MemoryNode>();
-            MemoryNode masterRootNode = null;
-            while (rawDataStack.Count > 0)
-            {
-                var currNodeData = rawDataStack.Pop();
-                var rootHeaderCNodes = currNodeData[0];
-                var rootHeaderMDataCount = currNodeData[1];
-
-                var rootHeader = new MemoryHeader();
-                rootHeader.SetChildNodeCount(rootHeaderCNodes);
-                rootHeader.SetMetadataCount(rootHeaderMDataCount);
-
-                masterRootNode = new MemoryNode(rootHeader);
-
-
-                if (masterRootNode.NumChildNodes == 0)
-                {
-                    foreach (var meta in currNodeData.Skip(2).Take(currNodeData[1]))
-                    {
-                        masterRootNode.AddMetadata(meta);
-                    }
-
-                }
-                else if (childStack.Count > 0 && masterRootNode.NumChildNodes > 0)
-                {
-                    var childSkip = 2;
-                    for (int i = 0; i < masterRootNode.NumChildNodes; i++)
-                    {
-                        var currChild = childStack.Pop();
-                        childSkip += currChild.TotalLength;
-                        masterRootNode.AddChild(currChild);
-                    }
-                    foreach (var meta in currNodeData.Skip(childSkip).Take(currNodeData[1]))
-                    {
-                        masterRootNode.AddMetadata(meta);
-                    }
-                }
-
-                
-                childStack.Push(masterRootNode);
-
-            }
-            return masterRootNode;
-
-
+            return rootNode;
 
         }
+
+        
 
 
     }
