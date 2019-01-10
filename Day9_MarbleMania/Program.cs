@@ -10,6 +10,13 @@ namespace Day9_MarbleMania
     {
         static void Main(string[] args)
         {
+            var board = new MarbleGameBoard();
+            for (int i = 0; i < 5; i++)
+            {
+                board.AddMarble(new Marble(i));
+            }
+            board.PrintBoard();
+            Console.ReadLine();
         }
     }
 }
