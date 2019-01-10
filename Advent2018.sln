@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day7_TheSumOfItsParts", "Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day8_MemoryManeuver", "Day8_MemoryManeuver\Day8_MemoryManeuver.csproj", "{4E9043EF-59BE-496A-BD73-C2C726E16831}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day9_MarbleMania", "Day9_MarbleMania\Day9_MarbleMania.csproj", "{3764018A-34E5-4941-A052-F2BBC9110576}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{4E9043EF-59BE-496A-BD73-C2C726E16831}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E9043EF-59BE-496A-BD73-C2C726E16831}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E9043EF-59BE-496A-BD73-C2C726E16831}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3764018A-34E5-4941-A052-F2BBC9110576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3764018A-34E5-4941-A052-F2BBC9110576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3764018A-34E5-4941-A052-F2BBC9110576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3764018A-34E5-4941-A052-F2BBC9110576}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
