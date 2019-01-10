@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day9_MarbleMania
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //var board = new MarbleGameBoard(9, 25);
             //var bestPlayer =board.Play();
@@ -26,7 +22,7 @@ namespace Day9_MarbleMania
             //var puzzleWinner = puzzleBoard.Play();
             //Console.WriteLine($"{puzzleBoard.LastMarble} - High score: {puzzleWinner.Score}");
 
-            var puzzleBoardP2 = new MarbleGameBoard(428, (70825 * 100));
+            var puzzleBoardP2 = new MarbleGameBoard(428, 70825 * 100);
             var puzzleWinnerP2 = puzzleBoardP2.Play();
             Console.WriteLine($"{puzzleBoardP2.LastMarble} - High score: {puzzleWinnerP2.Score}");
             Console.ReadLine();
