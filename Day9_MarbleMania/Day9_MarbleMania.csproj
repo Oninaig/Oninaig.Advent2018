@@ -42,6 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LinkedListExtensions.cs" />
+    <Compile Include="Marble.cs" />
+    <Compile Include="InfiniteEnumerable.cs" />
+    <Compile Include="MarbleGameBoard.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
