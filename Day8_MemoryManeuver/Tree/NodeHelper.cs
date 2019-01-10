@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day8_MemoryManeuver.Tree
 {
@@ -13,8 +9,9 @@ namespace Day8_MemoryManeuver.Tree
     {
         public static string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public static Dictionary<char, int> RepeatingAlphabet;
-        public static int AlphabetCounter = 0;
-        public static void InitRepeatingAlphabet(bool reset= false)
+        public static int AlphabetCounter;
+
+        public static void InitRepeatingAlphabet(bool reset = false)
         {
             if (RepeatingAlphabet == null || reset)
             {
@@ -52,27 +49,18 @@ namespace Day8_MemoryManeuver.Tree
         public static Queue<int> ReadInput(string fileName)
         {
             var lines = File.ReadAllText(fileName);
-            var splitInput = lines.Split(' ').Select(x=> Convert.ToInt32(x)).ToArray();
-
-            var inputQueue = new Queue<MemoryNode>();
-            var inputStack = new Stack<MemoryNode>();
-            var currChildIndex = 0;
-
+            var splitInput = lines.Split(' ').Select(x => Convert.ToInt32(x)).ToArray();
             var dataQueue = new Queue<int>();
             foreach (var dat in splitInput)
-            {
                 dataQueue.Enqueue(dat);
-            }
-
             return dataQueue;
-            
         }
 
 
         private static MemoryNode populateTree(Queue<int> data)
         {
             var parentNodes = new Stack<MemoryNode>();
-            var childNodes= new Stack<MemoryNode>();
+            var childNodes = new Stack<MemoryNode>();
             MemoryNode rootNode = null;
             while (data.Count > 0)
             {
@@ -89,16 +77,15 @@ namespace Day8_MemoryManeuver.Tree
                         parentNodes.Push(parent);
                         continue;
                     }
-                    else
+
+                    //if parent doesnt need any more kids, it means it still needs its metadata
+                    var metaCount = parent.NumMetaEntries;
+                    while (metaCount > 0)
                     {
-                        //if parent doesnt need any more kids, it means it still needs its metadata
-                        var metaCount = parent.NumMetaEntries;
-                        while (metaCount > 0)
-                        {
-                            parent.AddMetadata(data.Dequeue());
-                            metaCount--;
-                        }
+                        parent.AddMetadata(data.Dequeue());
+                        metaCount--;
                     }
+
                     //if we still have parents left after popping one off of the stack, it means this current parent is a child of another one, push it to the children stack and move on to the next piece of data.
                     if (parentNodes.Any())
                     {
@@ -137,13 +124,6 @@ namespace Day8_MemoryManeuver.Tree
             }
 
             return rootNode;
-
         }
-
-        
-
-
     }
-
-
 }
