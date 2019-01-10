@@ -46,6 +46,14 @@ namespace Day8_MemoryManeuver.Tree
             return result;
         }
 
+        public static int ReadInputPartTwo(string fileName)
+        {
+            var dataQueue = ReadInput(fileName);
+            var rootNode = populateTree(dataQueue);
+            var result = rootNode.NodeValue;
+            return result;
+        }
+
         public static Queue<int> ReadInput(string fileName)
         {
             var lines = File.ReadAllText(fileName);

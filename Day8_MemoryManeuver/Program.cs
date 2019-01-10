@@ -20,8 +20,10 @@ namespace Day8_MemoryManeuver
             //{
             //    Console.WriteLine(NodeHelper.GetNextChar());
             //}
-            var sampleAnswer = NodeHelper.ReadInputPartOne("sample.txt");
-            var puzzleAnswer = NodeHelper.ReadInputPartOne("puzzle.txt");
+            //var sampleAnswer = NodeHelper.ReadInputPartOne("sample.txt");
+            //var puzzleAnswer = NodeHelper.ReadInputPartOne("puzzle.txt");
+            var sampleAnswerPartTwo = NodeHelper.ReadInputPartTwo("sample.txt");
+            var puzzleAnswerPartTwo = NodeHelper.ReadInputPartTwo("puzzle.txt");
 
             Console.ReadLine();
         }

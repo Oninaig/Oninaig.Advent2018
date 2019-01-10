@@ -17,7 +17,7 @@ namespace Day8_MemoryManeuver.Tree
         public abstract int NumMetaEntries { get; }
         public abstract IEnumerable<Node<T1,T2>> Children { get; }
         public abstract int AddChild(Node<T1, T2> otherNode);
-
+        public abstract int NodeValue { get; }
         public abstract void Dump();
     }
 
@@ -53,7 +53,31 @@ namespace Day8_MemoryManeuver.Tree
             get { return Children.Count(); }
         }
 
+        public override int NodeValue
+        {
+            get
+            {
+                if (!HasChildren)
+                {
+                    var nodeVal = 0;
+                    foreach (var meta in this.Metadata.MetadataEntries)
+                        nodeVal += meta;
+                    return nodeVal;
+                }
+                else
+                {
+                    var nodeVal = 0;
+                    foreach (var meta in this.Metadata.MetadataEntries)
+                    {
+                        var child = Children.ElementAtOrDefault(meta-1);
+                        if (child != null)
+                            nodeVal += child.NodeValue;
+                    }
 
+                    return nodeVal;
+                }
+            }
+        }
         public override int TotalLength
         {
             get { return _totalLength; }
