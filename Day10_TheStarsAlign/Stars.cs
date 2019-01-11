@@ -11,7 +11,8 @@ namespace Day10_TheStarsAlign
 {
     public class Stars
     {
-        
+        //We are using a List of velocities because during a timestep, there can exist multiple points at the same location that have different velocities.
+        //without a list, we would lose the "duplicate" points.
         public Dictionary<Point, List<Velocity>> StarCoordinates;
         public string[,] StarSystem;
         public int MaxX;
@@ -19,19 +20,21 @@ namespace Day10_TheStarsAlign
         /// Negative is UP
         /// </summary>
         public int MaxY;
-
         public int MinX;
+
         public int MinY;
+        private int _totalPointCount;
         public Stars(string inputPath)
         {
+            _totalPointCount = 0;
             StarCoordinates = new Dictionary<Point, List<Velocity>>();
             var input = File.ReadAllLines(inputPath);
             foreach (var line in input)
             {
-                var positionInput = Regex.Replace(line.Substring(9, 8), @"\s|<|>", "").Split(',')
-                    .Select(x => Convert.ToInt32(x)).ToArray();
-                var velocityInput = Regex.Replace(line.Substring(27, 8), @"\s|<|>", "").Split(',')
-                    .Select(x => Convert.ToInt32(x)).ToArray();
+                Regex posRegex = new Regex("<(-|\\s)\\d+,\\s(-|\\s)\\d+>");
+                var matches = posRegex.Matches(line).Cast<Match>().Select(x=>Regex.Replace(x.Value, @"\s|<|>", "")).ToArray();
+                var positionInput = matches[0].Split(',').Select(x => Convert.ToInt32(x)).ToArray();
+                var velocityInput = matches[1].Split(',').Select(x => Convert.ToInt32(x)).ToArray();
                 var newPoint = new Point(positionInput[0], positionInput[1], false);
                 var newVelocity = new Velocity(velocityInput[0], velocityInput[1]);
                 if (newPoint.X > MaxX)
@@ -45,15 +48,21 @@ namespace Day10_TheStarsAlign
                 if (!StarCoordinates.ContainsKey(newPoint))
                     StarCoordinates[newPoint] = new List<Velocity>();
                 StarCoordinates[newPoint].Add(newVelocity);
+                _totalPointCount++;
             }
 
             var width = Math.Abs(MaxX - MinX);
             var length = Math.Abs(MinY - MaxY);
-            StarSystem = new string[width,length];
+            //StarSystem = new string[width,length];
         }
 
         public void DumpStarSystem()
         {
+            if (StarSystem == null)
+            {
+                Console.WriteLine("Cannot dump grid. Grid not initialized yet.");
+                return;
+            }
             for (int i = 0; i < StarSystem.GetLength(1)+1; i++)
             {
                 for (int j = 0; j < StarSystem.GetLength(0)+1; j++)
@@ -72,8 +81,6 @@ namespace Day10_TheStarsAlign
         {
             //var toDelete = new List<Point>();
             var toAdd = new Dictionary<Point, List<Velocity>>();
-            var toAddBuffer = new List<Point>();
-            var tooAddDupes = new List<Point>();
             Console.WriteLine("Press any key to perform a timestep. Type 'q' to quit");
             while (Console.ReadLine().Trim() != "q")
             {
@@ -93,16 +100,32 @@ namespace Day10_TheStarsAlign
 
                         toAdd[newPoint].Add(currVelocity);
                     }
-                    
-                    
                 }
                 StarCoordinates = new Dictionary<Point, List<Velocity>>(toAdd);
                 toAdd.Clear();
-                tooAddDupes.Clear();
-                toAddBuffer.Clear();
-                DumpStarSystem();
+                Console.WriteLine(averageDistance());
+                //DumpStarSystem();
                 Console.WriteLine("Press any key to perform another timestep. Type 'q' to quit");
             }
+        }
+
+        private double averageDistance()
+        {
+            var totalDist = 0.0;
+            foreach (var kvp in StarCoordinates)
+            {
+                var accu = 0.0;
+                foreach (var kvp2 in StarCoordinates)
+                {
+                    var dist = kvp.Key.DistanceFrom(kvp2.Key);
+                    if (dist > 0.0)
+                        accu += dist;
+                }
+
+                totalDist += (accu/(_totalPointCount-1.0));
+            }
+
+            return totalDist / _totalPointCount;
         }
     }
 
@@ -133,6 +156,11 @@ namespace Day10_TheStarsAlign
             if (this.X == other.X && this.Y == other.Y)
                 return true;
             return false;
+        }
+
+        public double DistanceFrom(Point otherPoint)
+        {
+            return Math.Sqrt(Math.Pow((otherPoint.X - X), 2) - Math.Pow((otherPoint.Y - Y), 2));
         }
     }
     public struct Velocity
