@@ -15,20 +15,22 @@ namespace Day9_MarbleMania
 
         public List<Marble> KeptMarbles { get; }
 
-        public ulong Score
-        {
-            get
-            {
-                ulong score = 0;
-                foreach (var marb in KeptMarbles)
-                    score += (ulong) marb.Value;
-                return score;
-            }
-        }
+
+        public ulong Score { get;set; }
+        //public ulong Score
+        //{
+        //    get
+        //    {
+        //        ulong score = 0;
+        //        foreach (var marb in KeptMarbles)
+        //            score += (ulong) marb.Value;
+        //        return score;
+        //    }
+        //}
 
         public void KeepMarble(Marble marble)
         {
-            KeptMarbles.Add(marble);
+            Score += (UInt64) marble.Value;
         }
     }
 }
