@@ -61,6 +61,11 @@ namespace Day11_ChronalCharge
             initGrid();
         }
 
+        public FuelCellCluster LargestClusterPower()
+        {
+            return _fuelCellClusters.First();
+        }
+
         private void initGrid()
         {
             FuelCellCluster cluster =null;
@@ -83,7 +88,7 @@ namespace Day11_ChronalCharge
                 }
                 for (int x = 0; x < Grid.GetLength(0); x++)
                 {
-                    var newCell = new FuelCell(new Point(x,y), GridSerialNumber);
+                    var newCell = new FuelCell(new Point(x+1,y+1), GridSerialNumber);
                     Grid[x, y] = newCell;
                     if (x + 2 < length)
                     {
@@ -92,8 +97,8 @@ namespace Day11_ChronalCharge
                         else
                             cluster = fuelClustersInProgress.Dequeue();
                             
-                        var newCellRightOne = new FuelCell(new Point(x+1, y), GridSerialNumber);
-                        var newCellRightTwo = new FuelCell(new Point(x + 2 ,y), GridSerialNumber);
+                        var newCellRightOne = new FuelCell(new Point(x+1+1, y+1), GridSerialNumber);
+                        var newCellRightTwo = new FuelCell(new Point(x + 2+1 ,y+1), GridSerialNumber);
                         var fuelCellRow = new List<FuelCell>{newCell, newCellRightOne, newCellRightTwo};
                         if (cluster.AddFuelCell(fuelCellRow))
                             finishedClusters.Add(cluster);
@@ -102,13 +107,18 @@ namespace Day11_ChronalCharge
                     }
                 }
             }
+
+            _fuelCellClusters = finishedClusters.OrderByDescending(x => x.TotalPower).ToList();
         }
+
+        
     }
 
     public class FuelCellCluster
     {
         public List<FuelCell> Cluster { get; private set; }
         public bool IsFull { get; private set; }
+        public int TotalPower{get; private set; }
         public FuelCellCluster()
         {
             this.Cluster = new List<FuelCell>(9);
@@ -117,7 +127,10 @@ namespace Day11_ChronalCharge
         public bool AddFuelCell(IEnumerable<FuelCell> cells)
         {
             if (IsFull)
+            {
+                setTotalPower();
                 return true;
+            }
             foreach (var cell in cells)
                 Cluster.Add(cell);
             if (Cluster.Count > 9)
@@ -125,9 +138,21 @@ namespace Day11_ChronalCharge
             if (Cluster.Count % 9 == 0)
             {
                 IsFull = true;
+                setTotalPower();
                 return true;
             }
             return false;
+        }
+
+        private void setTotalPower()
+        {
+            var totalPower = 0;
+            foreach (var cell in Cluster)
+            {
+                totalPower += cell.PowerLevel;
+            }
+
+            TotalPower = totalPower;
         }
         public bool AddFuelCell(FuelCell cell)
         {
