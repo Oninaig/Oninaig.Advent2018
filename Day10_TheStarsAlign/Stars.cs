@@ -53,7 +53,7 @@ namespace Day10_TheStarsAlign
 
             var width = Math.Abs(MaxX - MinX);
             var length = Math.Abs(MinY - MaxY);
-            StarSystem = new string[width,length];
+           // StarSystem = new string[width,length];
         }
 
         public void DumpStarSystem()
@@ -79,12 +79,13 @@ namespace Day10_TheStarsAlign
 
         public void TimeStep()
         {
-            //var toDelete = new List<Point>();
             var toAdd = new Dictionary<Point, List<Velocity>>();
             Console.WriteLine("Press any key to perform a timestep. Type 'q' to quit");
             var currAverageDistance = double.MaxValue;
-            while (Console.ReadLine().Trim() != "q")
+            var timeStepCounter = 0;
+            while (true)
             {
+                timeStepCounter++;
                 foreach (var kvp in StarCoordinates)
                 {
                     var currPoint = kvp.Key;
@@ -112,8 +113,13 @@ namespace Day10_TheStarsAlign
                 else
                     currAverageDistance = averageDistance(Accuracy.Low);
                 Console.WriteLine(currAverageDistance);
-                DumpStarSystem();
-                Thread.Sleep(1000);
+                if (currAverageDistance <= 20.0)
+                {
+                    DumpStarSystem();
+                    Console.WriteLine("Press enter to timestep (distance too close to auto-continue)");
+                    Console.WriteLine($"Seconds elapsed: {timeStepCounter}");
+                    Console.ReadLine();
+                }
             }
         }
 
