@@ -82,6 +82,7 @@ namespace Day10_TheStarsAlign
             //var toDelete = new List<Point>();
             var toAdd = new Dictionary<Point, List<Velocity>>();
             Console.WriteLine("Press any key to perform a timestep. Type 'q' to quit");
+            var currAverageDistance = double.MaxValue;
             while (Console.ReadLine().Trim() != "q")
             {
                 foreach (var kvp in StarCoordinates)
@@ -103,29 +104,55 @@ namespace Day10_TheStarsAlign
                 }
                 StarCoordinates = new Dictionary<Point, List<Velocity>>(toAdd);
                 toAdd.Clear();
-                Console.WriteLine(averageDistance());
-                //DumpStarSystem();
-                Console.WriteLine("Press any key to perform another timestep. Type 'q' to quit");
+                if (currAverageDistance <= 20.0)
+                    currAverageDistance = averageDistance(Accuracy.High);
+                else
+                    currAverageDistance = averageDistance(Accuracy.Low);
+                Console.WriteLine(currAverageDistance);
+                Thread.Sleep(1000);
             }
         }
 
-        private double averageDistance()
+        private enum Accuracy
+        {
+            Low,
+            High
+        }
+        private double averageDistance(Accuracy accuracy)
         {
             var totalDist = 0.0;
-            foreach (var kvp in StarCoordinates)
+
+            if (accuracy == Accuracy.High)
+            {
+                foreach (var kvp in StarCoordinates)
+                {
+                    var accu = 0.0;
+                    foreach (var kvp2 in StarCoordinates)
+                    {
+                        var dist = kvp.Key.DistanceFrom(kvp2.Key);
+                        if (dist > 0.0)
+                            accu += dist;
+                    }
+
+                    totalDist += (accu/(_totalPointCount-1.0));
+                }
+
+                return totalDist / _totalPointCount;
+            }
+            else
             {
                 var accu = 0.0;
-                foreach (var kvp2 in StarCoordinates)
+                var startPoint = StarCoordinates.First().Key;
+                foreach (var kvp in StarCoordinates)
                 {
-                    var dist = kvp.Key.DistanceFrom(kvp2.Key);
+                    var dist = kvp.Key.DistanceFrom(startPoint);
                     if (dist > 0.0)
                         accu += dist;
                 }
 
-                totalDist += (accu/(_totalPointCount-1.0));
+                return accu / (double) _totalPointCount;
             }
-
-            return totalDist / _totalPointCount;
+          
         }
     }
 

@@ -10,7 +10,7 @@ namespace Day10_TheStarsAlign
     {
         static void Main(string[] args)
         {
-            var test = new Stars("puzzle.txt");
+            var test = new Stars("sample.txt");
             test.DumpStarSystem();
             test.TimeStep();
             Console.ReadLine();
