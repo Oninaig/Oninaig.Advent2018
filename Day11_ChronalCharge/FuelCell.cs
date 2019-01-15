@@ -97,7 +97,7 @@ namespace Day11_ChronalCharge
                 }
             }
 
-            finishedClusters = finishedClusters.OrderByDescending(x => x.TotalPower).ToList();
+            _fuelCellClusters = finishedClusters.OrderByDescending(x => x.TotalPower).ToList();
 
         }
 
