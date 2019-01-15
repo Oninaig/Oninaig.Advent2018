@@ -71,14 +71,33 @@ namespace Day11_ChronalCharge
             var length = Grid.GetLength(0);
             var width = Grid.GetLength(1);
             //todo: better off letting each point be the top-left corner of its own 3x3 instead of trying to preinit a bunch of 1x3 that are gradually filled into 2x3 and then 3x3.
-
+            var finishedClusters = new List<FuelCellCluster>();
             for (int y = 0; y < Grid.GetLength(1); y++)
             {
                 for (int x = 0; x < Grid.GetLength(0); x++)
                 {
-
+                    if (x + 2 < length && y + 2 < width)
+                    {
+                        var cluster = new FuelCellCluster();
+                        var topLeft = new FuelCell(new Point(x + 1, y + 1), GridSerialNumber);
+                        cluster.AddFuelCell(topLeft);
+                        for (int i = 0; i < 3; i++)
+                        {
+                            for (int j = 0; j < 3; j++)
+                            {
+                                if (i == 0 && j == 0)
+                                    continue;
+                                cluster.AddFuelCell(new FuelCell(
+                                    new Point(topLeft.Coordinates.X + j, topLeft.Coordinates.Y + i), GridSerialNumber));
+                            }
+                        }
+                        
+                        finishedClusters.Add(cluster);
+                    }
                 }
             }
+
+            finishedClusters = finishedClusters.OrderByDescending(x => x.TotalPower).ToList();
 
         }
 
@@ -128,11 +147,15 @@ namespace Day11_ChronalCharge
         public bool AddFuelCell(FuelCell cell)
         {
             if (IsFull)
+            {
+                setTotalPower();
                 return true;
+            }
             Cluster.Add(cell);
             if (Cluster.Count % 9 == 0)
             {
                 IsFull = true;
+                setTotalPower();
                 return true;
             }
             return false;
