@@ -10,6 +10,8 @@ namespace Day11_ChronalCharge
     {
         static void Main(string[] args)
         {
+            var testGrid = new FuelCellGrid(18);
+            Console.ReadLine();
         }
     }
 }
