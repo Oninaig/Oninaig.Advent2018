@@ -31,7 +31,7 @@ namespace Day10_TheStarsAlign
             var input = File.ReadAllLines(inputPath);
             foreach (var line in input)
             {
-                Regex posRegex = new Regex("<(-|\\s)\\d+,\\s(-|\\s)\\d+>");
+                Regex posRegex = new Regex("<(-|\\s|\\d+)\\d*,\\s(-|\\s|\\d+)\\d*>");
                 var matches = posRegex.Matches(line).Cast<Match>().Select(x=>Regex.Replace(x.Value, @"\s|<|>", "")).ToArray();
                 var positionInput = matches[0].Split(',').Select(x => Convert.ToInt32(x)).ToArray();
                 var velocityInput = matches[1].Split(',').Select(x => Convert.ToInt32(x)).ToArray();
@@ -53,7 +53,7 @@ namespace Day10_TheStarsAlign
 
             var width = Math.Abs(MaxX - MinX);
             var length = Math.Abs(MinY - MaxY);
-            //StarSystem = new string[width,length];
+            StarSystem = new string[width,length];
         }
 
         public void DumpStarSystem()
@@ -105,12 +105,27 @@ namespace Day10_TheStarsAlign
                 StarCoordinates = new Dictionary<Point, List<Velocity>>(toAdd);
                 toAdd.Clear();
                 if (currAverageDistance <= 20.0)
+                {
                     currAverageDistance = averageDistance(Accuracy.High);
+                    initStartSystem();
+                }
                 else
                     currAverageDistance = averageDistance(Accuracy.Low);
                 Console.WriteLine(currAverageDistance);
+                DumpStarSystem();
                 Thread.Sleep(1000);
             }
+        }
+
+        private void initStartSystem()
+        {
+            MinX = StarCoordinates.OrderByDescending(x => x.Key.X).Last().Key.X;
+            MaxX = StarCoordinates.OrderByDescending(x => x.Key.X).First().Key.X;
+            MaxY= StarCoordinates.OrderByDescending(y => y.Key.Y).Last().Key.Y;
+            MinY= StarCoordinates.OrderByDescending(y => y.Key.Y).First().Key.Y;
+            var width = Math.Abs(MaxX - MinX);
+            var length = Math.Abs(MinY - MaxY);
+            StarSystem = new string[width, length];
         }
 
         private enum Accuracy
