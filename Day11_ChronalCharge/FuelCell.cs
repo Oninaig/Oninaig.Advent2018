@@ -68,47 +68,18 @@ namespace Day11_ChronalCharge
 
         private void initGrid()
         {
-            FuelCellCluster cluster =null;
             var length = Grid.GetLength(0);
             var width = Grid.GetLength(1);
-            List<FuelCellCluster> finishedClusters = new List<FuelCellCluster>();
-            Queue<FuelCellCluster> fuelClustersInProgress = new Queue<FuelCellCluster>();
-            bool newClusters = true;
+            //todo: better off letting each point be the top-left corner of its own 3x3 instead of trying to preinit a bunch of 1x3 that are gradually filled into 2x3 and then 3x3.
+
             for (int y = 0; y < Grid.GetLength(1); y++)
             {
-                if (fuelClustersInProgress.Any())
-                {
-                    //cluster = fuelClustersInProgress.Dequeue();
-                    newClusters = false;
-                }
-                else
-                {
-                    //cluster = new FuelCellCluster();
-                    newClusters = true;
-                }
                 for (int x = 0; x < Grid.GetLength(0); x++)
                 {
-                    var newCell = new FuelCell(new Point(x+1,y+1), GridSerialNumber);
-                    Grid[x, y] = newCell;
-                    if (x + 2 < length)
-                    {
-                        if(newClusters)
-                            cluster = new FuelCellCluster();
-                        else
-                            cluster = fuelClustersInProgress.Dequeue();
-                            
-                        var newCellRightOne = new FuelCell(new Point(x+1+1, y+1), GridSerialNumber);
-                        var newCellRightTwo = new FuelCell(new Point(x + 2+1 ,y+1), GridSerialNumber);
-                        var fuelCellRow = new List<FuelCell>{newCell, newCellRightOne, newCellRightTwo};
-                        if (cluster.AddFuelCell(fuelCellRow))
-                            finishedClusters.Add(cluster);
-                        else
-                            fuelClustersInProgress.Enqueue(cluster);
-                    }
+
                 }
             }
 
-            _fuelCellClusters = finishedClusters.OrderByDescending(x => x.TotalPower).ToList();
         }
 
         
