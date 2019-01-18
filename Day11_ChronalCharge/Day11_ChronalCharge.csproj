@@ -5,10 +5,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FFCB927A-D79D-490A-A4B3-CD90BAC21D58}</ProjectGuid>
+    <ProjectGuid>{4491A042-3B18-4ED5-90F2-37463BC4BB45}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Day1_ChronalCalibration</RootNamespace>
-    <AssemblyName>Day1_ChronalCalibration</AssemblyName>
+    <RootNamespace>Day11_ChronalCharge</RootNamespace>
+    <AssemblyName>Day11_ChronalCharge</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -48,17 +48,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FuelCell.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="inputs.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
