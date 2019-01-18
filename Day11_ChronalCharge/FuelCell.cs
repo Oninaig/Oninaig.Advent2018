@@ -169,15 +169,17 @@ namespace Day11_ChronalCharge
             //});
 
             var opt = new ParallelOptions();
-            opt.MaxDegreeOfParallelism = 4;
+            opt.MaxDegreeOfParallelism = 6;
             Parallel.For(0, width, opt, y =>
             {
+                FuelCellClusterSlim rowMaxCluster = new FuelCellClusterSlim(0, new Point(0,0), -1);
+
                 for (int x = 0; x < length; x++)
                 {
                     var currTopleft = Grid[x, y];
                     var maxSize = currTopleft.MaxSizeIfTopLeft;
                     var maxInitialized = false;
-                    FuelCellClusterSlim maxPowerCluster = new FuelCellClusterSlim(0, new Point(0,0), -1);
+                    FuelCellClusterSlim localTopLeftMaxCluster = new FuelCellClusterSlim(0, new Point(0,0), -1);
                     for (int k = 0; k < maxSize; k++)
                     {
                         var power = 0;
@@ -204,12 +206,12 @@ namespace Day11_ChronalCharge
                         //}
                         if (!maxInitialized)
                         {
-                            maxPowerCluster = new FuelCellClusterSlim(k, new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power);
+                            localTopLeftMaxCluster = new FuelCellClusterSlim(k, new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power);
                             maxInitialized = true;
                         }
-                        else if (maxPowerCluster.PowerLevel < power)
+                        else if (localTopLeftMaxCluster.PowerLevel < power)
                         {
-                            maxPowerCluster = new FuelCellClusterSlim(k, new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power);
+                            localTopLeftMaxCluster = new FuelCellClusterSlim(k, new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power);
                         }
                         
                         
@@ -217,10 +219,14 @@ namespace Day11_ChronalCharge
                         //    new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power));
                     }
 
-                    slimClusterBag.Add(maxPowerCluster);
+                    if (localTopLeftMaxCluster.PowerLevel > rowMaxCluster.PowerLevel)
+                        rowMaxCluster = localTopLeftMaxCluster;
+                    //slimClusterBag.Add(localTopLeftMaxCluster);
 
                     //Console.WriteLine($"{x}, {y}: Max: {currTopleft.MaxSizeIfTopLeft} | Power: {power}");
                 }
+                slimClusterBag.Add(rowMaxCluster);
+                Console.WriteLine($"{slimClusterBag.Count}");
             });
 
             //for (int y = 267; y < width; y ++)
