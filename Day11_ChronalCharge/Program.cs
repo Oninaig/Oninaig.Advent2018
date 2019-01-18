@@ -16,7 +16,8 @@ namespace Day11_ChronalCharge
 
 
             var puzzleGrid = new FuelCellGrid(5719, true);
-            //var puzzleResult = puzzleGrid.LargestClusterPower().TotalPower;
+            var puzzleResult = puzzleGrid.LargestClusterPower();
+            Console.WriteLine($"{puzzleResult.TotalPower} | {puzzleResult.Cluster[0].Coordinates.X}, {puzzleResult.Cluster[0].Coordinates.Y} | {puzzleResult.ClusterSize}");
             //var puzzleResultCoords = puzzleGrid.LargestClusterPower().Cluster[0].Coordinates;
             //Console.WriteLine($"{puzzleResultCoords.X}, {puzzleResultCoords.Y}");
             Console.ReadLine();
