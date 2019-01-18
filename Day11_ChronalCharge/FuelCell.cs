@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Day11_ChronalCharge
@@ -131,51 +132,16 @@ namespace Day11_ChronalCharge
             }
 
             ConcurrentBag<FuelCellClusterSlim> slimClusterBag = new ConcurrentBag<FuelCellClusterSlim>();
-            //Parallel.For(0, width, y =>
-            //{
-            //    for (int x = 0; x < length; x++)
-            //    {
-            //        var currTopleft = Grid[x, y];
-            //        var maxSize = currTopleft.MaxSizeIfTopLeft;
-            //        for (int k = 0; k < maxSize; k++)
-            //        {
-            //            var power = 0;
-            //            for (int j = 0; j < k+1; j++)
-            //            {
-            //                for (int l = 0; l < k+1; l++)
-            //                {
-            //                    if (x == 89 && y == 268 && k == 15)
-            //                    {
-            //                        Console.WriteLine("Stop here");
-            //                    }
-            //                    power += Grid[x + l, y + j].PowerLevel;
-            //                }
-            //            }
-
-            //            //if (currTopleft.Coordinates.X == 90 && currTopleft.Coordinates.Y == 269)
-            //            //{
-            //            //    Console.WriteLine("Stop hEre");
-            //            //}
-            //            if (x == 89 && y == 268)
-            //            {
-            //                Console.WriteLine("stop here");
-            //            }
-            //            slimClusterBag.Add(new FuelCellClusterSlim(x,
-            //                new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power));
-            //        }
-
-            //        //Console.WriteLine($"{x}, {y}: Max: {currTopleft.MaxSizeIfTopLeft} | Power: {power}");
-            //    }
-            //});
-
+          
             var opt = new ParallelOptions();
-            opt.MaxDegreeOfParallelism = 6;
+            opt.MaxDegreeOfParallelism = 8;
+            var count = 0;
             Parallel.For(0, width, opt, y =>
             {
                 FuelCellClusterSlim rowMaxCluster = new FuelCellClusterSlim(0, new Point(0,0), -1);
-
                 for (int x = 0; x < length; x++)
                 {
+                    
                     var currTopleft = Grid[x, y];
                     var maxSize = currTopleft.MaxSizeIfTopLeft;
                     var maxInitialized = false;
@@ -192,18 +158,6 @@ namespace Day11_ChronalCharge
                                 power += Grid[x + l, y + j].PowerLevel;
                             }
                         }
-                        //if (x == 89 && y == 268 && k == 16)
-                        //{
-                        //    Console.WriteLine("Stop here");
-                        //}
-                        //if (currTopleft.Coordinates.X == 90 && currTopleft.Coordinates.Y == 269)
-                        //{
-                        //    Console.WriteLine("Stop hEre");
-                        //}
-                        //if (x == 89 && y == 268)
-                        //{
-                        //    Console.WriteLine("stop here");
-                        //}
                         if (!maxInitialized)
                         {
                             localTopLeftMaxCluster = new FuelCellClusterSlim(k, new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power);
@@ -213,114 +167,20 @@ namespace Day11_ChronalCharge
                         {
                             localTopLeftMaxCluster = new FuelCellClusterSlim(k, new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power);
                         }
-                        
-                        
-                        //slimClusterBag.Add(new FuelCellClusterSlim(k,
-                        //    new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power));
                     }
 
                     if (localTopLeftMaxCluster.PowerLevel > rowMaxCluster.PowerLevel)
                         rowMaxCluster = localTopLeftMaxCluster;
-                    //slimClusterBag.Add(localTopLeftMaxCluster);
-
-                    //Console.WriteLine($"{x}, {y}: Max: {currTopleft.MaxSizeIfTopLeft} | Power: {power}");
                 }
                 slimClusterBag.Add(rowMaxCluster);
-                Console.WriteLine($"{slimClusterBag.Count}");
+                Interlocked.Increment(ref count);
+                Console.WriteLine(count);
             });
 
-            //for (int y = 267; y < width; y ++)
-            //{
-            //    for (int x = 88; x < length; x++)
-            //    {
-            //        var currTopleft = Grid[x, y];
-            //        var maxSize = currTopleft.MaxSizeIfTopLeft;
-            //        for (int k = 0; k < maxSize; k++)
-            //        {
-            //            var power = 0;
-            //            for (int j = 0; j < k; j++)
-            //            {
-            //                for (int l = 0; l < k; l++)
-            //                {
-            //                    if (x == 89 && y == 268 && k == 16)
-            //                    {
-            //                        Console.WriteLine("Stop here");
-            //                    }
-            //                    power += Grid[x + l, y + j].PowerLevel;
-            //                }
-            //            }
-
-            //            //if (currTopleft.Coordinates.X == 90 && currTopleft.Coordinates.Y == 269)
-            //            //{
-            //            //    Console.WriteLine("Stop hEre");
-            //            //}
-            //            if (x == 89 && y == 268)
-            //            {
-            //                Console.WriteLine("stop here");
-            //            }
-            //            slimClusterBag.Add(new FuelCellClusterSlim(x,
-            //                new Point(currTopleft.Coordinates.X, currTopleft.Coordinates.Y), power));
-            //        }
-
-            //        //Console.WriteLine($"{x}, {y}: Max: {currTopleft.MaxSizeIfTopLeft} | Power: {power}");
-            //    }
-            //}
+         
             var slimClusterBagAsList = slimClusterBag.ToList();
             var testMax = slimClusterBagAsList.OrderByDescending(x => x.PowerLevel).First();
-            var test = slimClusterBagAsList.Where(x => x.PowerLevel == 113);
-            //for (int y = 0; y < width; y++)
-            //{
-            //    for (int x = 0; x < length; x++)
-            //    {
-            //        if (x < length && y < width)
-            //        {
-
-
-            //            var currTopleft = Grid[x, y];
-            //            var maxPower = 0;
-            //            FuelCellClusterSlim[] maxPowerCluster = new FuelCellClusterSlim[1];
-            //            for (int k = 0; k < currTopleft.MaxSizeIfTopLeft; k++)
-            //            {
-            //                var totalPower = currTopleft.PowerLevel;
-            //                if (k == 0)
-            //                {
-            //                    var newClust = new FuelCellClusterSlim(k + 1, currTopleft.Coordinates, totalPower);
-            //                    //slimClusters.Add(newClust);
-            //                    if (totalPower > maxPower)
-            //                    {
-            //                        maxPower = totalPower;
-            //                        maxPowerCluster[0] = newClust;
-            //                    }
-
-            //                    continue;
-            //                }
-
-            //                for (int l = 0; l <= k; l++)
-            //                {
-            //                    for (int j = 0; j <= k; j++)
-            //                    {
-            //                        if (l == 0 && j == 0)
-            //                            continue;
-            //                        totalPower += Grid[x + j, y + k].PowerLevel;
-            //                    }
-            //                }
-
-            //                var newClust2 = new FuelCellClusterSlim(k, currTopleft.Coordinates, totalPower);
-            //                //slimClusters.Add(new FuelCellClusterSlim(k, currTopleft.Coordinates, totalPower));
-            //                if (totalPower > maxPower)
-            //                {
-            //                    maxPower = totalPower;
-            //                    maxPowerCluster[0] = newClust2;
-            //                }
-
-            //            }
-
-            //            Console.WriteLine($"{x}, {y}");
-            //        }
-
-            //    }
-            //    //_fuelCellClusters = finishedClusters.OrderByDescending(x => x.TotalPower).ToList();
-            //}
+           
         }
     }
 
