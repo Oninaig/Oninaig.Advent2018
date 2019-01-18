@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FuelCell.cs" />
+    <Compile Include="FuelCellCluster.cs" />
+    <Compile Include="FuelCellGrid.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests.cs" />
