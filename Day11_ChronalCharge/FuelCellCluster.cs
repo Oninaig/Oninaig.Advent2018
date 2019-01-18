@@ -16,6 +16,7 @@ namespace Day11_ChronalCharge
             PowerLevel = power;
         }
     }
+
     public class FuelCellCluster
     {
         private bool _isFull;
@@ -73,7 +74,7 @@ namespace Day11_ChronalCharge
         {
             if (IsFull)
             {
-                if(updatePower)
+                if (updatePower)
                     setTotalPower();
                 return true;
             }
@@ -84,7 +85,7 @@ namespace Day11_ChronalCharge
             if (Cluster.Count % ClusterSize == 0)
             {
                 IsFull = true;
-                if(updatePower)
+                if (updatePower)
                     setTotalPower();
                 return true;
             }

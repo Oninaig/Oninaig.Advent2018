@@ -36,27 +36,26 @@ namespace Day11_ChronalCharge
             var width = Grid.GetLength(1);
             var finishedClusters = new List<FuelCellCluster>();
             for (var y = 0; y < Grid.GetLength(1); y++)
-            for (var x = 0; x < Grid.GetLength(0); x++)
-                if (x + 2 < length && y + 2 < width)
-                {
-                    var cluster = new FuelCellCluster();
-                    var topLeft = new FuelCell(new Point(x + 1, y + 1), GridSerialNumber);
-                    cluster.AddFuelCell(topLeft);
-                    for (var i = 0; i < 3; i++)
-                    for (var j = 0; j < 3; j++)
+                for (var x = 0; x < Grid.GetLength(0); x++)
+                    if (x + 2 < length && y + 2 < width)
                     {
-                        if (i == 0 && j == 0)
-                            continue;
-                        cluster.AddFuelCell(new FuelCell(
-                            new Point(topLeft.Coordinates.X + j, topLeft.Coordinates.Y + i), GridSerialNumber));
-                    }
+                        var cluster = new FuelCellCluster();
+                        var topLeft = new FuelCell(new Point(x + 1, y + 1), GridSerialNumber);
+                        cluster.AddFuelCell(topLeft);
+                        for (var i = 0; i < 3; i++)
+                            for (var j = 0; j < 3; j++)
+                            {
+                                if (i == 0 && j == 0)
+                                    continue;
+                                cluster.AddFuelCell(new FuelCell(
+                                    new Point(topLeft.Coordinates.X + j, topLeft.Coordinates.Y + i), GridSerialNumber));
+                            }
 
-                    finishedClusters.Add(cluster);
-                }
+                        finishedClusters.Add(cluster);
+                    }
 
             _fuelCellClusters = finishedClusters.OrderByDescending(x => x.TotalPower).ToList();
         }
-
 
         /// <summary>
         ///     we can reuse the majority of the code from our original initGrid method, but now we need to expand each topLeft
@@ -67,16 +66,14 @@ namespace Day11_ChronalCharge
         {
             var length = Grid.GetLength(0);
             var width = Grid.GetLength(1);
-            var finishedClusters = new List<FuelCellCluster>();
-            var slimClusters = new List<FuelCellClusterSlim>();
             for (var y = 0; y < width; y++)
-            for (var x = 0; x < length; x++)
-                if (x < length && y < width)
-                {
-                    var topLeft = new FuelCell(new Point(x + 1, y + 1), GridSerialNumber);
-                    topLeft.MaxSizeIfTopLeft = x > y ? length - x : width - y;
-                    Grid[x, y] = topLeft;
-                }
+                for (var x = 0; x < length; x++)
+                    if (x < length && y < width)
+                    {
+                        var topLeft = new FuelCell(new Point(x + 1, y + 1), GridSerialNumber);
+                        topLeft.MaxSizeIfTopLeft = x > y ? length - x : width - y;
+                        Grid[x, y] = topLeft;
+                    }
 
             var slimClusterBag = new ConcurrentBag<FuelCellClusterSlim>();
 
@@ -96,8 +93,8 @@ namespace Day11_ChronalCharge
                     {
                         var power = 0;
                         for (var j = 0; j < k; j++)
-                        for (var l = 0; l < k; l++)
-                            power += Grid[x + l, y + j].PowerLevel;
+                            for (var l = 0; l < k; l++)
+                                power += Grid[x + l, y + j].PowerLevel;
                         if (!maxInitialized)
                         {
                             localTopLeftMaxCluster = new FuelCellClusterSlim(k,
@@ -120,7 +117,6 @@ namespace Day11_ChronalCharge
                 Console.WriteLine(count);
             });
 
-
             var slimClusterBagAsList = slimClusterBag.ToList();
             var testMax = slimClusterBagAsList.OrderByDescending(x => x.PowerLevel).First();
             var fcc = new FuelCellCluster(testMax.ClusterSize);
@@ -129,7 +125,4 @@ namespace Day11_ChronalCharge
             _fuelCellClusters.Add(fcc);
         }
     }
-
-
-    
 }
