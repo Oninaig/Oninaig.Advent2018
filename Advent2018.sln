@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day10_TheStarsAlign", "Day1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day11_ChronalCharge", "Day11_ChronalCharge\Day11_ChronalCharge.csproj", "{4491A042-3B18-4ED5-90F2-37463BC4BB45}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day12_SubterraneanSustainability", "Day12_SubterraneanSustainability\Day12_SubterraneanSustainability.csproj", "{90DCC8AB-0451-41E0-A43F-AF77593D1996}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{4491A042-3B18-4ED5-90F2-37463BC4BB45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4491A042-3B18-4ED5-90F2-37463BC4BB45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4491A042-3B18-4ED5-90F2-37463BC4BB45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90DCC8AB-0451-41E0-A43F-AF77593D1996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90DCC8AB-0451-41E0-A43F-AF77593D1996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90DCC8AB-0451-41E0-A43F-AF77593D1996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90DCC8AB-0451-41E0-A43F-AF77593D1996}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
