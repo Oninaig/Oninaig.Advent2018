@@ -41,15 +41,15 @@ namespace Day12_SubterraneanSustainability
 
     public class PotRow
     {
-        public Pot[] Row { get; set; }
-        public PotRow(int rowLength, bool doubleLength = true)
+        public List<Pot> Row { get; set; }
+        public PotRow(int rowLength = 0, bool doubleLength = true)
         {
-            if (doubleLength)
-                this.Row = new Pot[rowLength * 3 - 1];
-            else
-                this.Row = new Pot[rowLength];
+           this.Row = new List<Pot>(rowLength);
         }
-
+        public PotRow(List<Pot> otherRow)
+        {
+            this.Row = new List<Pot>(otherRow);
+        }
 
         public override bool Equals(object obj)
         {
@@ -164,15 +164,15 @@ namespace Day12_SubterraneanSustainability
 
         public void ProcessGeneration()
         {
-            var tempPots = new PotRow(Pots.Row.Length, false);
-            Array.Copy(Pots.Row,0, tempPots.Row,0, Pots.Row.Length);
-            for (int i = 0; i < Pots.Row.Length; i++)
+            var tempPots = new PotRow(Pots.Row);
+            //Array.Copy(Pots.Row,0, tempPots.Row,0, Pots.Row.Length);
+            for (int i = 0; i < Pots.Row.Count; i++)
             {
                 
                 var processingWindow = Pots.Row.Skip(i).Take(5).ToArray();
                 if (processingWindow.Length < 5)
                 {
-                    tempPots.Row[i].ContainsPlant = false;
+                    tempPots.Row[i]= new Pot(false, tempPots.Row[i].PotNumber);
                     continue;
                     //var backFilled = new Pot[5];
                     //Array.Copy(processingWindow, backFilled, processingWindow.Length);
@@ -181,15 +181,20 @@ namespace Day12_SubterraneanSustainability
                 var firstMatch = PotInstructions.Instructions.FirstOrDefault(x => x.Matches(processingWindow));
                 if (firstMatch == null)
                 {
-                    tempPots.Row[i + 2].ContainsPlant = false;
+                    //tempPots.Row[i + 2].ContainsPlant = false;
+                    tempPots.Row[i + 2]= new Pot(false, tempPots.Row[i+2].PotNumber);
+
                     continue;
                 }
 
                 processingWindow[2].ContainsPlant = firstMatch.Result == '#';
-                tempPots.Row[i + 2].ContainsPlant = processingWindow[2].ContainsPlant;
+                //tempPots.Row[i + 2].ContainsPlant = processingWindow[2].ContainsPlant;
+                tempPots.Row[i + 2] = new Pot(processingWindow[2].ContainsPlant, tempPots.Row[i+2].PotNumber);
+
             }
 
-            Array.Copy(tempPots.Row, Pots.Row, tempPots.Row.Length);
+            //Array.Copy(tempPots.Row, Pots.Row, tempPots.Row.Length);
+            Pots.Row = new List<Pot>(tempPots.Row);
             Pots.Dump();
         }
     }
@@ -217,7 +222,7 @@ namespace Day12_SubterraneanSustainability
             //init the positive row
 
             var positiveCounter = 0;
-            for (int i = negativeCounter; i < potRow.Row.Length; i++)
+            for (int i = negativeCounter; i < potRow.Row.Count; i++)
             {
                 if (positiveCounter >= initialState.Length)
                 {

@@ -10,7 +10,7 @@ namespace Day12_SubterraneanSustainability
     {
         static void Main(string[] args)
         {
-            var test = PotTools.InitPotCave("puzzleinput.txt");
+            var test = PotTools.InitPotCave("sampleinput.txt");
             test.ProcessGenerations(20);
             Console.ReadLine();
         }
