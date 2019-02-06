@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +11,24 @@ namespace Day12_SubterraneanSustainability
     {
         static void Main(string[] args)
         {
-            var test = PotTools.InitPotCave("sampleinput.txt");
-            var slower = test.ProcessGenerations(1000000);
-            test = PotTools.InitPotCave("sampleinput.txt");
-            var faster = test.ProcessGenerationsFast(1000000);
+            bool profiling = true;
+            if (profiling)
+            {
+                var test = PotTools.InitPotCave("sampleinput.txt");
+                var faster = test.ProcessGenerationsFast(1000000);
+            }
+            else
+            {
+                var test = PotTools.InitPotCave("sampleinput.txt");
+                var slower = test.ProcessGenerations(25000);
+                test = PotTools.InitPotCave("sampleinput.txt");
+                var faster = test.ProcessGenerationsFast(25000);
 
-            var percentFaster = (((faster - slower) / (double) slower) * 100) * -1;
-            Console.WriteLine($"Faster method is {percentFaster}% faster.");
-            Console.ReadLine();
+                var percentFaster = (((faster - slower) / (double)slower) * 100) * -1;
+                Debug.WriteLine($"Faster method is {percentFaster.ToString("N2")}% faster.");
+            }
+            
+            //Console.ReadLine();
         }
     }
 }

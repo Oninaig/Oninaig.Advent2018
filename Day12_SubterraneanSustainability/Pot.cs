@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Day12_SubterraneanSustainability
 {
-    public struct Pot
+    public struct Pot : IEquatable<Pot>
     {
         public int PotNumber { get; set; }
         public bool ContainsPlant { get; set; }
@@ -29,6 +29,13 @@ namespace Day12_SubterraneanSustainability
             if (!(obj is Pot))
                 return false;
             var otherPot = (Pot) obj;
+            if (otherPot.ContainsPlant == this.ContainsPlant)
+                return true;
+            return false;
+        }
+
+        public bool Equals(Pot otherPot)
+        {
             if (otherPot.ContainsPlant == this.ContainsPlant)
                 return true;
             return false;
@@ -156,9 +163,9 @@ namespace Day12_SubterraneanSustainability
                 this.InstructionsAsPots[i] = new Pot(Instructions[i] == '#', 0);
             }
         }
-        public bool Matches(List<Pot> otherPots)
+        public bool Matches(List<Pot> otherPots, int length)
         {
-            for (int i = 0; i < otherPots.Count; i++)
+            for (int i = 0; i < length; i++)
             {
                 if (!otherPots[i].Equals(InstructionsAsPots[i]))
                 {
@@ -170,6 +177,8 @@ namespace Day12_SubterraneanSustainability
         }
         public bool Matches(Pot[] otherPots)
         {
+            if (!otherPots[0].Equals(InstructionsAsPots[0]))
+                return false;
             for (int i = 0; i < otherPots.Length; i ++)
             {
                 if (!otherPots[i].Equals(InstructionsAsPots[i]))
@@ -201,9 +210,9 @@ namespace Day12_SubterraneanSustainability
             for (long i = 0; i < numGenerations; i++)
             {
                 ProcessGeneration();
-                if (i % 10000 == 0)
+                if (i % 100000 == 0)
                 {
-                    //Console.WriteLine($"Finished generation {i.ToString("N0")}");
+                    Console.WriteLine($"Finished generation {i.ToString("N0")}");
                 }
             }
             timer.Stop();
@@ -212,8 +221,8 @@ namespace Day12_SubterraneanSustainability
             foreach(var pot in Pots.Row)
                 if (pot.ContainsPlant)
                     totalCount += pot.PotNumber;
-            Console.WriteLine($"Total number: {totalCount}");
-            Console.Write($"After {numGenerations} generations and approx {timer.Elapsed.Seconds.ToString("N0")} seconds ({timer.ElapsedMilliseconds/1000.00}), the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
+            Debug.WriteLine($"Total number: {totalCount}");
+            Debug.WriteLine($"After {numGenerations} generations and approx {timer.Elapsed.TotalSeconds.ToString("N0")} seconds ({timer.ElapsedMilliseconds/1000.00}), the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
                           $" This results in an average of {((double)(endSize - startRowSize))/(double)numGenerations} pots added per generation.");
             return timer.ElapsedMilliseconds;
         }
@@ -238,8 +247,8 @@ namespace Day12_SubterraneanSustainability
             foreach (var pot in Pots.Row)
                 if (pot.ContainsPlant)
                     totalCount += pot.PotNumber;
-            Console.WriteLine($"Total number: {totalCount}");
-            Console.Write($"After {numGenerations} generations and approx {timer.Elapsed.Seconds.ToString("N0")} seconds ({timer.ElapsedMilliseconds/(1000.00)} s), the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
+            Debug.WriteLine($"Total number: {totalCount}");
+            Debug.WriteLine($"After {numGenerations} generations and approx {timer.Elapsed.TotalSeconds.ToString("N0")} seconds ({timer.ElapsedMilliseconds/(1000.00)} s), the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
                           $" This results in an average of {((double)(endSize - startRowSize)) / (double)numGenerations} pots added per generation.");
             return timer.ElapsedMilliseconds;
         }
@@ -277,7 +286,7 @@ namespace Day12_SubterraneanSustainability
                         }
                         continue;
                     }
-                    var firstMatch = PotInstructions.Instructions.FirstOrDefault(x => x.Matches(processingWindow));
+                    var firstMatch = PotInstructions.Instructions.FirstOrDefault(x => x.Matches(processingWindow, ProcessingWindowSize));
                     if (firstMatch == null)
                     {
                         tempPots.Row[i + 2] = new Pot(false, tempPots.Row[i + 2].PotNumber);
