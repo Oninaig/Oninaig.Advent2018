@@ -182,21 +182,27 @@ namespace Day12_SubterraneanSustainability
             Pots.Dump(true);
         }
 
-        public void ProcessGenerations(int numGenerations)
+        public void ProcessGenerations(long numGenerations)
         {
             var startRowSize = Pots.Row.Count;
-            for (int i = 0; i < numGenerations; i++)
+            var timer = new Stopwatch();
+            timer.Start();
+            for (long i = 0; i < numGenerations; i++)
             {
                 ProcessGeneration();
+                if (i % 10000 == 0)
+                {
+                    Console.WriteLine($"Finished generation {i.ToString("N0")}");
+                }
             }
-
+            timer.Stop();
             var endSize = Pots.Row.Count;
             var totalCount = 0;
             foreach(var pot in Pots.Row)
                 if (pot.ContainsPlant)
                     totalCount += pot.PotNumber;
             Console.WriteLine($"Total number: {totalCount}");
-            Console.Write($"After {numGenerations} generations, the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
+            Console.Write($"After {numGenerations} generations and {timer.Elapsed.Seconds.ToString("N0")} seconds, the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
                           $" This results in an average of {((double)(endSize - startRowSize))/(double)numGenerations} pots added per generation.");
         }
 
@@ -246,7 +252,7 @@ namespace Day12_SubterraneanSustainability
             }
 
             Pots.Row = new List<Pot>(tempPots.Row);
-            Pots.Dump(dumpRowNums);
+            //Pots.Dump(dumpRowNums);
         }
        
     }
