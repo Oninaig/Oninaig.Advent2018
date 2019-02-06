@@ -25,5 +25,26 @@ namespace Day12_SubterraneanSustainability
 
             return data.GetRange(index, count);
         }
+
+        public static int PotRangeHash(this IEnumerable<Pot> data, bool simpleComparison = false)
+        {
+            int hash = 17;
+            if (simpleComparison)
+            {
+                foreach (var pot in data)
+                {
+                    var newPot = new Pot(pot.ContainsPlant, 0);
+                    hash = hash * 23 + newPot.GetHashCode();
+                }
+            }
+            else
+            {
+                foreach (var pot in data)
+                    hash = hash * 23 + pot.GetHashCode();
+            }
+            
+            return hash;
+        }
+
     }
 }

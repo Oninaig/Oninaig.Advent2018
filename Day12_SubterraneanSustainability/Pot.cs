@@ -28,7 +28,7 @@ namespace Day12_SubterraneanSustainability
         {
             if (!(obj is Pot))
                 return false;
-            var otherPot = (Pot) obj;
+            var otherPot = (Pot)obj;
             if (otherPot.ContainsPlant == this.ContainsPlant)
                 return true;
             return false;
@@ -43,24 +43,45 @@ namespace Day12_SubterraneanSustainability
 
         public override string ToString()
         {
-            //return $"Plant {PotNumber} | HasPlant: {ContainsPlant}";
             return $"{(ContainsPlant ? "#" : ".")}";
         }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 23 + PotNumber.GetHashCode();
+            hash = hash * 23 + ContainsPlant.GetHashCode();
+            return hash;
+        }
+
+        public int GetSimpleHashCode()
+        {
+            return this.PotNumber;
+        }
+
     }
 
     public class PotRow
     {
         public List<Pot> Row { get; set; }
+        public Dictionary<int, Pot> PotDict { get; set; }
 
         public PotRow(int rowLength = 0, bool doubleLength = true)
         {
-           this.Row = new List<Pot>(rowLength*2);
+            this.Row = new List<Pot>(rowLength * 2);
+            this.PotDict = new Dictionary<int, Pot>();
         }
         public PotRow(PotRow otherRow)
         {
             this.Row = new List<Pot>(otherRow.Row);
+            this.PotDict = new Dictionary<int, Pot>(otherRow.PotDict);
         }
 
+        public void AddPot(Pot pot)
+        {
+            Row.Add(pot);
+            PotDict[pot.GetSimpleHashCode()] = pot;
+        }
         public override bool Equals(object obj)
         {
             var otherRow = obj as PotRow;
@@ -82,17 +103,17 @@ namespace Day12_SubterraneanSustainability
             var sbFinal = new StringBuilder();
             foreach (var pot in Row)
             {
-                
+
                 sbPotNum.Append($"{pot.PotNumber} ");
                 if (pot.PotNumber.ToString().Length > 1)
                 {
-                    sb.Append(new string(' ', pot.PotNumber.ToString().Length -1));
+                    sb.Append(new string(' ', pot.PotNumber.ToString().Length - 1));
                 }
                 sb.Append($"{pot.ToString()} ");
             }
 
-            if(includeRowNumbers)
-                sbFinal.AppendLine(sbPotNum.ToString());    
+            if (includeRowNumbers)
+                sbFinal.AppendLine(sbPotNum.ToString());
             sbFinal.AppendLine(sb.ToString());
             Console.WriteLine(sbFinal.ToString());
         }
@@ -107,9 +128,16 @@ namespace Day12_SubterraneanSustainability
             for (int i = 0; i < processingWindowSize; i++)
             {
                 if (needToExpandBeginning)
-                    this.Row.Insert(0, new Pot(false, --firstPotNum));
-                if(needToExpandEnd)
-                    this.Row.Add(new Pot(false, ++lastPotNum));
+                {
+                    var newPot = new Pot(false, --firstPotNum);
+                    this.Row.Insert(0, newPot);
+                    this.PotDict[newPot.GetHashCode()] = newPot;
+                }
+                if (needToExpandEnd)
+                {
+                    var newPot = new Pot(false, ++lastPotNum);
+                    AddPot(newPot);
+                }
             }
 
             Trim();
@@ -125,7 +153,37 @@ namespace Day12_SubterraneanSustainability
                 {
                     var newRow = Row.Skip(firstPlant - PotCave.ProcessingWindowSize).ToList();
                     Row = newRow;
+                    PotDict.Clear();
+                    foreach (var newPot in Row)
+                        PotDict[newPot.GetHashCode()] = newPot;
                 }
+            }
+        }
+
+        public void FinishGeneration(Dictionary<int, Pot> processedDict)
+        {
+            var newPotDict = new Dictionary<int, Pot>();
+            foreach (var key in PotDict.Keys)
+            {
+                var currentPot = PotDict[key];
+                Pot processedPot = new Pot(false, int.MinValue);
+                if (processedDict.TryGetValue(key, out processedPot))
+                {
+                    var changedPot = new Pot(true, currentPot.PotNumber);
+                    newPotDict[changedPot.GetHashCode()] = changedPot;
+                }
+                else
+                {
+                    var changedPot = new Pot(false, currentPot.PotNumber);
+                    newPotDict[changedPot.GetHashCode()] = changedPot;
+                }
+            }
+            PotDict.Clear();
+            PotDict = new Dictionary<int, Pot>(newPotDict);
+            Row.Clear();
+            foreach (var pot in PotDict.Values.OrderBy(x => x.PotNumber))
+            {
+                Row.Add(pot);
             }
         }
     }
@@ -133,15 +191,17 @@ namespace Day12_SubterraneanSustainability
     public class PotInstructionSet
     {
         public List<PotInstruction> Instructions { get; set; }
-
+        public Dictionary<int, PotInstruction> InstructionsDict { get; set; }
         public PotInstructionSet()
         {
             this.Instructions = new List<PotInstruction>();
+            this.InstructionsDict = new Dictionary<int, PotInstruction>();
         }
 
         public void AddInstruction(string rawInstruction)
         {
             var note = new PotInstruction(rawInstruction);
+            InstructionsDict[note.GetHashCode()] = note;
             this.Instructions.Add(note);
         }
     }
@@ -163,6 +223,12 @@ namespace Day12_SubterraneanSustainability
                 this.InstructionsAsPots[i] = new Pot(Instructions[i] == '#', 0);
             }
         }
+
+        public override int GetHashCode()
+        {
+            return InstructionsAsPots.PotRangeHash(true);
+        }
+
         public bool Matches(List<Pot> otherPots, int length)
         {
             for (int i = 0; i < length; i++)
@@ -179,7 +245,7 @@ namespace Day12_SubterraneanSustainability
         {
             if (!otherPots[0].Equals(InstructionsAsPots[0]))
                 return false;
-            for (int i = 0; i < otherPots.Length; i ++)
+            for (int i = 0; i < otherPots.Length; i++)
             {
                 if (!otherPots[i].Equals(InstructionsAsPots[i]))
                 {
@@ -202,7 +268,7 @@ namespace Day12_SubterraneanSustainability
             Pots.Dump(true);
         }
 
-        public long ProcessGenerations(long numGenerations)
+        public double ProcessGenerations(long numGenerations)
         {
             var startRowSize = Pots.Row.Count;
             var timer = new Stopwatch();
@@ -210,32 +276,6 @@ namespace Day12_SubterraneanSustainability
             for (long i = 0; i < numGenerations; i++)
             {
                 ProcessGeneration();
-                if (i % 100000 == 0)
-                {
-                    Console.WriteLine($"Finished generation {i.ToString("N0")}");
-                }
-            }
-            timer.Stop();
-            var endSize = Pots.Row.Count;
-            var totalCount = 0;
-            foreach(var pot in Pots.Row)
-                if (pot.ContainsPlant)
-                    totalCount += pot.PotNumber;
-            Debug.WriteLine($"Total number: {totalCount}");
-            Debug.WriteLine($"After {numGenerations} generations and approx {timer.Elapsed.TotalSeconds.ToString("N0")} seconds ({timer.ElapsedMilliseconds/1000.00}), the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
-                          $" This results in an average of {((double)(endSize - startRowSize))/(double)numGenerations} pots added per generation.");
-            return timer.ElapsedMilliseconds;
-        }
-
-
-        public double ProcessGenerationsFast(long numGenerations)
-        {
-            var startRowSize = Pots.Row.Count;
-            var timer = new Stopwatch();
-            timer.Start();
-            for (long i = 0; i < numGenerations; i++)
-            {
-                ProcessGeneration(true);
                 if (i % 10000 == 0)
                 {
                     //Console.WriteLine($"Finished generation {i.ToString("N0")}");
@@ -248,7 +288,7 @@ namespace Day12_SubterraneanSustainability
                 if (pot.ContainsPlant)
                     totalCount += pot.PotNumber;
             Debug.WriteLine($"Total number: {totalCount}");
-            Debug.WriteLine($"After {numGenerations} generations and approx {timer.Elapsed.TotalSeconds.ToString("N0")} seconds ({timer.ElapsedMilliseconds/(1000.00)} s), the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
+            Debug.WriteLine($"After {numGenerations} generations and approx {timer.Elapsed.TotalSeconds.ToString("N0")} seconds ({timer.ElapsedMilliseconds / (1000.00)} s), the row of pots grew from {startRowSize} pots to {endSize} pots, a difference of {endSize - startRowSize} pots." +
                           $" This results in an average of {((double)(endSize - startRowSize)) / (double)numGenerations} pots added per generation.");
             return timer.ElapsedMilliseconds;
         }
@@ -256,95 +296,64 @@ namespace Day12_SubterraneanSustainability
         public static readonly int ProcessingWindowSize = 5;
         private bool needToExpand(List<Pot> potList)
         {
-            if((potList.AsEnumerable().Reverse().Take(ProcessingWindowSize).Any(x=>x.ContainsPlant)) || potList.AsEnumerable().Take(ProcessingWindowSize).Any(x=>x.ContainsPlant))
+            if ((potList.AsEnumerable().Reverse().Take(ProcessingWindowSize).Any(x => x.ContainsPlant)) || potList.AsEnumerable().Take(ProcessingWindowSize).Any(x => x.ContainsPlant))
                 return true;
             return false;
         }
 
-        public void ProcessGeneration(bool useFastMethod = false)
+        public void ProcessGeneration()
         {
-            if (useFastMethod)
+            var dumpRowNums = false;
+            //add buffers on each end equal to the size of our window
+            if (needToExpand(Pots.Row))
             {
-                var dumpRowNums = false;
-                //add buffers on each end equal to the size of our window
-                if (needToExpand(Pots.Row))
-                {
-                    dumpRowNums = true;
-                    Pots.AddBuffers(ProcessingWindowSize);
-                }
-                var tempPots = new PotRow(Pots);
-
-                for (int i = 0; i < Pots.Row.Count; i++)
-                {
-
-                    var processingWindow = Pots.Row.GetRangeSafe(i, ProcessingWindowSize);
-                    if (processingWindow.Count < 5)
-                    {
-                        if (i + 2 < Pots.Row.Count)
-                        {
-                            tempPots.Row[i + 2] = new Pot(false, tempPots.Row[i + 2].PotNumber);
-                        }
-                        continue;
-                    }
-                    var firstMatch = PotInstructions.Instructions.FirstOrDefault(x => x.Matches(processingWindow, ProcessingWindowSize));
-                    if (firstMatch == null)
-                    {
-                        tempPots.Row[i + 2] = new Pot(false, tempPots.Row[i + 2].PotNumber);
-                        continue;
-                    }
-
-                    var middleItem = processingWindow[2];
-                    middleItem.ContainsPlant = firstMatch.Result == '#';
-                    processingWindow[2] = middleItem;
-                    tempPots.Row[i + 2] = new Pot(processingWindow[2].ContainsPlant, tempPots.Row[i + 2].PotNumber);
-
-                }
-
-                Pots.Row = new List<Pot>(tempPots.Row);
+                dumpRowNums = true;
+                Pots.AddBuffers(ProcessingWindowSize);
             }
-            else
+
+            //new plan. Why dont we just generate a collection of "slices" to process for pots, and then afterwards set the appropriate
+            //indexes to "hasPlant" in our main collection?
+            Queue<Pot[]> toBeProcessed = new Queue<Pot[]>();
+            var max = Pots.Row.Count;
+            for (int i = 0; i < max; i++)
             {
-                var dumpRowNums = false;
-                //add buffers on each end equal to the size of our window
-                if (needToExpand(Pots.Row))
+                var currProcessingWindow = new Pot[ProcessingWindowSize];
+                if (max - i < ProcessingWindowSize)
                 {
-                    dumpRowNums = true;
-                    Pots.AddBuffers(ProcessingWindowSize);
+                    var newSize = max - i;
+                    currProcessingWindow = new Pot[newSize];
+                    for (int j = 0; j < newSize; j++)
+                        currProcessingWindow[j] = Pots.Row[i + j];
                 }
-                var tempPots = new PotRow(Pots);
-
-                for (int i = 0; i < Pots.Row.Count; i++)
+                else
                 {
-
-                    var processingWindow = Pots.Row.Skip(i).Take(ProcessingWindowSize).ToArray();
-                    if (processingWindow.Length < 5)
+                    for (int j = 0; j < ProcessingWindowSize; j++)
                     {
-                        if (i + 2 < Pots.Row.Count)
-                        {
-                            tempPots.Row[i + 2] = new Pot(false, tempPots.Row[i + 2].PotNumber);
-                        }
-                        continue;
+                        currProcessingWindow[j] = Pots.Row[i + j];
                     }
-                    var firstMatch = PotInstructions.Instructions.FirstOrDefault(x => x.Matches(processingWindow));
-                    if (firstMatch == null)
-                    {
-                        tempPots.Row[i + 2] = new Pot(false, tempPots.Row[i + 2].PotNumber);
-                        continue;
-                    }
-
-                    processingWindow[2].ContainsPlant = firstMatch.Result == '#';
-                    tempPots.Row[i + 2] = new Pot(processingWindow[2].ContainsPlant, tempPots.Row[i + 2].PotNumber);
-
-
-
                 }
-
-                Pots.Row = new List<Pot>(tempPots.Row);
+                toBeProcessed.Enqueue(currProcessingWindow);
+             
             }
-          
-            //Pots.Dump(dumpRowNums);
+
+            var processedDict = new Dictionary<int, Pot>();
+            while (toBeProcessed.Any())
+            {
+                var currWindow = toBeProcessed.Dequeue();
+                PotInstruction firstMatch = null;
+                PotInstructions.InstructionsDict.TryGetValue(currWindow.PotRangeHash(true), out firstMatch);
+                if (firstMatch != null)
+                {
+                    var newPot = new Pot(true, currWindow[2].PotNumber);
+                    //use old pot for key
+                    processedDict[currWindow[2].GetHashCode()] = newPot;
+                }
+            }
+
+            Pots.FinishGeneration(processedDict);
+            //Pots.Row = new List<Pot>(tempPots.Row);
         }
-       
+
     }
 
     /// <summary>
@@ -354,7 +363,6 @@ namespace Day12_SubterraneanSustainability
     /// Thus the only choise we can make when choosing a premutation is to choose the smallest part.
     /// ***This may be done in K−(N−1) ways, where K are the number of elements in your set and N are the number of elements you should choose.***
     /// We need to subtract N−1 as the last N−1 elements may not be the first element if we need to choose N elements.
-    /// 
     /// </summary>
     public static class PotTools
     {
@@ -362,35 +370,34 @@ namespace Day12_SubterraneanSustainability
         {
             var input = File.ReadAllLines(inputFile);
             //Get our initial state
-            var initialState = new string(input[0].Skip(15).Select(x=>x).ToArray());
-       
+            var initialState = new string(input[0].Skip(15).Select(x => x).ToArray());
+
             //Build our initial row of pots.
             var potRow = new PotRow(initialState.Length);
-            
+
             //init the negative rows
-            var negativeCounter = 0; 
-            for (int i = initialState.Length-1; i > 0; i--)
+            var negativeCounter = 0;
+            for (int i = initialState.Length - 1; i > 0; i--)
             {
-                potRow.Row.Add(new Pot(false, i * -1));
+                potRow.AddPot( new Pot(false, i * -1));
                 negativeCounter++;
             }
 
             //init the positive row
-
             var positiveCounter = 0;
             for (int i = negativeCounter; i < potRow.Row.Capacity; i++)
             {
                 if (positiveCounter >= initialState.Length)
                 {
-                    potRow.Row.Add(new Pot(false, positiveCounter));
+                    potRow.AddPot(new Pot(false, positiveCounter));
 
                 }
                 else
                 {
                     var containsPlant = initialState[positiveCounter] == '#';
-                    potRow.Row.Add(new Pot(containsPlant, positiveCounter));
+                    potRow.AddPot(new Pot(containsPlant, positiveCounter));
                 }
-                
+
                 positiveCounter++;
             }
 
@@ -405,6 +412,6 @@ namespace Day12_SubterraneanSustainability
             return potCave;
         }
 
-      
+
     }
 }
