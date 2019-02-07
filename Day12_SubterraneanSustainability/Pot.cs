@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Day12_SubterraneanSustainability
 {
-    public struct Pot : IEquatable<Pot>
+    public class Pot : IEquatable<Pot>
     {
         public int PotNumber { get; set; }
         public bool ContainsPlant { get; set; }
@@ -101,16 +101,20 @@ namespace Day12_SubterraneanSustainability
         //}
         private bool needToExpandRight()
         {
-            for(int i = UpperBound; i > UpperBound-5; i--)
-                if (PotDict[i].ContainsPlant)
-                    return true;
+            //for(int i = UpperBound; i > UpperBound-5; i--)
+            //    if (PotDict[i].ContainsPlant)
+            //        return true;
+            if (UpperPotWithPlant + 5 > UpperBound)
+                return true;
             return false;
         }
         private bool needToExpandLeft()
         {
-            for (int i = LowerBound; i < LowerBound + 5; i++)
-                if (PotDict[i].ContainsPlant)
-                    return true;
+            //for (int i = LowerBound; i < LowerBound + 5; i++)
+            //    if (PotDict[i].ContainsPlant)
+            //        return true;
+            if (LowerPotWithPlant - 5 < LowerBound)
+                return true;
             return false;
         }
         public void InitRowStats()
@@ -162,7 +166,7 @@ namespace Day12_SubterraneanSustainability
             LowerPotWithPlant = int.MaxValue;
         }
 
-        public void UpdatePot(int potKey, Pot newPot)
+        public void UpdatePot(int potKey, bool hasPlant)
         {
             //if ((potKey == UpperPotWithPlant || potKey == LowerPotWithPlant))
             //{
@@ -171,11 +175,13 @@ namespace Day12_SubterraneanSustainability
             //    if (potKey == LowerPotWithPlant)
             //        LowerPotWithPlant = potKey;
             //}
-               
 
-            PotDict[potKey] = newPot;
 
-            if (newPot.ContainsPlant)
+
+            PotDict[potKey].ContainsPlant = hasPlant;
+
+
+            if (hasPlant)
             {
                 if (potKey > UpperPotWithPlant)
                     UpperPotWithPlant = potKey;
@@ -342,7 +348,6 @@ namespace Day12_SubterraneanSustainability
 
         private void processGeneration()
         {
-            var totalPots = RowOfPots.PotDict.Count;
             var resultDict = new Dictionary<int, bool>();
             for (int i = RowOfPots.LowerBound; i <= RowOfPots.UpperBound; i++)
             {
@@ -358,19 +363,15 @@ namespace Day12_SubterraneanSustainability
             //Update our row dictionary
             RowOfPots.StartUpdate();
             //todo: testing a new method
-            var tempDict = new Dictionary<int, Pot>(RowOfPots.PotDict);
-            foreach (var kvp in tempDict)
+            foreach (var kvp in RowOfPots.PotDict)
             {
-                var currentPlant = RowOfPots.PotDict[kvp.Key];
                 if (resultDict.ContainsKey(kvp.Key))
                 {
-                    var newPot = new Pot(resultDict[kvp.Key], currentPlant.PotNumber);
-                    RowOfPots.UpdatePot(kvp.Key, newPot);
+                    RowOfPots.UpdatePot(kvp.Key, resultDict[kvp.Key]);
                 }
                 else
                 {
-                    var newPot = new Pot(false, currentPlant.PotNumber);
-                    RowOfPots.UpdatePot(kvp.Key, newPot);
+                    RowOfPots.UpdatePot(kvp.Key, false);
                 }
             }
 

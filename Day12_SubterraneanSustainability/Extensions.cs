@@ -30,10 +30,7 @@ namespace Day12_SubterraneanSustainability
         {
             int hash = 17;
             foreach (var pot in data)
-            {
-                var newPot = new Pot(pot.ContainsPlant, 0);
-                hash = hash * 23 + newPot.GetNonUniqueHashCode();
-            }
+                hash = hash * 23 + pot.GetNonUniqueHashCode();
 
             return hash;
         }
