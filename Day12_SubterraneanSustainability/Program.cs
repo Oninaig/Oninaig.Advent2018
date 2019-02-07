@@ -11,20 +11,22 @@ namespace Day12_SubterraneanSustainability
     {
         static void Main(string[] args)
         {
+            Debug.Listeners.Add(new ConsoleTraceListener());
             bool profiling = false;
             if (profiling)
             {
                 var test = PotTools.InitPotCave("sampleinput.txt");
-                var faster = test.ProcessGenerations(1000000);
+                //var faster = test.ProcessGenerations(1000000);
             }
             else
             {
                 
-                var test = PotTools.InitPotCave("sampleinput.txt");
-                var faster = test.ProcessGenerations(1000000);
+                var test = PotTools.InitPotCave("sampleinput.txt", 5);
+                test.ProcessGenerations(1000000);
+                var result = test.GetResult();
+                Debug.WriteLine($"Result {result} | Size: {test.RowOfPots.PotDict.Count}");
             }
             
-            //Console.ReadLine();
         }
     }
 }
