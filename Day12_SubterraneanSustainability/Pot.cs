@@ -115,9 +115,9 @@ namespace Day12_SubterraneanSustainability
         }
         public void InitRowStats()
         {
-            var ordered = PotDict.Keys.OrderBy(x => x);
-            UpperBound = ordered.Last();
-            LowerBound = ordered.First();
+            var ordered = PotDict.Keys.OrderBy(x => x).ToArray();
+            UpperBound = ordered[ordered.Length-1];
+            LowerBound = ordered[0];
         }
 
         public Tuple<int, int> GetBounds()
@@ -155,9 +155,9 @@ namespace Day12_SubterraneanSustainability
 
         public void StartUpdate()
         {
-            this.changedPots = new Dictionary<int, bool>();
-            foreach (var key in PotDict.Keys)
-                changedPots[key] = false;
+            //this.changedPots = new Dictionary<int, bool>();
+            //foreach (var key in PotDict.Keys)
+            //    changedPots[key] = false;
             UpperPotWithPlant = int.MinValue;
             LowerPotWithPlant = int.MaxValue;
         }
@@ -182,7 +182,7 @@ namespace Day12_SubterraneanSustainability
                 if (potKey < LowerPotWithPlant)
                     LowerPotWithPlant = potKey;
             }
-            changedPots[potKey] = true;
+            //changedPots[potKey] = true;
         }
 
         private void addBuffers(bool right, bool left, int bufferSize = 5)
@@ -205,7 +205,7 @@ namespace Day12_SubterraneanSustainability
             }
 
             trim();
-            InitRowStats();
+            //InitRowStats();
         }
 
 
@@ -216,22 +216,29 @@ namespace Day12_SubterraneanSustainability
             //var lowerLimit = firstPot.Key - 5;
             //var lastPot = ordered.Last();
             //var upperLimit = lastPot.Key + 5;
-            for (int i = LowerBound; i <= LowerPotWithPlant-5; i++)
+            for (int i = LowerBound; i <= LowerPotWithPlant - 5; i++)
+            {
                 PotDict.Remove(i);
-            for (int i = UpperBound; i >= UpperPotWithPlant+5; i--)
+                LowerBound++;
+            }
+
+            for (int i = UpperBound; i >= UpperPotWithPlant + 5; i--)
+            {
                 PotDict.Remove(i);
+                UpperBound--;
+            }
         }
         public void EndUpdate()
         {
-            foreach (var kvp in changedPots.Where(x => x.Value == false))
-            {
-                var newPot = new Pot(false, PotDict[kvp.Key].PotNumber);
-                PotDict[kvp.Key] = newPot;
-                //if (kvp.Key == UpperPotWithPlant)
-                //    UpperPotWithPlant = int.MinValue;
-                //if (kvp.Key == LowerPotWithPlant)
-                //    LowerPotWithPlant = int.MaxValue;
-            }
+            //foreach (var kvp in changedPots.Where(x => x.Value == false))
+            //{
+            //    var newPot = new Pot(false, PotDict[kvp.Key].PotNumber);
+            //    PotDict[kvp.Key] = newPot;
+            //    //if (kvp.Key == UpperPotWithPlant)
+            //    //    UpperPotWithPlant = int.MinValue;
+            //    //if (kvp.Key == LowerPotWithPlant)
+            //    //    LowerPotWithPlant = int.MaxValue;
+            //}
 
             //var keys = new StringBuilder();
             //var values = new StringBuilder();
@@ -245,7 +252,7 @@ namespace Day12_SubterraneanSustainability
             //Debug.WriteLine(values.ToString());
 
             //Debug.WriteLine("");
-            changedPots.Clear();
+            //changedPots.Clear();
             var needRight = needToExpandRight();
             var needLeft = needToExpandLeft();
             addBuffers(needRight, needLeft);
@@ -350,12 +357,29 @@ namespace Day12_SubterraneanSustainability
 
             //Update our row dictionary
             RowOfPots.StartUpdate();
-            foreach (var key in resultDict.Keys)
+            //todo: testing a new method
+            var tempDict = new Dictionary<int, Pot>(RowOfPots.PotDict);
+            foreach (var kvp in tempDict)
             {
-                var currentPlant = RowOfPots.PotDict[key];
-                var newPot = new Pot(resultDict[key], currentPlant.PotNumber);
-                RowOfPots.UpdatePot(key, newPot);
+                var currentPlant = RowOfPots.PotDict[kvp.Key];
+                if (resultDict.ContainsKey(kvp.Key))
+                {
+                    var newPot = new Pot(resultDict[kvp.Key], currentPlant.PotNumber);
+                    RowOfPots.UpdatePot(kvp.Key, newPot);
+                }
+                else
+                {
+                    var newPot = new Pot(false, currentPlant.PotNumber);
+                    RowOfPots.UpdatePot(kvp.Key, newPot);
+                }
             }
+
+            //foreach (var key in resultDict.Keys)
+            //{
+            //    var currentPlant = RowOfPots.PotDict[key];
+            //    var newPot = new Pot(resultDict[key], currentPlant.PotNumber);
+            //    RowOfPots.UpdatePot(key, newPot);
+            //}
 
             RowOfPots.EndUpdate();
         }
