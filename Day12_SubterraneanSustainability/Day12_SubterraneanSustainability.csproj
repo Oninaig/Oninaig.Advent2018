@@ -44,6 +44,11 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="Pot.cs" />
+    <Compile Include="PotCave.cs" />
+    <Compile Include="PotInstructionSet.cs" />
+    <Compile Include="PotRangeInstruction.cs" />
+    <Compile Include="PotRow.cs" />
+    <Compile Include="PotTools.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

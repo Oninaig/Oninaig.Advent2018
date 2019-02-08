@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day12_SubterraneanSustainability
 {
@@ -10,7 +7,7 @@ namespace Day12_SubterraneanSustainability
     {
         public static T[] SubArray<T>(this T[] data, int index, int length)
         {
-            T[] result = new T[length];
+            var result = new T[length];
             Array.Copy(data, index, result, 0, length);
             return result;
         }
@@ -28,12 +25,11 @@ namespace Day12_SubterraneanSustainability
 
         public static int SimplePotRangeHash(this IEnumerable<Pot> data)
         {
-            int hash = 17;
+            var hash = 17;
             foreach (var pot in data)
                 hash = hash * 23 + pot.GetNonUniqueHashCode();
 
             return hash;
         }
-
     }
 }
