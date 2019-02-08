@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace Day12_SubterraneanSustainability
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            var test = PotTools.InitPotCave("sampleinput.txt");
-            test.ProcessGenerations(20);
-            Console.ReadLine();
+            Debug.Listeners.Add(new ConsoleTraceListener());
+                var test = PotTools.InitPotCave("puzzleinput.txt", 5);
+                test.ProcessGenerations(10000);
+                var result = test.GetResult();
+                Debug.WriteLine($"Result {result} | Size: {test.RowOfPots.PotDict.Count}");
         }
     }
 }
