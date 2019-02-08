@@ -11,6 +11,9 @@ namespace Day13_MineCartMadness
         static void Main(string[] args)
         {
             var grid = new TrackGrid("sampleinput.txt");
+            grid.DumpGrid();
+            grid.Tick();
+            grid.DumpGrid();
             Console.ReadLine();
         }
     }

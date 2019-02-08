@@ -84,21 +84,72 @@ namespace Day13_MineCartMadness
         }
         public void Tick()
         {
-            var head = LinkedGrid.First;
-            while (head != null)
+            foreach(var cart in AllCarts)
+                cart.ResetMovement();
+            var currentRow = LinkedGrid.First;
+            while (currentRow != null)
             {
-                var track = head.Value;
+                var track = currentRow.Value;
                 
                 //Move all the carts on the track (top to bottom, left to right)
                 var cartsToMove = track.CartsOnTrackRow;
+                var cartsToRemove = new List<Cart>();
                 foreach (var cart in cartsToMove)
                 {
+                    if (cart.HasMovedThisTick)
+                        continue;
+                    var previousDirect = cart.CurrentDirection;
                     var moveResult = track.MoveCart(cart);
                     if(moveResult.HasErrors)
                         throw new InvalidOperationException("Cart was unable to be moved. Does it have a valid direction?");
-                    if(!moveResult.Successful)
+
+                    //Unsuccessful movement means we need to jump track rows
+                    if (!moveResult.Successful)
+                    {
+                        switch (moveResult.Cart.CurrentDirection)
+                        {
+                            case CartDirection.Down:
+                                if(currentRow.Next == null)
+                                    throw new InvalidOperationException("No lower track row to jump to");
+                                var lowerRow = currentRow.Next.Value;
+                                //todo:check for collisions
+                                lowerRow.InsertCart(moveResult.Cart, moveResult.Cart.PositionIndex);
+                                //track.RemoveCart(moveResult.Cart);
+                                cartsToRemove.Add(cart);
+                                //replace the old track
+                                //if(previousDirect == CartDirection.Left)
+                                //    track.InsertRail('/', 0);
+                                //else if(previousDirect == CartDirection.Right)
+                                break;
+                            case CartDirection.Up:
+                                if (currentRow.Previous == null)
+                                    throw new InvalidOperationException("No lower track row to jump to");
+                                var upperRow = currentRow.Previous.Value;
+                                upperRow.InsertCart(moveResult.Cart, moveResult.Cart.PositionIndex);
+                                //track.RemoveCart(moveResult.Cart);
+                                cartsToRemove.Add(cart);
+                                break;
+                        }
+                    }
                 }
+
+                foreach (var cart in cartsToRemove)
+                    track.RemoveCart(cart);
+                currentRow = currentRow.Next;
             }
+        }
+
+        public void DumpGrid()
+        {
+            var builder = new StringBuilder();
+            foreach (var row in LinkedGrid)
+            {
+                foreach (var c in row.TracksAndCarts)
+                    builder.Append(c);
+                builder.AppendLine();
+            }
+
+            Console.WriteLine(builder.ToString());
         }
     }
 
@@ -118,6 +169,7 @@ namespace Day13_MineCartMadness
 
     public class Cart
     {
+        public bool HasMovedThisTick { get; private set; }
         public TrackRow OnTrackRow { get; private set; }
         public Guid Id { get; private set; }
         public int PositionIndex { get; private set; }
@@ -137,11 +189,18 @@ namespace Day13_MineCartMadness
         public void SwitchDirection(CartDirection direction)
         {
             this.CurrentDirection = direction;
+            this.HasMovedThisTick = true;
         }
 
         public void MoveTo(int index)
         {
             this.PositionIndex = index;
+            this.HasMovedThisTick = true;
+        }
+
+        public void ResetMovement()
+        {
+            this.HasMovedThisTick = false;
         }
     }
 
@@ -167,6 +226,31 @@ namespace Day13_MineCartMadness
             this.CartsOnTrackRow.Add(cart);
         }
 
+        public void InsertCart(Cart cart, int index)
+        {
+            CartsOnTrackRow.Add(cart);
+            switch (TracksAndCarts[index])
+            {
+                case '\\':
+                    if(cart.CurrentDirection == CartDirection.Down)
+                        cart.SwitchDirection(CartDirection.Right);
+                    else
+                        cart.SwitchDirection(CartDirection.Left);
+                    break;
+                case '/':
+                    if(cart.CurrentDirection == CartDirection.Down)
+                        cart.SwitchDirection(CartDirection.Left);
+                    else
+                        cart.SwitchDirection(CartDirection.Right);
+                    break;
+            }
+            TracksAndCarts[index] = (char)cart.CurrentDirection;
+        }
+
+        public void InsertRail(char rail, int index)
+        {
+            this.TracksAndCarts[index] = rail;
+        }
         public CartMovementResult MoveCart(Cart cart)
         {
             //first lets check to see if the cart is currently on a curve, meaning it will need to be  moved to another row.
@@ -192,7 +276,14 @@ namespace Day13_MineCartMadness
                         }
                     }
 
+                    if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '\\')
+                        TracksAndCarts[cart.PositionIndex] = '/';
+                    else if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '/')
+                        TracksAndCarts[cart.PositionIndex] = '\\';
+                    else
+                        TracksAndCarts[cart.PositionIndex] = '-';
                     cart.MoveTo(leftPosition);
+                    TracksAndCarts[leftPosition] = (char) cart.CurrentDirection;
                     return new CartMovementResult(true, cart);
                 case CartDirection.Right:
                     var rightPosition = cart.PositionIndex + 1;
@@ -210,12 +301,39 @@ namespace Day13_MineCartMadness
                         }
                     }
 
+                    if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '\\')
+                        TracksAndCarts[cart.PositionIndex] = '/';
+                    else if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '/')
+                        TracksAndCarts[cart.PositionIndex] = '\\';
+                    else
+                        TracksAndCarts[cart.PositionIndex] = '-';
                     cart.MoveTo(rightPosition);
+                    TracksAndCarts[rightPosition] = (char)cart.CurrentDirection;
                     return new CartMovementResult(true, cart);
 
             }
             return new CartMovementResult(false, cart, true);
         }
-        
+
+        public void RemoveCart(Cart moveResultCart)
+        {
+            //replace the curve that the cart was on
+            if (moveResultCart.CurrentDirection == CartDirection.Down)
+            {
+                if (moveResultCart.PositionIndex == TracksAndCarts.Count - 1)
+                    TracksAndCarts[moveResultCart.PositionIndex] = '\\';
+                else
+                    TracksAndCarts[moveResultCart.PositionIndex] = '/';
+            }
+            else if (moveResultCart.CurrentDirection == CartDirection.Up)
+            {
+                if (moveResultCart.PositionIndex == TracksAndCarts.Count - 1)
+                    TracksAndCarts[moveResultCart.PositionIndex] = '/';
+                else
+                    TracksAndCarts[moveResultCart.PositionIndex] = '\\';
+            }
+
+            CartsOnTrackRow.Remove(moveResultCart);
+        }
     }
 }
