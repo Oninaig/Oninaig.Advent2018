@@ -1,8 +1,10 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +22,13 @@ namespace Day13_MineCartMadness
         public static bool IsCurve(this char c)
         {
             if (c == '/' || c == '\\')
+                return true;
+            return false;
+        }
+
+        public static bool IsIntersection(this char c)
+        {
+            if (c == '+')
                 return true;
             return false;
         }
@@ -46,6 +55,13 @@ namespace Day13_MineCartMadness
         Error = '#'
     }
 
+    public enum CartIntersectionBehavior
+    {
+        Left,
+        Straight,
+        Right
+    }
+
     public class TrackGrid
     {
         public LinkedList<TrackRow> LinkedGrid { get; private set; }
@@ -53,16 +69,19 @@ namespace Day13_MineCartMadness
         public TrackGrid(string inputPath)
         {
             initGrid(inputPath);
+            tickCounter = 0;
+            this.DebugData = new Diagnostics();
         }
-      
+        public Diagnostics DebugData { get; private set; }
         private void initGrid(string path)
         {
             var input = File.ReadAllLines(path);
             this.LinkedGrid = new LinkedList<TrackRow>();
             this.AllCarts = new List<Cart>();
+            var indexCounter = 0;
             foreach (var line in input)
             {
-                var row = new TrackRow();
+                var row = new TrackRow(indexCounter++);
                 for (int i = 0; i < line.Length; i++)
                 {
                     var c = line[i];
@@ -82,63 +101,83 @@ namespace Day13_MineCartMadness
                     LinkedGrid.AddLast(row);
             }
         }
+
+        private int tickCounter;
         public void Tick()
         {
-            foreach(var cart in AllCarts)
-                cart.ResetMovement();
-            var currentRow = LinkedGrid.First;
-            while (currentRow != null)
+            try
             {
-                var track = currentRow.Value;
-                
-                //Move all the carts on the track (top to bottom, left to right)
-                var cartsToMove = track.CartsOnTrackRow;
-                var cartsToRemove = new List<Cart>();
-                foreach (var cart in cartsToMove)
+                foreach (var cart in AllCarts)
+                    cart.ResetMovement();
+                var currentRow = LinkedGrid.First;
+                while (currentRow != null)
                 {
-                    if (cart.HasMovedThisTick)
-                        continue;
-                    var previousDirect = cart.CurrentDirection;
-                    var moveResult = track.MoveCart(cart);
-                    if(moveResult.HasErrors)
-                        throw new InvalidOperationException("Cart was unable to be moved. Does it have a valid direction?");
+                    var track = currentRow.Value;
 
-                    //Unsuccessful movement means we need to jump track rows
-                    if (!moveResult.Successful)
+                    //Move all the carts on the track (top to bottom, left to right)
+                    var cartsToMove = track.CartsOnTrackRow;
+                    var cartsToRemove = new List<Cart>();
+                    foreach (var cart in cartsToMove)
                     {
-                        switch (moveResult.Cart.CurrentDirection)
+                        if (cart.HasMovedThisTick)
+                            continue;
+                        var previousDirect = cart.CurrentDirection;
+                        var moveResult = track.MoveCart(cart);
+                        if (moveResult.HasErrors)
+                            throw new InvalidOperationException(
+                                "Cart was unable to be moved. Does it have a valid direction?");
+
+                        //Unsuccessful movement means we need to jump track rows
+                        if (!moveResult.Successful)
                         {
-                            case CartDirection.Down:
-                                if(currentRow.Next == null)
-                                    throw new InvalidOperationException("No lower track row to jump to");
-                                var lowerRow = currentRow.Next.Value;
-                                //todo:check for collisions
-                                lowerRow.InsertCart(moveResult.Cart, moveResult.Cart.PositionIndex);
-                                //track.RemoveCart(moveResult.Cart);
-                                cartsToRemove.Add(cart);
-                                //replace the old track
-                                //if(previousDirect == CartDirection.Left)
-                                //    track.InsertRail('/', 0);
-                                //else if(previousDirect == CartDirection.Right)
-                                break;
-                            case CartDirection.Up:
-                                if (currentRow.Previous == null)
-                                    throw new InvalidOperationException("No lower track row to jump to");
-                                var upperRow = currentRow.Previous.Value;
-                                upperRow.InsertCart(moveResult.Cart, moveResult.Cart.PositionIndex);
-                                //track.RemoveCart(moveResult.Cart);
-                                cartsToRemove.Add(cart);
-                                break;
+                            switch (moveResult.Cart.CurrentDirection)
+                            {
+                                case CartDirection.Down:
+                                    if (currentRow.Next == null)
+                                        throw new InvalidOperationException("No lower track row to jump to");
+                                    var lowerRow = currentRow.Next.Value;
+                                    //todo:check for collisions
+                                    lowerRow.InsertCart(moveResult.Cart, moveResult.Cart.PositionIndex);
+                                    cartsToRemove.Add(cart);
+                                    break;
+                                case CartDirection.Up:
+                                    if (currentRow.Previous == null)
+                                        throw new InvalidOperationException("No lower track row to jump to");
+                                    var upperRow = currentRow.Previous.Value;
+                                    upperRow.InsertCart(moveResult.Cart, moveResult.Cart.PositionIndex);
+                                    //track.RemoveCart(moveResult.Cart);
+                                    cartsToRemove.Add(cart);
+                                    break;
+                            }
                         }
                     }
+
+                    foreach (var cart in cartsToRemove)
+                        track.RemoveCart(cart);
+                    track.ResolveIntersections();
+                    currentRow = currentRow.Next;
                 }
 
-                foreach (var cart in cartsToRemove)
-                    track.RemoveCart(cart);
-                currentRow = currentRow.Next;
+                DebugData.AddData(GetGridAsString(), tickCounter++);
+
+            }
+            catch (Exception e)
+            {
+                DebugData.DumpCrashData(tickCounter-1, (int)e.Data["coordx"], (int)e.Data["coordy"]);
             }
         }
+        public string GetGridAsString()
+        {
+            var builder = new StringBuilder();
+            foreach (var row in LinkedGrid)
+            {
+                foreach (var c in row.TracksAndCarts)
+                    builder.Append(c);
+                builder.AppendLine();
+            }
 
+            return builder.ToString();
+        }
         public void DumpGrid()
         {
             var builder = new StringBuilder();
@@ -169,6 +208,7 @@ namespace Day13_MineCartMadness
 
     public class Cart
     {
+        public CartIntersectionBehavior CurrentIntersectionBehavior { get; private set; }
         public bool HasMovedThisTick { get; private set; }
         public TrackRow OnTrackRow { get; private set; }
         public Guid Id { get; private set; }
@@ -176,10 +216,63 @@ namespace Day13_MineCartMadness
         public CartDirection CurrentDirection { get; private set; }
         public Cart(char direction)
         {
+            this.CurrentIntersectionBehavior = CartIntersectionBehavior.Left;
             this.CurrentDirection = (CartDirection) direction;
             this.Id = Guid.NewGuid();
         }
 
+        public void CycleIntersectionBehavior()
+        {
+            switch (CurrentIntersectionBehavior)
+            {
+                case CartIntersectionBehavior.Left:
+                    CurrentIntersectionBehavior = CartIntersectionBehavior.Straight;
+                    break;
+                case CartIntersectionBehavior.Straight:
+                    CurrentIntersectionBehavior = CartIntersectionBehavior.Right;
+                    break;
+                case CartIntersectionBehavior.Right:
+                    CurrentIntersectionBehavior = CartIntersectionBehavior.Left;
+                    break;
+            }
+        }
+
+        public CartDirection GetIntersectionDecision()
+        {
+            switch (CurrentIntersectionBehavior)
+            {
+                case CartIntersectionBehavior.Left:
+                    switch (CurrentDirection)
+                    {
+                        case CartDirection.Down:
+                            return CartDirection.Right;
+                        case CartDirection.Left:
+                            return CartDirection.Down;
+                        case CartDirection.Right:
+                            return CartDirection.Up;
+                        case CartDirection.Up:
+                            return CartDirection.Left;
+                    }
+                    break;
+                case CartIntersectionBehavior.Straight:
+                    return CurrentDirection;
+                case CartIntersectionBehavior.Right:
+                    switch (CurrentDirection)
+                    {
+                        case CartDirection.Down:
+                            return CartDirection.Left;
+                        case CartDirection.Left:
+                            return CartDirection.Up;
+                        case CartDirection.Right:
+                            return CartDirection.Down;
+                        case CartDirection.Up:
+                            return CartDirection.Right;
+                    }
+                    break;
+            }
+
+            return CartDirection.Error;
+        }
         public void SetTrackRow(TrackRow track, int position)
         {
             this.OnTrackRow = track;
@@ -202,23 +295,49 @@ namespace Day13_MineCartMadness
         {
             this.HasMovedThisTick = false;
         }
+
+        public void SetMoved()
+        {
+            this.HasMovedThisTick = true;
+        }
     }
 
     public class TrackRow
     {
+        public List<char> Tracks { get; private set; }
         public List<char> TracksAndCarts { get; private set; }
         public List<Cart> CartsOnTrackRow { get; private set; }
         public Guid TrackRowId { get; private set; }
-        public TrackRow()
+        public int GridIndex { get; private set; }
+        public TrackRow(int index)
         {
             this.TracksAndCarts = new List<char>();
             this.CartsOnTrackRow = new List<Cart>();
+            this.Tracks = new List<char>();
             this.TrackRowId = Guid.NewGuid();
+            this.GridIndex = index;
         }
 
-        public void AddToTrack(char newRail)
+        public void AddToTrack(char railOrCart)
         {
-            TracksAndCarts.Add(newRail);
+            TracksAndCarts.Add(railOrCart);
+            if (railOrCart.IsCart())
+            {
+                switch ((CartDirection) railOrCart)
+                {
+                    case CartDirection.Down:
+                    case CartDirection.Up:
+                        Tracks.Add('|');
+                        break;
+                    case CartDirection.Left:
+                    case CartDirection.Right:
+                        Tracks.Add('-');
+                        break;
+                }
+            }
+            else
+                Tracks.Add(railOrCart);
+
         }
 
         public void AddCartToTrack(Cart cart)
@@ -244,12 +363,32 @@ namespace Day13_MineCartMadness
                         cart.SwitchDirection(CartDirection.Right);
                     break;
             }
+
+            if (TracksAndCarts[index].IsCart())
+            {
+                var error = new InvalidOperationException($"Crash at ({index}, {GridIndex})!");
+                error.Data["coordx"] = index;
+                error.Data["coordy"] = GridIndex;
+                throw error;
+            }
+            cart.MoveTo(index);
             TracksAndCarts[index] = (char)cart.CurrentDirection;
         }
 
         public void InsertRail(char rail, int index)
         {
             this.TracksAndCarts[index] = rail;
+        }
+
+        public void ResolveIntersections()
+        {
+            foreach(var cart in CartsOnTrackRow)
+                if (Tracks[cart.PositionIndex].IsIntersection())
+                {
+                    cart.SwitchDirection(cart.GetIntersectionDecision());
+                    TracksAndCarts[cart.PositionIndex] = (char) cart.CurrentDirection;
+                    cart.CycleIntersectionBehavior();
+                }
         }
         public CartMovementResult MoveCart(Cart cart)
         {
@@ -276,12 +415,11 @@ namespace Day13_MineCartMadness
                         }
                     }
 
-                    if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '\\')
-                        TracksAndCarts[cart.PositionIndex] = '/';
-                    else if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '/')
-                        TracksAndCarts[cart.PositionIndex] = '\\';
-                    else
-                        TracksAndCarts[cart.PositionIndex] = '-';
+                    if (TracksAndCarts[leftPosition].IsCart())
+                    {
+                        throw new InvalidOperationException($"Crash at ({leftPosition}, {GridIndex})!");
+                    }
+                    TracksAndCarts[cart.PositionIndex] = Tracks[cart.PositionIndex];
                     cart.MoveTo(leftPosition);
                     TracksAndCarts[leftPosition] = (char) cart.CurrentDirection;
                     return new CartMovementResult(true, cart);
@@ -301,12 +439,11 @@ namespace Day13_MineCartMadness
                         }
                     }
 
-                    if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '\\')
-                        TracksAndCarts[cart.PositionIndex] = '/';
-                    else if (cart.PositionIndex == 0 && TracksAndCarts[TracksAndCarts.Count - 1] == '/')
-                        TracksAndCarts[cart.PositionIndex] = '\\';
-                    else
-                        TracksAndCarts[cart.PositionIndex] = '-';
+                    if (TracksAndCarts[rightPosition].IsCart())
+                    {
+                        throw new InvalidOperationException($"Crash at ({rightPosition}, {GridIndex})!");
+                    }
+                    TracksAndCarts[cart.PositionIndex] = Tracks[cart.PositionIndex];
                     cart.MoveTo(rightPosition);
                     TracksAndCarts[rightPosition] = (char)cart.CurrentDirection;
                     return new CartMovementResult(true, cart);
@@ -317,21 +454,22 @@ namespace Day13_MineCartMadness
 
         public void RemoveCart(Cart moveResultCart)
         {
-            //replace the curve that the cart was on
-            if (moveResultCart.CurrentDirection == CartDirection.Down)
-            {
-                if (moveResultCart.PositionIndex == TracksAndCarts.Count - 1)
-                    TracksAndCarts[moveResultCart.PositionIndex] = '\\';
-                else
-                    TracksAndCarts[moveResultCart.PositionIndex] = '/';
-            }
-            else if (moveResultCart.CurrentDirection == CartDirection.Up)
-            {
-                if (moveResultCart.PositionIndex == TracksAndCarts.Count - 1)
-                    TracksAndCarts[moveResultCart.PositionIndex] = '/';
-                else
-                    TracksAndCarts[moveResultCart.PositionIndex] = '\\';
-            }
+            TracksAndCarts[moveResultCart.PositionIndex] = Tracks[moveResultCart.PositionIndex];
+            ////replace the curve that the cart was on
+            //if (moveResultCart.CurrentDirection == CartDirection.Down)
+            //{
+            //    if (moveResultCart.PositionIndex == TracksAndCarts.Count - 1)
+            //        TracksAndCarts[moveResultCart.PositionIndex] = '\\';
+            //    else
+            //        TracksAndCarts[moveResultCart.PositionIndex] = '/';
+            //}
+            //else if (moveResultCart.CurrentDirection == CartDirection.Up)
+            //{
+            //    if (moveResultCart.PositionIndex == TracksAndCarts.Count - 1)
+            //        TracksAndCarts[moveResultCart.PositionIndex] = '/';
+            //    else
+            //        TracksAndCarts[moveResultCart.PositionIndex] = '\\';
+            //}
 
             CartsOnTrackRow.Remove(moveResultCart);
         }
