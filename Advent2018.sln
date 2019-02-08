@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day11_ChronalCharge", "Day1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day12_SubterraneanSustainability", "Day12_SubterraneanSustainability\Day12_SubterraneanSustainability.csproj", "{90DCC8AB-0451-41E0-A43F-AF77593D1996}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day13_MineCartMadness", "Day13_MineCartMadness\Day13_MineCartMadness.csproj", "{F864AD39-D322-43A6-A2D4-24CD48860BD7}"
+EndProject
 Global
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
@@ -84,6 +86,10 @@ Global
 		{90DCC8AB-0451-41E0-A43F-AF77593D1996}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90DCC8AB-0451-41E0-A43F-AF77593D1996}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90DCC8AB-0451-41E0-A43F-AF77593D1996}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F864AD39-D322-43A6-A2D4-24CD48860BD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F864AD39-D322-43A6-A2D4-24CD48860BD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F864AD39-D322-43A6-A2D4-24CD48860BD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F864AD39-D322-43A6-A2D4-24CD48860BD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
