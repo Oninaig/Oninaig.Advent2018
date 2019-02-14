@@ -16,11 +16,7 @@ namespace Day13_MineCartMadness
             //    grid.Tick();
             //}
 
-            var grid = new TrackGrid("puzzle.txt");
-            while (true)
-            {
-                grid.Tick();
-            }
+            var grid = new TrackGrid("sampleinput.txt");
             Console.ReadLine();
         }
     }
