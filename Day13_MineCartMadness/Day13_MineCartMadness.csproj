@@ -47,9 +47,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Carts\Cart.cs" />
+    <Compile Include="Carts\CartIntersectionBehavior.cs" />
+    <Compile Include="Navigation\Coord.cs" />
     <Compile Include="Diagnostics.cs" />
+    <Compile Include="Navigation\Direction.cs" />
+    <Compile Include="Rails\Intersection.cs" />
+    <Compile Include="MineCartExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rails\Rail.cs" />
+    <Compile Include="Tracks\Track.cs" />
     <Compile Include="TrackGrid.cs" />
   </ItemGroup>
   <ItemGroup>

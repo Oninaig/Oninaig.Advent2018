@@ -8,114 +8,20 @@ using System.Runtime.Remoting.Messaging;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Day13_MineCartMadness.Navigation;
+using Day13_MineCartMadness.Rails;
+using Day13_MineCartMadness.Tracks;
 
 namespace Day13_MineCartMadness
 {
-    public static class MineCartExtensions
-    {
-        public static bool IsCart(this char c)
-        {
-            if (c == '<' || c == '>' || c == '^' || c == 'v')
-                return true;
-            return false;
-        }
-
-        public static bool IsCurve(this char c)
-        {
-            if (c == '/' || c == '\\')
-                return true;
-            return false;
-        }
-
-        public static bool IsTopLeftCurve(this char c)
-        {
-            if (c == '/')
-                return true;
-            return false;
-        }
-
-        public static bool IsIntersection(this char c)
-        {
-            if (c == '+')
-                return true;
-            return false;
-        }
-
-        public static bool IsHorizontalRail(this char c)
-        {
-            return (c == '-');
-        }
-
-        public static bool IsVerticalRail(this char c)
-        {
-            return c == '|';
-        }
-
-        /// <summary>
-        /// Combines IsVerticalRail, IsCart, and IsIntersection (is c a vertical rail, a cart, or an intersection?
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static bool IsVertCartInter(this char c)
-        {
-            return c.IsVerticalRail() || c.IsCart() || c.IsIntersection();
-        }
-
-        /// <summary>
-        /// Combines IsHorizontalRail, IsCart, and IsIntersection (is c a vertical rail, a cart, or an intersection?
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static bool IsHoriCartInter(this char c)
-        {
-            return c.IsHorizontalRail() || c.IsCart() || c.IsIntersection();
-        }
-
-        public static bool IsTopLeftCurve(this char c, char c1, char c2)
-        {
-            if (c.IsTopLeftCurve() && (c1.IsVertCartInter()) && (c2.IsHoriCartInter()))
-                return true;
-            return false;
-        }
-
-        public static CartDirection GetCartDirection(this char c)
-        {
-            return (CartDirection) c;
-        }
-    }
-
-
-    
-    public enum CartDirection
-    {
-        Up = '^',
-        Down = 'v',
-        Left = '<',
-        Right = '>',
-        Error = '#'
-    }
-
-    public enum Direction
-    {
-        Up,
-        Down,
-        Left,
-        Right
-    }
-
-    public enum CartIntersectionBehavior
-    {
-        Left,
-        Straight,
-        Right
-    }
-
     public class TrackGrid
     {
         private List<Track> Tracks { get; set; }
+        public Dictionary<Coord, Intersection> IntersectionMap { get; set; }
         public TrackGrid(string inputPath)
         {
             this.Tracks = new List<Track>();
+            this.IntersectionMap = new Dictionary<Coord, Intersection>();
             initGrid(inputPath);
         }
         private void initGrid(string path)
@@ -141,7 +47,6 @@ namespace Day13_MineCartMadness
                     }
                     Console.Write(currRail);
                 }
-
                 Console.WriteLine();
             }
         }
@@ -164,7 +69,10 @@ namespace Day13_MineCartMadness
                 var nextRail = grid[nextX][nextY];
                 if (!nextRail.IsCurve())
                 {
-                    track.AddRail(nextX, nextY, nextRail);
+                    if (nextRail.IsIntersection())
+                        track.AddRail(nextX, nextY, nextRail, IntersectionMap);
+                    else
+                        track.AddRail(nextX, nextY, nextRail);
                     switch (currentDirection)
                     {
                         case Direction.Right:
@@ -215,83 +123,6 @@ namespace Day13_MineCartMadness
                 }
             }
             Tracks.Add(track);
-        }
-    }
-
-    public class Track
-    {
-        public Coord TopLeft { get; set; }
-        public Guid TrackId { get; private set; }
-        public LinkedList<Rail> Rails { get; private set; }
-        public bool IsComplete { get; set; }
-        public List<Cart> CartsOnTrack { get; private set; }
-        public Track(Coord topleft)
-        {
-            this.TopLeft = topleft;
-            this.TrackId = Guid.NewGuid();
-            this.Rails = new LinkedList<Rail>();
-            this.CartsOnTrack = new List<Cart>();
-        }
-
-
-        public void AddRail(int x, int y, char c)
-        {
-            if (c.IsCart())
-            {
-                CartsOnTrack.Add(new Cart(new Coord(x,y),this));
-                switch (c.GetCartDirection())
-                {
-                    case CartDirection.Up:
-                    case CartDirection.Down:
-                        c = '|';
-                        break;
-                    case CartDirection.Left:
-                    case CartDirection.Right:
-                        c = '-';
-                        break;
-                }
-            }
-
-            Rails.AddLast(new Rail(this, c, new Coord(x, y)));
-            //todo: this will fail to work if tracks are anything but squares/rectangles.
-            if (TopLeft.X == x - 1 && TopLeft.Y == y)
-                this.IsComplete = true;
-        }
-    }
-
-    public class Cart
-    {
-        public Coord Coordinates { get; set; }
-        public Track OnTrack { get; set; }
-
-        public Cart(Coord coordinates, Track owner)
-        {
-            this.Coordinates = coordinates;
-            this.OnTrack = owner;
-        }
-    }
-
-    public class Rail
-    {
-        public char RailType { get; private set; }
-        public Track OwnerTrack { get; private set; }
-        public Coord Coordinates { get; private set; }
-        public Rail(Track owner, char railType, Coord coordinates)
-        {
-            this.OwnerTrack = owner;
-            this.RailType = railType;
-            this.Coordinates = coordinates;
-        }
-    }
-
-    public struct Coord
-    {
-        public int X, Y;
-
-        public Coord(int x, int y)
-        {
-            X = x;
-            Y = y;
         }
     }
 }
