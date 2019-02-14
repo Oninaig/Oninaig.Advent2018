@@ -13,23 +13,19 @@ namespace Day13_MineCartMadness.Tracks
         public LinkedList<Rail> Rails { get; private set; }
         public bool IsComplete { get; set; }
         public List<Cart> CartsOnTrack { get; private set; }
-        public List<Track> IntersectsWith { get; set; }
         public Track(Coord topleft)
         {
             this.TopLeft = topleft;
             this.TrackId = Guid.NewGuid();
             this.Rails = new LinkedList<Rail>();
             this.CartsOnTrack = new List<Cart>();
-            this.IntersectsWith = new List<Track>();
         }
-
-
 
         public void AddRail(int x, int y, char c)
         {
             if (c.IsCart())
             {
-                CartsOnTrack.Add(new Cart(new Coord(x,y),this));
+                CartsOnTrack.Add(new Cart(new Coord(x,y),this, c.GetCartDirection()));
                 switch (c.GetCartDirection())
                 {
                     case CartDirection.Up:

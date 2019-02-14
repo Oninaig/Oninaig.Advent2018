@@ -14,5 +14,16 @@ namespace Day13_MineCartMadness.Rails
             this.RailType = railType;
             this.Coordinates = coordinates;
         }
+
+        public override bool Equals(object obj)
+        {
+            var otherRail = (Rail) obj;
+            return otherRail.Coordinates.X == this.Coordinates.X && otherRail.Coordinates.Y == this.Coordinates.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

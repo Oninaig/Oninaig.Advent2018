@@ -1,13 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using Day13_MineCartMadness.Navigation;
 using Day13_MineCartMadness.Rails;
 using Day13_MineCartMadness.Tracks;
@@ -16,14 +10,16 @@ namespace Day13_MineCartMadness
 {
     public class TrackGrid
     {
-        private List<Track> Tracks { get; set; }
-        public Dictionary<Coord, Intersection> IntersectionMap { get; set; }
         public TrackGrid(string inputPath)
         {
-            this.Tracks = new List<Track>();
-            this.IntersectionMap = new Dictionary<Coord, Intersection>();
+            Tracks = new List<Track>();
+            IntersectionMap = new Dictionary<Coord, Intersection>();
             initGrid(inputPath);
         }
+
+        public List<Track> Tracks { get; }
+        public Dictionary<Coord, Intersection> IntersectionMap { get; set; }
+
         private void initGrid(string path)
         {
             var input = File.ReadAllLines(path);
@@ -35,18 +31,18 @@ namespace Day13_MineCartMadness
         private void initTracks(char[][] grid)
         {
             //find next top left
-            for (int x = 0; x < grid.Length; x++)
+            for (var x = 0; x < grid.Length; x++)
             {
-                for (int y = 0; y < grid[x].Length; y++)
+                for (var y = 0; y < grid[x].Length; y++)
                 {
                     var currRail = grid[x][y];
                     //if currRail is a top left rail of a track, initialize that track
-                    if (currRail.IsCurve() && x+1 < grid.Length && y+1 < grid[x].Length && currRail.IsTopLeftCurve(grid[x+1][y], grid[x][y+1]))
-                    {
+                    if (currRail.IsCurve() && x + 1 < grid.Length && y + 1 < grid[x].Length &&
+                        currRail.IsTopLeftCurve(grid[x + 1][y], grid[x][y + 1]))
                         initTrack(x, y, grid);
-                    }
                     Console.Write(currRail);
                 }
+
                 Console.WriteLine();
             }
         }
@@ -93,7 +89,6 @@ namespace Day13_MineCartMadness
                 {
                     track.AddRail(nextX, nextY, nextRail);
                     if (nextRail == '\\')
-                    {
                         switch (currentDirection)
                         {
                             case Direction.Right:
@@ -105,9 +100,7 @@ namespace Day13_MineCartMadness
                                 nextX = nextX - 1;
                                 break;
                         }
-                    }
                     else if (nextRail == '/')
-                    {
                         switch (currentDirection)
                         {
                             case Direction.Down:
@@ -119,9 +112,9 @@ namespace Day13_MineCartMadness
                                 nextY = nextY + 1;
                                 break;
                         }
-                    }
                 }
             }
+
             Tracks.Add(track);
         }
     }
