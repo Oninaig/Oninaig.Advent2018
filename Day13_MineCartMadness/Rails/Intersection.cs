@@ -6,14 +6,15 @@ namespace Day13_MineCartMadness.Rails
 {
     public class Intersection
     {
-        public List<Track> Owners { get; set; }
-        public Coord Coordinates { get; set; }
         public Intersection(Track owner, Coord coordinates)
         {
-            if(this.Owners == null)
-                this.Owners = new List<Track>();
-            this.Owners.Add(owner);
-            this.Coordinates = coordinates;
+            if (Owners == null)
+                Owners = new List<Track>();
+            Owners.Add(owner);
+            Coordinates = coordinates;
         }
+
+        public List<Track> Owners { get; set; }
+        public Coord Coordinates { get; set; }
     }
 }

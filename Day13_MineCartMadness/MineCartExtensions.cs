@@ -34,7 +34,7 @@ namespace Day13_MineCartMadness
 
         public static bool IsHorizontalRail(this char c)
         {
-            return (c == '-');
+            return c == '-';
         }
 
         public static bool IsVerticalRail(this char c)
@@ -43,7 +43,7 @@ namespace Day13_MineCartMadness
         }
 
         /// <summary>
-        /// Combines IsVerticalRail, IsCart, and IsIntersection (is c a vertical rail, a cart, or an intersection?
+        ///     Combines IsVerticalRail, IsCart, and IsIntersection (is c a vertical rail, a cart, or an intersection?
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -53,7 +53,7 @@ namespace Day13_MineCartMadness
         }
 
         /// <summary>
-        /// Combines IsHorizontalRail, IsCart, and IsIntersection (is c a vertical rail, a cart, or an intersection?
+        ///     Combines IsHorizontalRail, IsCart, and IsIntersection (is c a vertical rail, a cart, or an intersection?
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -64,7 +64,7 @@ namespace Day13_MineCartMadness
 
         public static bool IsTopLeftCurve(this char c, char c1, char c2)
         {
-            if (c.IsTopLeftCurve() && (c1.IsVertCartInter()) && (c2.IsHoriCartInter()))
+            if (c.IsTopLeftCurve() && c1.IsVertCartInter() && c2.IsHoriCartInter())
                 return true;
             return false;
         }

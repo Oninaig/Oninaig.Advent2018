@@ -2,18 +2,19 @@
 {
     public struct Coord
     {
-        int? _x;
-        int? _y;
+        private int? _x;
+        private int? _y;
+
         public int X
         {
-            get { return _x ?? -1; }
-            set { _x = value; }
+            get => _x ?? -1;
+            set => _x = value;
         }
 
         public int Y
         {
-            get { return _y ?? -1; }
-            set { _y = value; }
+            get => _y ?? -1;
+            set => _y = value;
         }
 
         public Coord(int x, int y)

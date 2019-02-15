@@ -5,20 +5,21 @@ namespace Day13_MineCartMadness.Rails
 {
     public class Rail
     {
-        public char RailType { get; private set; }
-        public Track OwnerTrack { get; private set; }
-        public Coord Coordinates { get; private set; }
         public Rail(Track owner, char railType, Coord coordinates)
         {
-            this.OwnerTrack = owner;
-            this.RailType = railType;
-            this.Coordinates = coordinates;
+            OwnerTrack = owner;
+            RailType = railType;
+            Coordinates = coordinates;
         }
+
+        public char RailType { get; }
+        public Track OwnerTrack { get; }
+        public Coord Coordinates { get; }
 
         public override bool Equals(object obj)
         {
             var otherRail = (Rail) obj;
-            return otherRail.Coordinates.X == this.Coordinates.X && otherRail.Coordinates.Y == this.Coordinates.Y;
+            return otherRail.Coordinates.X == Coordinates.X && otherRail.Coordinates.Y == Coordinates.Y;
         }
 
         public override int GetHashCode()
@@ -29,10 +30,11 @@ namespace Day13_MineCartMadness.Rails
 
     public class Curve : Rail
     {
-        public int CurveMarker { get; private set; }
         public Curve(Track owner, char railType, Coord coordinates, int marker) : base(owner, railType, coordinates)
         {
-            this.CurveMarker = marker;
+            CurveMarker = marker;
         }
+
+        public int CurveMarker { get; }
     }
 }

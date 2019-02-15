@@ -1,11 +1,6 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
 using Day13_MineCartMadness.Navigation;
 using Day13_MineCartMadness.Rails;
 using Day13_MineCartMadness.Tracks;
@@ -14,33 +9,34 @@ namespace Day13_MineCartMadness.Carts
 {
     public class Cart
     {
+        private int currQuadrant;
+        private bool needToCheckQuadrant;
+
+        public Cart(Coord coordinates, Track owner)
+        {
+            Coordinates = coordinates;
+            OnTrack = owner;
+            CurrentBehavior = CartIntersectionBehavior.Left;
+            currQuadrant = -1;
+            needToCheckQuadrant = true;
+        }
+
+        public Cart(Coord coordinates, Track owner, CartDirection direction) : this(coordinates, owner)
+        {
+            CurrentDirection = direction;
+        }
+
         public Coord Coordinates { get; set; }
         public Track OnTrack { get; set; }
         public CartDirection CurrentDirection { get; set; }
         public bool IsGoingBackwards { get; set; }
         public CartIntersectionBehavior CurrentBehavior { get; set; }
         public LinkedListNode<Rail> CurrentRailNode { get; set; }
-        private int currQuadrant;
-        private bool needToCheckQuadrant;
         public bool Moved { get; set; }
-
-        public Cart(Coord coordinates, Track owner)
-        {
-            this.Coordinates = coordinates;
-            this.OnTrack = owner;
-            this.CurrentBehavior = CartIntersectionBehavior.Left;
-            this.currQuadrant = -1;
-            this.needToCheckQuadrant = true;
-        }
-
-        public Cart(Coord coordinates, Track owner, CartDirection direction) : this(coordinates, owner)
-        {
-            this.CurrentDirection = direction;
-        }
 
         public void ResetMovement()
         {
-            this.Moved = false;
+            Moved = false;
         }
 
         private int getCurrentQuadrant()
@@ -51,31 +47,27 @@ namespace Day13_MineCartMadness.Carts
             var reverseLook = CurrentRailNode.Previous;
             var closestPreviousCurveMarker = -1;
             if (CurrentRailNode.Value is Curve)
-            {
                 closestPreviousCurveMarker = ((Curve) CurrentRailNode.Value).CurveMarker;
-            }
             else
-            {
                 while (reverseLook != null)
                 {
                     if (reverseLook.Value is Curve)
                     {
-                        closestPreviousCurveMarker = ((Curve)reverseLook.Value).CurveMarker;
+                        closestPreviousCurveMarker = ((Curve) reverseLook.Value).CurveMarker;
                         break;
                     }
 
                     reverseLook = reverseLook.Previous;
                 }
-            }
 
             if (closestPreviousCurveMarker > -1)
             {
-                this.currQuadrant = closestPreviousCurveMarker;
-                this.needToCheckQuadrant = false;
+                currQuadrant = closestPreviousCurveMarker;
+                needToCheckQuadrant = false;
                 return closestPreviousCurveMarker;
             }
-            else
-                throw new InvalidOperationException();
+
+            throw new InvalidOperationException();
         }
 
         private RelativeDirection getCurrentRelativeDirection()
@@ -113,7 +105,6 @@ namespace Day13_MineCartMadness.Carts
                             return RelativeDirection.Left;
                         case CartDirection.Left:
                             return RelativeDirection.Right;
-                        
                     }
 
                     break;
@@ -126,18 +117,20 @@ namespace Day13_MineCartMadness.Carts
                         case CartDirection.Up:
                             return RelativeDirection.Right;
                     }
+
                     break;
             }
 
             return RelativeDirection.Error;
         }
+
         public void Move(Dictionary<Coord, Intersection> intersectionMap)
         {
-            if (this.Moved)
+            if (Moved)
                 return;
             if (CurrentRailNode == null)
                 CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
-                    new Coord(this.Coordinates.X, this.Coordinates.Y)));
+                    new Coord(Coordinates.X, Coordinates.Y)));
 
             //I just realized we can get our "relative" direction (whether we are going forward or backwards in the linked-list)
             //by checking our direction against what "quadrant" we are in on the track, where a quadrant is a section of track between two curves.
@@ -151,19 +144,18 @@ namespace Day13_MineCartMadness.Carts
                     break;
                 case RelativeDirection.Error:
                     throw new InvalidOperationException("");
-
             }
 
-            this.Coordinates = CurrentRailNode.Value.Coordinates;
+            Coordinates = CurrentRailNode.Value.Coordinates;
             if (!checkForIntersection(intersectionMap))
                 checkForCurves();
             checkForCollision();
-            this.Moved = true;
+            Moved = true;
         }
 
         private void checkForCollision()
         {
-            var collisionCoord = this.OnTrack.CartsOnTrack.GroupBy(x => x.Coordinates).Where(g => g.Count() > 1)
+            var collisionCoord = OnTrack.CartsOnTrack.GroupBy(x => x.Coordinates).Where(g => g.Count() > 1)
                 .Select(y => y.Key).FirstOrDefault();
             if (collisionCoord.X == -1)
                 return;
@@ -202,35 +194,30 @@ namespace Day13_MineCartMadness.Carts
                         break;
                 }
 
-                this.needToCheckQuadrant = true;
+                needToCheckQuadrant = true;
             }
-                
         }
 
 
         private bool checkForIntersection(Dictionary<Coord, Intersection> intersectionMap)
         {
-            if (intersectionMap.ContainsKey(this.Coordinates))
+            if (intersectionMap.ContainsKey(Coordinates))
             {
-                var otherTrack = intersectionMap[this.Coordinates].Owners.First(x => x.TrackId != this.OnTrack.TrackId);
+                var otherTrack = intersectionMap[Coordinates].Owners.First(x => x.TrackId != OnTrack.TrackId);
                 var newDirection = getIntersectDirection();
                 if (CurrentDirection == newDirection)
                 {
                     cycleBehavior();
                     return false;
                 }
-                else
-                {
-                    //this.OnTrack.CartsOnTrack.Remove(this);
-                    this.OnTrack = otherTrack;
-                    this.CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
-                        new Coord(this.Coordinates.X, this.Coordinates.Y)));
-                    //this.OnTrack.CartsOnTrack.Add(this);
-                    this.CurrentDirection = newDirection;
-                    this.cycleBehavior();
-                    this.needToCheckQuadrant = true;
-                    return true;
-                }
+
+                OnTrack = otherTrack;
+                CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
+                    new Coord(Coordinates.X, Coordinates.Y)));
+                CurrentDirection = newDirection;
+                cycleBehavior();
+                needToCheckQuadrant = true;
+                return true;
             }
 
             return false;
@@ -292,6 +279,7 @@ namespace Day13_MineCartMadness.Carts
 
             return CartDirection.Error;
         }
+
         private void cycleBehavior()
         {
             switch (CurrentBehavior)

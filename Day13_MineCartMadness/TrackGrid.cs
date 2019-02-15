@@ -22,38 +22,27 @@ namespace Day13_MineCartMadness
         public List<Track> Tracks { get; }
         public List<Cart> AllCarts { get; set; }
         public Dictionary<Coord, Intersection> IntersectionMap { get; set; }
+        public int MaxX { get; set; }
+        public int MaxY { get; set; }
 
         public void DumpGrid()
         {
             var dumpGrid = new char[MaxY][];
-            for (int i = 0; i < MaxY; i++)
-            {
-                dumpGrid[i] = new char[MaxX];
-            }
+            for (var i = 0; i < MaxY; i++) dumpGrid[i] = new char[MaxX];
 
             foreach (var t in Tracks)
-            {
-                foreach (var r in t.Rails)
-                {
-                    dumpGrid[r.Coordinates.X][r.Coordinates.Y] = r.RailType;
-                }
-            }
+            foreach (var r in t.Rails)
+                dumpGrid[r.Coordinates.X][r.Coordinates.Y] = r.RailType;
 
-            foreach (var c in AllCarts)
-            {
-                    dumpGrid[c.Coordinates.X][c.Coordinates.Y] = (char)c.CurrentDirection;
-            }
+            foreach (var c in AllCarts) dumpGrid[c.Coordinates.X][c.Coordinates.Y] = (char) c.CurrentDirection;
 
-            for (int x = 0; x < dumpGrid.Length; x++)
+            for (var x = 0; x < dumpGrid.Length; x++)
             {
-                for (var y = 0; y < dumpGrid[x].Length; y++)
-                {
-                    Console.Write(dumpGrid[x][y]);
-                }
+                for (var y = 0; y < dumpGrid[x].Length; y++) Console.Write(dumpGrid[x][y]);
                 Console.WriteLine();
             }
-
         }
+
         private void initGrid(string path)
         {
             var input = File.ReadAllLines(path);
@@ -81,13 +70,13 @@ namespace Day13_MineCartMadness
                     var newCarts = AllCarts.Where(x => x.OnTrack.TrackId == t.TrackId).ToList();
                     t.CartsOnTrack.AddRange(newCarts);
                 }
-                DumpGrid();
-                foreach(var c in AllCarts)
+
+                //DumpGrid();
+                foreach (var c in AllCarts)
                     c.ResetMovement();
             }
         }
-        public int MaxX { get; set; }
-        public int MaxY { get; set; }
+
         private void initTracks(char[][] grid)
         {
             //find next top left
@@ -102,10 +91,9 @@ namespace Day13_MineCartMadness
                     if (currRail.IsCurve() && x + 1 < grid.Length && y + 1 < grid[x].Length &&
                         currRail.IsTopLeftCurve(grid[x + 1][y], grid[x][y + 1]))
                         initTrack(x, y, grid);
-                    Console.Write(currRail);
                     newMaxX++;
                 }
-                Console.WriteLine();
+
                 if (newMaxX > MaxX)
                     MaxX = newMaxX;
             }
