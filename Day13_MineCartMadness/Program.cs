@@ -20,8 +20,9 @@ namespace Day13_MineCartMadness
             foreach (var c in grid.Tracks)
             {
                 foreach(var ca in c.CartsOnTrack)
-                    ca.Move();
+                    ca.Move(grid.IntersectionMap);
             }
+            grid.DumpGrid();
             Console.ReadLine();
         }
     }

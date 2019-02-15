@@ -2,12 +2,24 @@
 {
     public struct Coord
     {
-        public int X, Y;
+        int? _x;
+        int? _y;
+        public int X
+        {
+            get { return _x ?? -1; }
+            set { _x = value; }
+        }
+
+        public int Y
+        {
+            get { return _y ?? -1; }
+            set { _y = value; }
+        }
 
         public Coord(int x, int y)
         {
-            X = x;
-            Y = y;
+            _x = x;
+            _y = y;
         }
     }
 }

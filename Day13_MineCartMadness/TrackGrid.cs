@@ -20,6 +20,37 @@ namespace Day13_MineCartMadness
         public List<Track> Tracks { get; }
         public Dictionary<Coord, Intersection> IntersectionMap { get; set; }
 
+        public void DumpGrid()
+        {
+            var dumpGrid = new char[MaxY][];
+            for (int i = 0; i < MaxY; i++)
+            {
+                dumpGrid[i] = new char[MaxX];
+            }
+
+            foreach (var t in Tracks)
+            {
+                foreach (var r in t.Rails)
+                {
+                    dumpGrid[r.Coordinates.X][r.Coordinates.Y] = r.RailType;
+                }
+
+                foreach (var c in t.CartsOnTrack)
+                {
+                    dumpGrid[c.Coordinates.X][c.Coordinates.Y] = (char) c.CurrentDirection;
+                }
+            }
+
+            for (int x = 0; x < dumpGrid.Length; x++)
+            {
+                for (var y = 0; y < dumpGrid[x].Length; y++)
+                {
+                    Console.Write(dumpGrid[x][y]);
+                }
+                Console.WriteLine();
+            }
+
+        }
         private void initGrid(string path)
         {
             var input = File.ReadAllLines(path);
@@ -28,11 +59,15 @@ namespace Day13_MineCartMadness
             initTracks(grid);
         }
 
+        public int MaxX { get; set; }
+        public int MaxY { get; set; }
         private void initTracks(char[][] grid)
         {
             //find next top left
+            MaxY = grid.Length;
             for (var x = 0; x < grid.Length; x++)
             {
+                var newMaxX = 0;
                 for (var y = 0; y < grid[x].Length; y++)
                 {
                     var currRail = grid[x][y];
@@ -41,9 +76,11 @@ namespace Day13_MineCartMadness
                         currRail.IsTopLeftCurve(grid[x + 1][y], grid[x][y + 1]))
                         initTrack(x, y, grid);
                     Console.Write(currRail);
+                    newMaxX++;
                 }
-
                 Console.WriteLine();
+                if (newMaxX > MaxX)
+                    MaxX = newMaxX;
             }
         }
 

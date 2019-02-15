@@ -17,4 +17,11 @@
         Error = '#'
     }
 
+    public enum RelativeDirection
+    {
+        Left,
+        Right,
+        Error
+    }
+
 }

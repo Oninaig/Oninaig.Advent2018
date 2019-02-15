@@ -13,12 +13,14 @@ namespace Day13_MineCartMadness.Tracks
         public LinkedList<Rail> Rails { get; private set; }
         public bool IsComplete { get; set; }
         public List<Cart> CartsOnTrack { get; private set; }
+        private int currCurveMarker;
         public Track(Coord topleft)
         {
             this.TopLeft = topleft;
             this.TrackId = Guid.NewGuid();
             this.Rails = new LinkedList<Rail>();
             this.CartsOnTrack = new List<Cart>();
+            this.currCurveMarker = 1;
         }
 
         public void AddRail(int x, int y, char c)
@@ -39,8 +41,10 @@ namespace Day13_MineCartMadness.Tracks
                 }
             }
 
-
-            Rails.AddLast(new Rail(this, c, new Coord(x, y)));
+            if (c.IsCurve())
+                Rails.AddLast(new Curve(this, c, new Coord(x, y), currCurveMarker++));
+            else
+                Rails.AddLast(new Rail(this, c, new Coord(x, y)));
             //todo: this will fail to work if tracks are anything but squares/rectangles.
             if (TopLeft.X == x - 1 && TopLeft.Y == y)
                 this.IsComplete = true;

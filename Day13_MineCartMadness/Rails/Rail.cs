@@ -26,4 +26,13 @@ namespace Day13_MineCartMadness.Rails
             return base.GetHashCode();
         }
     }
+
+    public class Curve : Rail
+    {
+        public int CurveMarker { get; private set; }
+        public Curve(Track owner, char railType, Coord coordinates, int marker) : base(owner, railType, coordinates)
+        {
+            this.CurveMarker = marker;
+        }
+    }
 }
