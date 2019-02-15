@@ -1,26 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day13_MineCartMadness
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            //var grid = new TrackGrid("sampleinput.txt");
-            //while (true)
-            //{
-            //    grid.Tick();
-            //}
-
             var grid = new TrackGrid("puzzle.txt");
-            while (true)
-            {
-                grid.Tick();
-            }
+            grid.StartMoving();
             Console.ReadLine();
         }
     }
