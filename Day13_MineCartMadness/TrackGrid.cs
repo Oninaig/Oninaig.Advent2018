@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Day13_MineCartMadness.Carts;
 using Day13_MineCartMadness.Navigation;
 using Day13_MineCartMadness.Rails;
 using Day13_MineCartMadness.Tracks;
@@ -13,11 +14,13 @@ namespace Day13_MineCartMadness
         public TrackGrid(string inputPath)
         {
             Tracks = new List<Track>();
+            AllCarts = new List<Cart>();
             IntersectionMap = new Dictionary<Coord, Intersection>();
             initGrid(inputPath);
         }
 
         public List<Track> Tracks { get; }
+        public List<Cart> AllCarts { get; set; }
         public Dictionary<Coord, Intersection> IntersectionMap { get; set; }
 
         public void DumpGrid()
@@ -34,11 +37,11 @@ namespace Day13_MineCartMadness
                 {
                     dumpGrid[r.Coordinates.X][r.Coordinates.Y] = r.RailType;
                 }
+            }
 
-                foreach (var c in t.CartsOnTrack)
-                {
-                    dumpGrid[c.Coordinates.X][c.Coordinates.Y] = (char) c.CurrentDirection;
-                }
+            foreach (var c in AllCarts)
+            {
+                    dumpGrid[c.Coordinates.X][c.Coordinates.Y] = (char)c.CurrentDirection;
             }
 
             for (int x = 0; x < dumpGrid.Length; x++)
@@ -57,8 +60,32 @@ namespace Day13_MineCartMadness
             var indexCounter = 0;
             var grid = File.ReadAllLines(path).Select(x => x.ToCharArray()).ToArray();
             initTracks(grid);
+            foreach (var t in Tracks)
+            foreach (var c in t.CartsOnTrack)
+                AllCarts.Add(c);
         }
 
+        public void StartMoving()
+        {
+            while (true)
+            {
+                foreach (var c in AllCarts.OrderBy(x => x.Coordinates.X))
+                    c.Move(IntersectionMap);
+
+                //foreach(var t in Tracks)
+                //foreach (var c in t.CartsOnTrack)
+                //    c.Move(IntersectionMap);
+                foreach (var t in Tracks)
+                {
+                    t.CartsOnTrack.Clear();
+                    var newCarts = AllCarts.Where(x => x.OnTrack.TrackId == t.TrackId).ToList();
+                    t.CartsOnTrack.AddRange(newCarts);
+                }
+                DumpGrid();
+                foreach(var c in AllCarts)
+                    c.ResetMovement();
+            }
+        }
         public int MaxX { get; set; }
         public int MaxY { get; set; }
         private void initTracks(char[][] grid)

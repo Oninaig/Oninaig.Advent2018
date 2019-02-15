@@ -50,15 +50,22 @@ namespace Day13_MineCartMadness.Carts
 
             var reverseLook = CurrentRailNode.Previous;
             var closestPreviousCurveMarker = -1;
-            while (reverseLook != null)
+            if (CurrentRailNode.Value is Curve)
             {
-                if (reverseLook.Value is Curve)
+                closestPreviousCurveMarker = ((Curve) CurrentRailNode.Value).CurveMarker;
+            }
+            else
+            {
+                while (reverseLook != null)
                 {
-                    closestPreviousCurveMarker = ((Curve) reverseLook.Value).CurveMarker;
-                    break;
-                }
+                    if (reverseLook.Value is Curve)
+                    {
+                        closestPreviousCurveMarker = ((Curve)reverseLook.Value).CurveMarker;
+                        break;
+                    }
 
-                reverseLook = reverseLook.Previous;
+                    reverseLook = reverseLook.Previous;
+                }
             }
 
             if (closestPreviousCurveMarker > -1)
@@ -79,6 +86,7 @@ namespace Day13_MineCartMadness.Carts
                 case 1:
                     switch (CurrentDirection)
                     {
+                        case CartDirection.Down:
                         case CartDirection.Left:
                             return RelativeDirection.Left;
                         case CartDirection.Right:
@@ -89,6 +97,7 @@ namespace Day13_MineCartMadness.Carts
                 case 2:
                     switch (CurrentDirection)
                     {
+                        case CartDirection.Left:
                         case CartDirection.Up:
                             return RelativeDirection.Left;
                         case CartDirection.Down:
@@ -99,16 +108,19 @@ namespace Day13_MineCartMadness.Carts
                 case 3:
                     switch (CurrentDirection)
                     {
+                        case CartDirection.Up:
                         case CartDirection.Right:
                             return RelativeDirection.Left;
                         case CartDirection.Left:
                             return RelativeDirection.Right;
+                        
                     }
 
                     break;
                 case 4:
                     switch (CurrentDirection)
                     {
+                        case CartDirection.Right:
                         case CartDirection.Down:
                             return RelativeDirection.Left;
                         case CartDirection.Up:
@@ -132,11 +144,14 @@ namespace Day13_MineCartMadness.Carts
             switch (getCurrentRelativeDirection())
             {
                 case RelativeDirection.Left:
-                    CurrentRailNode = CurrentRailNode.Previous;
+                    CurrentRailNode = CurrentRailNode.Previous ?? CurrentRailNode.List.Last;
                     break;
                 case RelativeDirection.Right:
-                    CurrentRailNode = CurrentRailNode.Next;
+                    CurrentRailNode = CurrentRailNode.Next ?? CurrentRailNode.List.First;
                     break;
+                case RelativeDirection.Error:
+                    throw new InvalidOperationException("");
+
             }
 
             this.Coordinates = CurrentRailNode.Value.Coordinates;
@@ -152,12 +167,13 @@ namespace Day13_MineCartMadness.Carts
                 .Select(y => y.Key).FirstOrDefault();
             if (collisionCoord.X == -1)
                 return;
-            throw new InvalidOperationException($"Collision at {collisionCoord.X} , {collisionCoord.Y}");
+            throw new InvalidOperationException($"Collision at {collisionCoord.Y} , {collisionCoord.X}");
         }
 
         private void checkForCurves()
         {
-            if(CurrentRailNode.Value is Curve)
+            if (CurrentRailNode.Value is Curve)
+            {
                 switch (CurrentDirection)
                 {
                     case CartDirection.Down:
@@ -185,6 +201,10 @@ namespace Day13_MineCartMadness.Carts
                             CurrentDirection = CartDirection.Right;
                         break;
                 }
+
+                this.needToCheckQuadrant = true;
+            }
+                
         }
 
 
@@ -195,14 +215,20 @@ namespace Day13_MineCartMadness.Carts
                 var otherTrack = intersectionMap[this.Coordinates].Owners.First(x => x.TrackId != this.OnTrack.TrackId);
                 var newDirection = getIntersectDirection();
                 if (CurrentDirection == newDirection)
+                {
+                    cycleBehavior();
                     return false;
+                }
                 else
                 {
-                    this.OnTrack.CartsOnTrack.Remove(this);
+                    //this.OnTrack.CartsOnTrack.Remove(this);
                     this.OnTrack = otherTrack;
-                    this.OnTrack.CartsOnTrack.Add(this);
+                    this.CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
+                        new Coord(this.Coordinates.X, this.Coordinates.Y)));
+                    //this.OnTrack.CartsOnTrack.Add(this);
                     this.CurrentDirection = newDirection;
                     this.cycleBehavior();
+                    this.needToCheckQuadrant = true;
                     return true;
                 }
             }

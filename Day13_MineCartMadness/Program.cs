@@ -17,11 +17,7 @@ namespace Day13_MineCartMadness
             //}
 
             var grid = new TrackGrid("sampleinput.txt");
-            foreach (var c in grid.Tracks)
-            {
-                foreach(var ca in c.CartsOnTrack)
-                    ca.Move(grid.IntersectionMap);
-            }
+            grid.StartMoving();
             grid.DumpGrid();
             Console.ReadLine();
         }
