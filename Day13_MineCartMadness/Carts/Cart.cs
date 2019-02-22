@@ -124,10 +124,10 @@ namespace Day13_MineCartMadness.Carts
             return RelativeDirection.Error;
         }
 
-        public void Move(Dictionary<Coord, Intersection> intersectionMap)
+        public CartMoveResult Move(Dictionary<Coord, Intersection> intersectionMap)
         {
             if (Moved)
-                return;
+                return new CartMoveResult(true, false);
             if (CurrentRailNode == null)
                 CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
                     new Coord(Coordinates.X, Coordinates.Y)));
@@ -149,19 +149,41 @@ namespace Day13_MineCartMadness.Carts
             Coordinates = CurrentRailNode.Value.Coordinates;
             if (!checkForIntersection(intersectionMap))
                 checkForCurves();
-            checkForCollision();
             Moved = true;
+            return checkForCollision();
         }
 
-        private void checkForCollision()
+        private CartMoveResult checkForCollision()
         {
-            var collisionCoord = OnTrack.CartsOnTrack.GroupBy(x => x.Coordinates).Where(g => g.Count() > 1)
-                .Select(y => y.Key).FirstOrDefault();
-            if (collisionCoord.X == -1)
-                return;
-            throw new InvalidOperationException($"Collision at {collisionCoord.Y} , {collisionCoord.X}");
+            try
+            {
+                var collidingCarts = OnTrack.CartsOnTrack.GroupBy(x => x.Coordinates).Where(g => g.Count() > 1);
+                if (collidingCarts.Any())
+                {
+                    var collidingCartsList = collidingCarts.SelectMany(x => x).ToList();
+                    //var collidingCartsList = collidingCarts.Select(y => y.Select(x=>x));
+                    var collisionCoord = collidingCartsList[0].Coordinates;
+                    if (collisionCoord.X == -1)
+                        return new CartMoveResult(true, false);
+
+                    throw new CartCollisionException($"Collision at {collisionCoord.Y} , {collisionCoord.X}",
+                        collidingCartsList[0], collidingCartsList[1]);
+                }
+               
+            }
+            catch (CartCollisionException cartEx)
+            {
+                return new CartMoveResult(false, true, cartEx.Cart1, cartEx.Cart2);
+            }
+
+            return new CartMoveResult(true, false);
         }
 
+        public void Destroy()
+        {
+            OnTrack.CartsOnTrack.Remove(this);
+            OnTrack = null;
+        }
         private void checkForCurves()
         {
             if (CurrentRailNode.Value is Curve)
@@ -211,7 +233,9 @@ namespace Day13_MineCartMadness.Carts
                     return false;
                 }
 
+                OnTrack.CartsOnTrack.Remove(this);
                 OnTrack = otherTrack;
+                OnTrack.CartsOnTrack.Add(this);
                 CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
                     new Coord(Coordinates.X, Coordinates.Y)));
                 CurrentDirection = newDirection;
@@ -294,6 +318,27 @@ namespace Day13_MineCartMadness.Carts
                     CurrentBehavior = CartIntersectionBehavior.Left;
                     break;
             }
+        }
+    }
+
+    public class CartMoveResult
+    {
+        public bool Success { get; }
+        public bool Deleted { get; }
+        public Cart DeletedCartA { get; }
+        public Cart DeletedCartB { get; }
+        public CartMoveResult(bool success, bool deleted)
+        {
+            Success = success;
+            Deleted = deleted;
+        }
+
+        public CartMoveResult(bool success, bool deleted, Cart deletedCartA, Cart deletedCartB)
+        {
+            Success = success;
+            Deleted = deleted;
+            DeletedCartA = deletedCartA;
+            DeletedCartB = deletedCartB;
         }
     }
 }

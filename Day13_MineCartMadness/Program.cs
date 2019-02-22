@@ -6,7 +6,7 @@ namespace Day13_MineCartMadness
     {
         private static void Main(string[] args)
         {
-            var grid = new TrackGrid("puzzle.txt");
+            var grid = new TrackGrid("collisioninput.txt");
             grid.StartMoving();
             Console.ReadLine();
         }

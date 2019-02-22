@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.XPath;
 using Day13_MineCartMadness.Carts;
 using Day13_MineCartMadness.Navigation;
 using Day13_MineCartMadness.Rails;
@@ -56,11 +57,51 @@ namespace Day13_MineCartMadness
 
         public void StartMoving()
         {
+            var tickCount = 0;
+            var rootCoord = new Coord(0, 0);
+            
             while (true)
             {
-                foreach (var c in AllCarts.OrderBy(x => x.Coordinates.X))
-                    c.Move(IntersectionMap);
+                var cartsToRemove = new List<Cart>();
+                var cartsByRow = AllCarts.GroupBy(x => x.Coordinates.X);
+                foreach (var g in cartsByRow)
+                {
+                    foreach (var c in g.OrderBy(x=>x.Coordinates.Y))
+                    {
+                        if (cartsToRemove.Contains(c))
+                            continue;
+                        var result = c.Move(IntersectionMap);
+                        if (!result.Deleted && !result.Success)
+                            throw new InvalidOperationException("This should never happen");
+                        if (result.Deleted)
+                        {
+                            Console.WriteLine($"{result.DeletedCartA.CurrentDirection} crashed into {result.DeletedCartB.CurrentDirection} at {result.DeletedCartA.Coordinates.Y}, {result.DeletedCartA.Coordinates.X} on tick {tickCount+1}. {AllCarts.Count-2} carts left.");
+                            result.DeletedCartA.Destroy();
+                            result.DeletedCartB.Destroy();
+                            
+                            cartsToRemove.Add(result.DeletedCartA);
+                            cartsToRemove.Add(result.DeletedCartB);
+                        }
+                    }
+                }
+                //foreach (var c in AllCarts.OrderBy(x => x.Coordinates.DistanceFrom(rootCoord)))
+                //{
+                //    if (cartsToRemove.Contains(c))
+                //        continue;
+                //    var result = c.Move(IntersectionMap);
+                //    if(!result.Deleted && !result.Success)
+                //        throw new InvalidOperationException("This should never happen");
+                //    if (result.Deleted)
+                //    {
+                //        result.DeletedCartA.Destroy();
+                //        result.DeletedCartB.Destroy();
+                //        cartsToRemove.Add(result.DeletedCartA);
+                //        cartsToRemove.Add(result.DeletedCartB);
+                //    }
+                //}
 
+                foreach (var cartToRemove in cartsToRemove)
+                    AllCarts.Remove(cartToRemove);
                 //foreach(var t in Tracks)
                 //foreach (var c in t.CartsOnTrack)
                 //    c.Move(IntersectionMap);
@@ -71,10 +112,16 @@ namespace Day13_MineCartMadness
                     t.CartsOnTrack.AddRange(newCarts);
                 }
 
-                //DumpGrid();
+                DumpGrid();
                 foreach (var c in AllCarts)
                     c.ResetMovement();
+
+                tickCount++;
+                if (AllCarts.Count == 1)
+                    break;
             }
+
+            Console.WriteLine($"{AllCarts[0].Coordinates.Y}, {AllCarts[0].Coordinates.X}");
         }
 
         private void initTracks(char[][] grid)

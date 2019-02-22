@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Day13_MineCartMadness.Carts;
 using Day13_MineCartMadness.Navigation;
 using Day13_MineCartMadness.Rails;
@@ -47,9 +48,11 @@ namespace Day13_MineCartMadness.Tracks
                 Rails.AddLast(new Curve(this, c, new Coord(x, y), currCurveMarker++));
             else
                 Rails.AddLast(new Rail(this, c, new Coord(x, y)));
-            //todo: this will fail to work if tracks are anything but squares/rectangles.
-            if (TopLeft.X == x - 1 && TopLeft.Y == y)
+            if (Rails.Count(z => z is Curve) == 4)
                 IsComplete = true;
+            ////todo: this will fail to work if tracks are anything but squares/rectangles.
+            //if (TopLeft.X == x - 1 && TopLeft.Y == y)
+            //    IsComplete = true;
         }
 
         public void AddRail(int nextX, int nextY, char nextRail, Dictionary<Coord, Intersection> intersectionMap)

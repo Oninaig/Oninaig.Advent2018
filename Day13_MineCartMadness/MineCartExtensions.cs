@@ -1,4 +1,5 @@
-﻿using Day13_MineCartMadness.Navigation;
+﻿using System.Runtime.InteropServices;
+using Day13_MineCartMadness.Navigation;
 
 namespace Day13_MineCartMadness
 {
@@ -42,6 +43,15 @@ namespace Day13_MineCartMadness
             return c == '|';
         }
 
+        public static bool IsOppositeCurve(this char c, char c2)
+        {
+            if (c == '\\')
+                return c2 == '/';
+            else if (c == '/')
+                return c2 == '\\';
+            return false;
+        }
+
         /// <summary>
         ///     Combines IsVerticalRail, IsCart, and IsIntersection (is c a vertical rail, a cart, or an intersection?
         /// </summary>
@@ -64,7 +74,7 @@ namespace Day13_MineCartMadness
 
         public static bool IsTopLeftCurve(this char c, char c1, char c2)
         {
-            if (c.IsTopLeftCurve() && c1.IsVertCartInter() && c2.IsHoriCartInter())
+            if (c.IsTopLeftCurve() && (c1.IsVertCartInter() || c1.IsOppositeCurve(c)) && (c2.IsHoriCartInter() || c2.IsOppositeCurve(c)))
                 return true;
             return false;
         }
