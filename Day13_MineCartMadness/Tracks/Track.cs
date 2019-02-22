@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using Day13_MineCartMadness.Carts;
 using Day13_MineCartMadness.Navigation;
 using Day13_MineCartMadness.Rails;
+using Console = Colorful.Console;
 
 namespace Day13_MineCartMadness.Tracks
 {
@@ -26,8 +28,20 @@ namespace Day13_MineCartMadness.Tracks
         public bool IsComplete { get; set; }
         public List<Cart> CartsOnTrack { get; }
 
-        public void AddRail(int x, int y, char c)
+        public void AddRail(int x, int y, char c, bool isTopLeft = false)
         {
+            if (!isTopLeft)
+            {
+                var newCoord = new Coord(x, y);
+                if (newCoord.Equals(TopLeft))
+                {
+                    Console.WriteLine("New coord is the topleft coord, we are finished", Color.Green);
+                    IsComplete = true;
+                    return;
+                }
+            }
+            
+
             if (c.IsCart())
             {
                 CartsOnTrack.Add(new Cart(new Coord(x, y), this, c.GetCartDirection()));
@@ -48,8 +62,8 @@ namespace Day13_MineCartMadness.Tracks
                 Rails.AddLast(new Curve(this, c, new Coord(x, y), currCurveMarker++));
             else
                 Rails.AddLast(new Rail(this, c, new Coord(x, y)));
-            if (Rails.Count(z => z is Curve) == 4)
-                IsComplete = true;
+            //if (Rails.Count(z => z is Curve) == 4)
+            //    IsComplete = true;
             ////todo: this will fail to work if tracks are anything but squares/rectangles.
             //if (TopLeft.X == x - 1 && TopLeft.Y == y)
             //    IsComplete = true;
@@ -57,7 +71,7 @@ namespace Day13_MineCartMadness.Tracks
 
         public void AddRail(int nextX, int nextY, char nextRail, Dictionary<Coord, Intersection> intersectionMap)
         {
-            if (intersectionMap.ContainsKey(new Coord(nextX, nextY)))
+            if (intersectionMap.ContainsKey(new Coord(nextX, nextY)) && !intersectionMap[new Coord(nextX, nextY)].Owners.Contains(this))
                 intersectionMap[new Coord(nextX, nextY)].Owners.Add(this);
             else
                 intersectionMap[new Coord(nextX, nextY)] = new Intersection(this, new Coord(nextX, nextY));

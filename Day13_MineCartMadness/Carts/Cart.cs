@@ -26,6 +26,10 @@ namespace Day13_MineCartMadness.Carts
             CurrentDirection = direction;
         }
 
+        public void WhereAmI()
+        {
+            Console.WriteLine($"I am at {Coordinates.X}, {Coordinates.Y} going {CurrentDirection}");
+        }
         public Coord Coordinates { get; set; }
         public Track OnTrack { get; set; }
         public CartDirection CurrentDirection { get; set; }
@@ -134,23 +138,42 @@ namespace Day13_MineCartMadness.Carts
 
             //I just realized we can get our "relative" direction (whether we are going forward or backwards in the linked-list)
             //by checking our direction against what "quadrant" we are in on the track, where a quadrant is a section of track between two curves.
-            switch (getCurrentRelativeDirection())
+            //switch (getCurrentRelativeDirection())
+            //{
+            //    case RelativeDirection.Left:
+            //        CurrentRailNode = CurrentRailNode.Previous ?? CurrentRailNode.List.Last;
+            //        break;
+            //    case RelativeDirection.Right:
+            //        CurrentRailNode = CurrentRailNode.Next ?? CurrentRailNode.List.First;
+            //        break;
+            //    case RelativeDirection.Error:
+            //        throw new InvalidOperationException("");
+            //}
+
+            switch (CurrentDirection)
             {
-                case RelativeDirection.Left:
-                    CurrentRailNode = CurrentRailNode.Previous ?? CurrentRailNode.List.Last;
+                case CartDirection.Down:
+                    CurrentRailNode =
+                        OnTrack.Rails.Find(new Rail(null, '*', new Coord(Coordinates.X + 1, Coordinates.Y)));
                     break;
-                case RelativeDirection.Right:
-                    CurrentRailNode = CurrentRailNode.Next ?? CurrentRailNode.List.First;
+                case CartDirection.Up:
+                    CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*', new Coord(Coordinates.X-1, Coordinates.Y)));
                     break;
-                case RelativeDirection.Error:
-                    throw new InvalidOperationException("");
+                case CartDirection.Left:
+                    CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*', new Coord(Coordinates.X, Coordinates.Y-1)));
+                    break;
+                case CartDirection.Right:
+                    CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*', new Coord(Coordinates.X, Coordinates.Y +1)));
+                    break;
             }
 
             Coordinates = CurrentRailNode.Value.Coordinates;
+            var intersectionCheck = checkForIntersection(intersectionMap);
             if (!checkForIntersection(intersectionMap))
                 checkForCurves();
             Moved = true;
-            return checkForCollision();
+            return new CartMoveResult(true, false);
+            //return checkForCollision();
         }
 
         private CartMoveResult checkForCollision()
@@ -220,30 +243,56 @@ namespace Day13_MineCartMadness.Carts
             }
         }
 
+        internal class CartIntersectionCheckResult
+        {
+            public bool IsIntersection { get; }
+            public bool IsOverlappingSelf { get; }
 
+            public CartIntersectionCheckResult(bool isIntersection, bool isOverlappingSelf)
+            {
+                IsIntersection = isIntersection;
+                IsOverlappingSelf = isOverlappingSelf;
+            }
+        }
         private bool checkForIntersection(Dictionary<Coord, Intersection> intersectionMap)
         {
             if (intersectionMap.ContainsKey(Coordinates))
             {
-                var otherTrack = intersectionMap[Coordinates].Owners.First(x => x.TrackId != OnTrack.TrackId);
-                var newDirection = getIntersectDirection();
-                if (CurrentDirection == newDirection)
+                try
                 {
+                    var otherTrack = intersectionMap[Coordinates].Owners.FirstOrDefault(x => x.TrackId != OnTrack.TrackId);
+                    var newDirection = getIntersectDirection();
+                    if (CurrentDirection == newDirection)
+                    {
+                        cycleBehavior();
+                        //return new CartIntersectionCheckResult(false, false);
+                        return false;
+                    }
+
+                    if (otherTrack != null)
+                    {
+                        OnTrack.CartsOnTrack.Remove(this);
+                        OnTrack = otherTrack;
+                        OnTrack.CartsOnTrack.Add(this);
+                    }
+                    CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
+                        new Coord(Coordinates.X, Coordinates.Y)));
+                    CurrentDirection = newDirection;
                     cycleBehavior();
+                    needToCheckQuadrant = true;
+                    //return new CartIntersectionCheckResult(true, false);
+                    return true;
+                }
+                catch (InvalidOperationException e)
+                {
+                    Console.WriteLine($"Intersection belongs to single track (it must overlay itself at some point. Returning false");
+                    //return new CartIntersectionCheckResult(true, true);
                     return false;
                 }
-
-                OnTrack.CartsOnTrack.Remove(this);
-                OnTrack = otherTrack;
-                OnTrack.CartsOnTrack.Add(this);
-                CurrentRailNode = OnTrack.Rails.Find(new Rail(null, '*',
-                    new Coord(Coordinates.X, Coordinates.Y)));
-                CurrentDirection = newDirection;
-                cycleBehavior();
-                needToCheckQuadrant = true;
-                return true;
+           
             }
 
+            //return new CartIntersectionCheckResult(false, false);
             return false;
         }
 
