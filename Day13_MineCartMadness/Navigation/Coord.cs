@@ -1,5 +1,5 @@
 ﻿using System;
-using Console = Colorful.Console;
+
 namespace Day13_MineCartMadness.Navigation
 {
     public struct Coord
@@ -35,7 +35,7 @@ namespace Day13_MineCartMadness.Navigation
         public override bool Equals(object obj)
         {
             var otherCoord = (Coord) obj;
-            return (otherCoord.X == X && otherCoord.Y == Y);
+            return otherCoord.X == X && otherCoord.Y == Y;
         }
     }
 }

@@ -1,21 +1,21 @@
-﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Xml.XPath;
+using Colorful;
 using Day13_MineCartMadness.Carts;
 using Day13_MineCartMadness.Navigation;
 using Day13_MineCartMadness.Rails;
 using Day13_MineCartMadness.Tracks;
-using Console = Colorful.Console;
 
 namespace Day13_MineCartMadness
 {
     public class TrackGrid
     {
+        private int dumpConsoleLeft = -1;
+        private int dumpConsoleTop = -1;
+
         public TrackGrid(string inputPath)
         {
             Tracks = new List<Track>();
@@ -30,8 +30,6 @@ namespace Day13_MineCartMadness
         public int MaxX { get; set; }
         public int MaxY { get; set; }
 
-        private int dumpConsoleLeft = -1;
-        private int dumpConsoleTop = -1;
         public void DumpGrid()
         {
             var consoleLeftTemp = -1;
@@ -62,18 +60,16 @@ namespace Day13_MineCartMadness
                 for (var y = 0; y < dumpGrid[x].Length; y++)
                 {
                     var output = dumpGrid[x][y];
-                    if(output.IsCart())
+                    if (output.IsCart())
                         Console.Write(output, Color.Green);
                     else
                         Console.Write(dumpGrid[x][y]);
                 }
+
                 Console.WriteLine();
             }
 
-            if (consoleLeftTemp != -1)
-            {
-                Console.SetCursorPosition(consoleLeftTemp, consoleTopTemp);
-            }
+            if (consoleLeftTemp != -1) Console.SetCursorPosition(consoleLeftTemp, consoleTopTemp);
         }
 
         private void initGrid(string path)
@@ -89,70 +85,40 @@ namespace Day13_MineCartMadness
 
         private void DumpCarts()
         {
-            foreach(var c in AllCarts.GroupBy(x => x.Coordinates.X).OrderBy(x => x.Key))
-                foreach(var ca in c.OrderBy(x=>x.Coordinates.Y))
-                    ca.WhereAmI();
+            foreach (var c in AllCarts.GroupBy(x => x.Coordinates.X).OrderBy(x => x.Key))
+            foreach (var ca in c.OrderBy(x => x.Coordinates.Y))
+                ca.WhereAmI();
         }
+
         public void StartMoving(int delay = 0, bool dumpGrid = false)
         {
             var tickCount = 0;
-            var rootCoord = new Coord(0, 0);
-            
+
             while (true)
             {
                 var cartsToRemove = new List<Cart>();
-                var cartsByRow = AllCarts.GroupBy(x => x.Coordinates.X).OrderBy(x=>x.Key);
+                var cartsByRow = AllCarts.GroupBy(x => x.Coordinates.X).OrderBy(x => x.Key);
                 foreach (var g in cartsByRow)
+                foreach (var c in g.OrderBy(x => x.Coordinates.Y))
                 {
-                    foreach (var c in g.OrderBy(x=>x.Coordinates.Y))
-                    {
-                        if (cartsToRemove.Contains(c))
-                            continue;
-                        var result = c.Move(IntersectionMap);
-                        if (!result.Deleted && !result.Success)
-                            throw new InvalidOperationException("This should never happen");
-                        //if (result.Deleted)
-                        //{
-                        //    Console.WriteLine($"{result.DeletedCartA.CurrentDirection} crashed into {result.DeletedCartB.CurrentDirection} at {result.DeletedCartA.Coordinates.Y}, {result.DeletedCartA.Coordinates.X} on tick {tickCount+1}. {AllCarts.Count-2} carts left.");
-                        //    result.DeletedCartA.Destroy();
-                        //    result.DeletedCartB.Destroy();
-                            
-                        //    cartsToRemove.Add(result.DeletedCartA);
-                        //    cartsToRemove.Add(result.DeletedCartB);
-                        //}
+                    if (cartsToRemove.Contains(c))
+                        continue;
+                    c.Move(IntersectionMap);
 
-                        var collidingCarts = AllCarts.Where(x => x.Coordinates.Equals(c.Coordinates)).ToList();
-                        if (collidingCarts.Count() > 1)
-                        {
-                            Console.WriteLine($"{collidingCarts[0].CurrentDirection} " +
-                                              $"crashed into {collidingCarts[1].CurrentDirection} " +
-                                              $"at {collidingCarts[0].Coordinates.Y}, {collidingCarts[0].Coordinates.X} " +
-                                              $"on tick {tickCount + 1}. {AllCarts.Count - 2} carts left.");
-                            cartsToRemove.AddRange(collidingCarts);
-                        }
+                    var collidingCarts = AllCarts.Where(x => x.Coordinates.Equals(c.Coordinates)).ToList();
+                    if (collidingCarts.Count() > 1)
+                    {
+                        Console.WriteLine($"{collidingCarts[0].CurrentDirection} " +
+                                          $"crashed into {collidingCarts[1].CurrentDirection} " +
+                                          $"at {collidingCarts[0].Coordinates.Y}, {collidingCarts[0].Coordinates.X} " +
+                                          $"on tick {tickCount + 1}. {AllCarts.Count - 2} carts left.");
+                        cartsToRemove.AddRange(collidingCarts);
                     }
                 }
-                //foreach (var c in AllCarts.OrderBy(x => x.Coordinates.DistanceFrom(rootCoord)))
-                //{
-                //    if (cartsToRemove.Contains(c))
-                //        continue;
-                //    var result = c.Move(IntersectionMap);
-                //    if(!result.Deleted && !result.Success)
-                //        throw new InvalidOperationException("This should never happen");
-                //    if (result.Deleted)
-                //    {
-                //        result.DeletedCartA.Destroy();
-                //        result.DeletedCartB.Destroy();
-                //        cartsToRemove.Add(result.DeletedCartA);
-                //        cartsToRemove.Add(result.DeletedCartB);
-                //    }
-                //}
 
                 foreach (var cartToRemove in cartsToRemove)
                     AllCarts.Remove(cartToRemove);
-                //foreach(var t in Tracks)
-                //foreach (var c in t.CartsOnTrack)
-                //    c.Move(IntersectionMap);
+
                 foreach (var t in Tracks)
                 {
                     t.CartsOnTrack.Clear();
@@ -160,7 +126,7 @@ namespace Day13_MineCartMadness
                     t.CartsOnTrack.AddRange(newCarts);
                 }
 
-                if(dumpGrid)
+                if (dumpGrid)
                     DumpGrid();
                 foreach (var c in AllCarts)
                     c.ResetMovement();
@@ -173,13 +139,9 @@ namespace Day13_MineCartMadness
             }
 
             if (AllCarts.Count == 0)
-            {
                 Console.WriteLine("No Carts left! Finished Moving!");
-            }
             else
-            {
                 Console.WriteLine($"{AllCarts[0].Coordinates.Y}, {AllCarts[0].Coordinates.X}");
-            }
         }
 
         private void initTracks(char[][] grid)
@@ -263,7 +225,6 @@ namespace Day13_MineCartMadness
                             case Direction.Up:
                                 currentDirection = Direction.Left;
                                 nextY = nextY - 1;
-                                Console.WriteLine("At bottom switch");
                                 break;
                         }
                     else if (nextRail == '/')
