@@ -11,14 +11,14 @@ namespace Day14_ChocolateCharts
 {
     public class Elf
     {
-        public Guid RecipeId { get; set; }
+        public int recipeScore { get; set; }
         public Guid Id { get; set; }
         public int CurrIndex { get; set; }
-        public Elf(Guid recipeId)
+        public Elf(int recipeScore)
         {
-            RecipeId = recipeId;
             Id = Guid.NewGuid();
             CurrIndex = -1;
+            this.recipeScore = recipeScore;
         }
 
         public override int GetHashCode()
@@ -40,33 +40,31 @@ namespace Day14_ChocolateCharts
 
     public class ChocolateChart
     {
-        public List<Recipe> Recipes { get; set; }
-        public Dictionary<Elf, Recipe> ElfDict { get; set; }
+        public List<int> Recipes { get; set; }
+        public Dictionary<Elf, int> ElfDict { get; set; }
         public List<Elf> AllElves { get; set; }
         public int TotalRecipes { get; set; }
         public ChocolateChart()
         {
-            Recipes = new List<Recipe>();
-            ElfDict = new Dictionary<Elf, Recipe>();
+            Recipes = new List<int>();
+            ElfDict = new Dictionary<Elf, int>();
             AllElves = new List<Elf>();
         }
 
         public void AddRecipe(int score)
         {
-            var rec = new Recipe(score);
-            Recipes.Add(rec);
+            Recipes.Add(score);
             TotalRecipes++;
-            var elf = new Elf(rec.Id);
+            var elf = new Elf(score);
             elf.CurrIndex = Recipes.Count - 1;
-            ElfDict[elf] = rec;
+            ElfDict[elf] = score;
             AllElves.Add(elf);
         }
 
         public void AddRecipe(Elf elf, int score)
         {
-            var rec = new Recipe(score);
-            Recipes.Add(rec);
-            ElfDict[elf] = rec;
+            Recipes.Add(score);
+            ElfDict[elf] = score;
             AllElves.Add(elf);
         }
 
@@ -75,13 +73,13 @@ namespace Day14_ChocolateCharts
             var runningTotal = 0;
             foreach (var elf in AllElves)
             {
-                runningTotal += ElfDict[elf].Score;
+                runningTotal += ElfDict[elf];
             }
 
             var ret = 0;
             foreach (var i in runningTotal.ToString().AsNumbers())
             {
-                Recipes.Add(new Recipe(i));
+                Recipes.Add(i);
                 ret++;
                 TotalRecipes++;
             }
@@ -89,7 +87,7 @@ namespace Day14_ChocolateCharts
             foreach (var e in AllElves)
             {
                 var currRecipe = ElfDict[e];
-                var distanceToMove = currRecipe.Score + 1;
+                var distanceToMove = currRecipe + 1;
                 var newRecipeIndex = moveForward(distanceToMove, e);
                 e.CurrIndex = newRecipeIndex;
                 ElfDict[e] = Recipes[e.CurrIndex];
@@ -106,13 +104,13 @@ namespace Day14_ChocolateCharts
             var runningTotal = 0;
             foreach (var elf in AllElves)
             {
-                runningTotal += ElfDict[elf].Score;
+                runningTotal += ElfDict[elf];
             }
 
 
             for (int i = 0; i < runningTotal.Count(); i++)
             {
-                Recipes.Add(new Recipe(runningTotal.DigitAt(i + 1)));
+                Recipes.Add(runningTotal.DigitAt(i + 1));
                 TotalRecipes++;
             }
             //foreach (var i in runningTotal.ToString().AsNumbers())
@@ -125,7 +123,7 @@ namespace Day14_ChocolateCharts
             foreach (var e in AllElves)
             {
                 var currRecipe = ElfDict[e];
-                var distanceToMove = currRecipe.Score + 1;
+                var distanceToMove = currRecipe + 1;
                 var newRecipeIndex = moveForward(distanceToMove, e);
                 e.CurrIndex = newRecipeIndex;
                 ElfDict[e] = Recipes[e.CurrIndex];
@@ -136,34 +134,35 @@ namespace Day14_ChocolateCharts
             if (counter > TotalRecipes)
                 return false;
 
-            
+            if (TotalRecipes >= 20280196)
+                Console.WriteLine();
+
             for (int i = TotalRecipes - (counter+4); i < TotalRecipes; i++)
             {
+                var result = true;
                 if (i < 0)
                     return false;
                 for (int j = 0; j < input.Length; j++)
                 {
                     if (i + j > TotalRecipes - 1)
                         return false;
-                    processingRecipes[j] = Recipes[i + j].Score;
+                    processingRecipes[j] = Recipes[i + j];
                 }
 
                 for (int k = 0; k < input.Length; k++)
                 {
                     if (processingRecipes[k] != input[k].CharToInt())
-                        return false;
-                    //if (processingRecipes[k] != int.Parse(input[k].ToString()))
-                    //    return false;
+                    {
+                        result = false;
+                        break;
+                    }
                 }
-                Console.WriteLine($"{input} found after {i} recipes.");
-                return true;
-                //if (string.Join("", processingRecipes) == input)
-                //{
-                //    Console.WriteLine($"{input} found after {i} recipes.");
-                //    return true;
-
-
-                //}
+                
+                if (result == true)
+                {
+                    Console.WriteLine($"{input} found after {i} recipes. | {string.Join("", Recipes.Skip(i).Take(counter).Select(x => x))}");
+                    return result;
+                }
             }
             //for (int i = 0; i < 4; i++)
             //{
@@ -190,11 +189,11 @@ namespace Day14_ChocolateCharts
             for (int i = 0; i < Recipes.Count; i++)
             {
                 if(i == elf1Index)
-                    Console.Write($"({Recipes[i].Score}) ");
+                    Console.Write($"({Recipes[i]}) ");
                 else if(i == elf2Index)
-                    Console.Write($"[{Recipes[i].Score}] ");
+                    Console.Write($"[{Recipes[i]}] ");
                 else
-                    Console.Write($"{Recipes[i].Score} ");
+                    Console.Write($"{Recipes[i]} ");
             }
 
             Console.WriteLine();
@@ -236,7 +235,7 @@ namespace Day14_ChocolateCharts
             long runningTotal = 0;
             foreach (var r in Recipes.Skip(index).Take(numRecipes))
             {
-                runningTotal = 10 * runningTotal + r.Score;
+                runningTotal = 10 * runningTotal + r;
             }
 
             return runningTotal;

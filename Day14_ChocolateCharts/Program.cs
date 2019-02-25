@@ -45,7 +45,7 @@ namespace Day14_ChocolateCharts
             chart.AddRecipe(3);
             chart.AddRecipe(7);
             chart.Dump();
-            var puzzleInput = "594140";
+            var puzzleInput = "293801";
 
             var foundResult = false;
             while (!foundResult)
