@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day14_ChocolateCharts
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //Part1();
             Part2();
@@ -31,7 +27,6 @@ namespace Day14_ChocolateCharts
                 currRecipeCount += chart.Combine();
                 if (currRecipeCount < 100)
                     chart.Dump();
-
             }
 
             Console.WriteLine(chart.ScoreAfter(puzzleInput, 10));
@@ -48,20 +43,7 @@ namespace Day14_ChocolateCharts
             var puzzleInput = "293801";
 
             var foundResult = false;
-            while (!foundResult)
-            {
-                foundResult = chart.CombinePt2(puzzleInput);
-            }
-            //var currRecipeCount = chart.Recipes.Count;
-            //while (currRecipeCount < puzzleInput + 10)
-            //{
-            //    currRecipeCount += chart.Combine();
-            //    if (currRecipeCount < 100)
-            //        chart.Dump();
-
-            //}
-
-            //Console.WriteLine(chart.ScoreAfter(puzzleInput, 10));
+            while (!foundResult) foundResult = chart.CombinePt2(puzzleInput);
 
             Console.ReadLine();
         }
