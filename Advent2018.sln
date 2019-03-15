@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day13_MineCartMadness", "Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day14_ChocolateCharts", "Day14_ChocolateCharts\Day14_ChocolateCharts.csproj", "{E0BAAE91-C118-4E4A-AAFF-B631B38C1788}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day15_BeverageBandits", "Day15_BeverageBandits\Day15_BeverageBandits.csproj", "{E6773E9C-BA14-41B3-A1F9-90DF7A7DB616}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advent2018.Common", "Advent2018.Common\Advent2018.Common.csproj", "{2E5BFFC8-103D-4AC6-A501-D9F3CCB20A1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +97,14 @@ Global
 		{E0BAAE91-C118-4E4A-AAFF-B631B38C1788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0BAAE91-C118-4E4A-AAFF-B631B38C1788}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0BAAE91-C118-4E4A-AAFF-B631B38C1788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6773E9C-BA14-41B3-A1F9-90DF7A7DB616}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6773E9C-BA14-41B3-A1F9-90DF7A7DB616}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6773E9C-BA14-41B3-A1F9-90DF7A7DB616}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6773E9C-BA14-41B3-A1F9-90DF7A7DB616}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E5BFFC8-103D-4AC6-A501-D9F3CCB20A1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E5BFFC8-103D-4AC6-A501-D9F3CCB20A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E5BFFC8-103D-4AC6-A501-D9F3CCB20A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E5BFFC8-103D-4AC6-A501-D9F3CCB20A1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
